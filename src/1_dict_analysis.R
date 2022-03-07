@@ -1,22 +1,13 @@
 
-library(rtweet)
-library(ggplot2)
-library(dplyr)
-library(readtext)
-library(quanteda)
-library(httpuv)
-library(maps)
-library(leaflet)
-library(lattice)
-library(cowplot)
-library(gridExtra)
-library(plyr)
-library(syuzhet)
-library(wordcloud)
-library(readr)
 ###################################################
+# Working directory from .Rproj
+here::here("")
+
+# Source setup scripts:-------------------------------------------------------------------
+source(here::here("src","00_setup.R"))
+
 #import tweets
-tw <- read_delim("C:/Users/Riccardo/Desktop/Master Thesis/tweet_510901_delim.csv",
+tw <- read_delim("data/tweet_510901_delim.csv",
                  delim = ";",
                  escape_double = FALSE,
                  trim_ws = TRUE)
