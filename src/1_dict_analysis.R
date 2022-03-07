@@ -43,7 +43,7 @@ topfeatures(tw_dfm, 5)
 
 ##############################################################
 #import dictionaries file
-populism_dictionaries <- read_delim("C:/Users/Riccardo/Desktop/Master Thesis/populism_dictionaries_delim.csv",
+populism_dictionaries <- read_delim("data/populism_dictionaries_delim.csv",
                                     delim = ";",
                                     escape_double = FALSE,
                                     trim_ws = TRUE)
@@ -77,34 +77,34 @@ Decadri_dict <- dictionary(Decadri)
 ####################################################
 # create my own dictionary
 
-Roodujin_dict <- dictionary(list(populism = c("antidemocratic", "casta", "consens", "corrot", "disonest", "elit", "establishment",
-                                        "ingann", "mentir", "menzogn", "partitocrazia", "propagand", "scandal", "tradim",
-                                        "tradir", "tradit", "vergogn", "verita")))
+Roodujin_dict <- dictionary(list(populism = c("antidemocratic*", "casta", "consens*", "corrot*", "disonest*", "elit*", "establishment",
+                                        "ingann*", "mentir*", "menzogn*", "partitocrazia", "propagand*", "scandal*", "tradim*",
+                                        "tradir*", "tradit*", "vergogn*", "verita")))
 
-Decadri_Boussalis_dict <- dictionary(list( people = c("abitant", "cittadin","consumator","contribuent","elettor","gente","popol",
-                                                      "popolazion", "uomo della strada","comun mortal","italiano medio", "uomo medio"),
-                                           Common_Will = c("senso comune","buon senso","plebescitar","referendum","plebiscito",
+Decadri_Boussalis_dict <- dictionary(list( people = c("abitant*", "cittadin*","consumator*","contribuent*","elettor*","gente","popol*",
+                                                      "popolazion*", "uomo della strada","comun* mortal*","italiano medio", "uomo medio"),
+                                           Common_Will = c("senso comune","buon senso","plebescitar*","referendum","plebiscito",
                                                            "petizione","democrazia diretta","volonta popolare","voto popolare",
                                                            "sovranita popolare","mandato popolare"),
-                                           elite = c("antidemocratic","casta","consens","corrot","disonest","elit","establishment",
-                                                     "ingann","mentir","menzogn","partitocrazia","propagand","scandal","tradim",
-                                                     "tradir","tradit","vergogn","verita","presuntuos","spocchios","spocchia",
-                                                     "puzza sotto il naso", "senso di superiorita","politicant","paternalistic",
-                                                     "pezz gross","burocrat","torre d avorio","solit partit", "vecch partit",
-                                                     "corruzione","avid","raccomandati","arrogant","attaccat all poltron",
-                                                     "assetat di potere","manipolare","nomenklatura","professoron",
-                                                     "bugie dei partiti", "falsita dei partiti","mazzett","mercanteggiamenti",
-                                                     "pseudo-partit","baron","autocratic","sistema-partito","tecnocrat",
-                                                     "altezzos","non democratic","prendere in giro","bullarsi di",
-                                                     "clientelismo","dittatur* di partito","teatro politico","banchier",
-                                                     "cosiddett giornalist"," cosiddetti media","lobbist")))
+                                           elite = c("antidemocratic*","casta","consens*","corrot*","disonest*","elit*","establishment",
+                                                     "ingann*","mentir*","menzogn*","partitocrazia","propagand*","scandal*","tradim*",
+                                                     "tradir*","tradit*","vergogn*","verita","presuntuos*","spocchios*","spocchia",
+                                                     "puzza sotto il naso", "senso di superiorita","politicant*","paternalistic*",
+                                                     "pezz* gross*","burocrat*","torre d avorio","solit* partit*", "vecch* partit*",
+                                                     "corruzione","avid*","raccomandati","arrogant*","attaccat* all* poltron*",
+                                                     "assetat* di potere","manipolare","nomenklatura","professoron*",
+                                                     "bugie dei partiti", "falsita dei partiti","mazzett*","mercanteggiamenti",
+                                                     "pseudo-partit*","baron*","autocratic*","sistema-partito","tecnocrat*",
+                                                     "altezzos*","non democratic*","prendere in giro","bullarsi di",
+                                                     "clientelismo","dittatur* di partito","teatro politico","banchier*",
+                                                     "cosiddett* giornalist*"," cosiddetti media","lobbist*")))
 summary(Decadri_Boussalis_dict)
 ###################################################
-# Made the anlysis
+# Made the anlysis on a subset
 
 recent_corpus <- corpus_subset(tw_corpus,  like > 2)
 summary(recent_corpus)
 recent_corpus
-byPresMat <- dfm(recent_corpus, dictionary = Decadri_Boussalis_dict)
+byPresMat <- dfm(recent_corpus, dictionary = Roodujin_dict)
 byPresMat
 summary(byPresMat)
