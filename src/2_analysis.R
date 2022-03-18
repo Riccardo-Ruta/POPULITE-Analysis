@@ -76,10 +76,12 @@ summary(gruppo)
 #####################################################
 tw <- read.csv("data/large_files/TweetPopulite (1).csv", 
                  sep = ";", encoding = "utf-8")#, escape_double = FALSE, trim_ws = TRUE)
-View(test)
+View(tw)
 
 a <- filter(tw, id_tweet == 166277240 )
+View(a)
 a$Tweet
+
 # 3145936
 
 col <- colnames(tw)
@@ -127,4 +129,54 @@ for (i in colnames(tw)) {
 time_format <- "%a %b %d %H:%M:%S %z %Y"
 tw$new_time <- as.POSIXct(strptime(tw$created_at, time_format, tz="GMT"), tz="GMT")
 
+##########################################################
+#18/03/2022
+# Controllo se ci sono 255 utenti con il Genere missing o 
+# se ci sono degli id_pol errati (che non corrisopndono ad utenti reali)
+# id_pol corriponde a singolo utente?
 
+# Conto distinti id_pol filtrati per Genere mancante
+print(paste("Genere",(tw %>% filter(Genere =="#N/D") %>% distinct(id_pol) %>% count())))
+
+# conto distinti id_pol filtrati per testo mancante
+print(paste("Tweet",tw %>% filter(Tweet  =="#N/D") %>% distinct(id_pol) %>% count()))
+
+## conto distinti id_pol filtrati per testo mancante e Genere mancante
+tw %>% filter(Genere =="#N/D" & Tweet !="#N/D" ) %>% distinct(id_pol) #%>% count()
+
+#conto il numero dei singoli id_pol presenti nel dataset
+#779
+# dovrebbero essere 976, essendo 779 abbiamo 197 id_pol "in più"
+tw %>% distinct(id_pol) %>% count()
+
+#Conto il numero di id_pol che hanno almeno 1 Tweet missing
+# 772
+tw %>% filter(Tweet == "#N/D") %>% distinct(id_pol) %>% count()
+
+# Conto il numero di id_pol con Genere missing e Tweet presente
+#253
+tw %>% filter(Genere == "#N/D" & Tweet != "#N/D") %>% distinct(id_pol) %>% count()
+
+
+#Conto il numero di id_pol che hanno almeno un caso in cui il Tweet non è missing
+#773
+bb %>% filter(Tweet!= "#N/D") %>% distinct(id_pol) %>% count()
+
+#Conto il numero di id_pol che hanno almeno un caso in cui il Tweet è missing
+#772
+bb %>% filter(Tweet== "#N/D") %>% distinct(id_pol) %>% count()
+
+# creo df con solo osservazioni in cui il Genere è missing
+zz <- tw %>% filter(Genere== "#N/D")
+#creo un sub df in cui ci sono solo osservazioni con Tweet missing
+zz1 <- zz %>% filter(Tweet == "#N/D")
+#creo un sub df in cui ci sono solo osservazioni con Tweet missing
+zz2 <- zz %>% filter(Tweet != "#N/D")
+
+# Conto i distinti id_pol di zz1
+#250
+zz1 %>% distinct(id_pol) %>% count()
+
+# Conto i distinti id_pol di zz2
+#253
+zz2 %>% distinct(id_pol) %>% count()
