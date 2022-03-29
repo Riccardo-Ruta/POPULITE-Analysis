@@ -99,11 +99,21 @@ for (i in colnames(tw)) {
 
 #how to select columns using pipe
 test <- tw %>% select(Genere)
-#how to filter
+
+#how to filter by observations
 test2 <- tw %>% filter(Genere=="#N/D")
 
 # Numero di utenti per cui il Gender è missing: 255
 print(paste("Genere",(tw %>% filter(Genere =="#N/D") %>% distinct(id_pol) %>% count())))
+
+# seleziono le osservazioni in cui il genere è mancante
+gender_missing <- tw %>% filter(Genere =="#N/D")
+
+# Numero di utenti per cui il Gender e il testo è missing : 250
+print(paste("Genere e Tweet missing",(tw %>% filter(Genere =="#N/D" & Tweet == "#N/D") %>% distinct(id_pol) %>% count())))
+
+# seleziono le osservazioni in cui il genere e il testo è mancante
+gen_twet_missing <- tw %>% filter(Genere =="#N/D" & Tweet == "#N/D")
 
 # Numero di utenti per cui il Gruppo Politico è missing: 385
 print(paste("GruppoPolitico", tw %>% filter(GruppoPolitico =="#N/D") %>% distinct(id_pol) %>% count()))
