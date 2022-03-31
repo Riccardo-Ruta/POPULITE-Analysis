@@ -15,26 +15,22 @@ View(tw)
 
 colnames(tw)
 
-# FILTER DATA REMOVING MISSING AND RETWEETS
-filtered <- filter(tw,  id_pol != "#N/D" &
-                     id_tw_user != "#N/D" &
-                     id_tweet != "#N/D" &
-                     Url != "#N/D" &
-                     Cognome != "#N/D" &
-                     Nome != "#N/D" &
-                     Genere!= "#N/D" &
-                     GruppoPolitico != "#N/D" &
-                     Tweet != "#N/D" &
-                     CreatoId != "#N/D" &
-                     CreatoIlCodice!= "#N/D" &
-                     !Tweet %like% "RT" )
-View(filtered)
+#set #N/D as NA
+tw_na <- na_if(tw,"#N/D")
+
+#remove NA
+filtered <- tw_na %>% na.omit()
+
+# remove Retweets
+filtered <- filter(filtered, !Tweet %like% "RT")
+
 
 #Adjust datetime
 Sys.setlocale("LC_TIME", "C")
 
 filtered$data <- as.Date(strptime(filtered$CreatoId,"%a %b %d %H:%M:%S %z %Y", tz = "CET"))
 
+View(filtered)
 
 # FILTER FRATOIANNI DATA
 frat <- filter(filtered, Cognome %like% "FRATOIANNI")
@@ -43,15 +39,30 @@ frat <- filter(filtered, Cognome %like% "FRATOIANNI")
 frat_11_28 <- filter(frat, data %like% "11-28")
 
 #Group Tweets by date
-frat_uniti <- frat %>%
+frat_daily <- frat %>%
   group_by(data) %>%
   summarise(Tweet_uniti = paste(Tweet, collapse = ","))
 
 #Add column with the count of the daily tweets  
-frat_uniti$numero_tweet <- (frat %>% group_by(data) %>% count())[2]
-count(distinct(frat$data))
+frat_daily$Tweets_num <- (frat %>% group_by(data) %>% count())[2]
+frat_daily <- as.data.frame(frat_daily)
+View(frat_daily)
 
-frat_uniti$numero_tweet <- frat %>% goup(data) %>% count()
+# Create the column for the week
+
+frat_daily$period <- frat_daily %>%
+  mutate(period = replace(data, data > "2021-07-05" & data < "2021-07-11", 1))
+
+#Group Tweets by period
+frat_daily <- frat %>%
+  group_by(period) %>%
+  summarise(Tweet_uniti = paste(Tweet, collapse = ","))
+
+
+
+
+
+
 
 
 
