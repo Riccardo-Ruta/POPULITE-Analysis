@@ -100,7 +100,9 @@ Decadri_Boussalis_dict <- dictionary(list( people = c("abitant", "cittadin","con
                                                      "cosiddett giornalist"," cosiddetti media","lobbist")))
 summary(Decadri_Boussalis_dict)
 ###################################################
-# Made the anlysis
+# Made the analysis
+
+
 
 recent_corpus <- corpus_subset(tw_corpus,  like > 2)
 summary(recent_corpus)
