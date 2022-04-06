@@ -30,6 +30,8 @@ Sys.setlocale("LC_TIME", "C")
 
 filtered$data <- as.Date(strptime(filtered$CreatoId,"%a %b %d %H:%M:%S %z %Y", tz = "CET"))
 
+typeof(filtered$data)
+
 View(filtered)
 
 # FILTER FRATOIANNI DATA
@@ -51,7 +53,13 @@ View(frat_daily)
 # Create the column for the week
 
 frat_daily$period <- frat_daily %>%
-  mutate(period = replace(data, data > "2021-07-05" & data < "2021-07-11", 1))
+  mutate(period = replace(data, data > 2021-07-05 & data < 2021-07-11, 1))
+
+# Cretae the column for the week test
+
+test <- frat %>%
+  group_by(year = year(date), week = week(date)) %>%
+  summarise_if(is.numeric, sum)
 
 #Group Tweets by period
 frat_daily <- frat %>%
