@@ -40,6 +40,7 @@ frat <- filter(filtered, Cognome %like% "FRATOIANNI")
 #Filter for a specific date 
 frat_11_28 <- filter(frat, data %like% "11-28")
 
+# GROUP BY DAY
 #Group Tweets by date
 frat_daily <- frat %>%
   group_by(data) %>%
@@ -50,22 +51,22 @@ frat_daily$Tweets_num <- (frat %>% group_by(data) %>% count())[2]
 frat_daily <- as.data.frame(frat_daily)
 View(frat_daily)
 
+# GROUP BY WEEK
 # Create the column for the week
+frat_weekly <- frat_daily %>%
+  mutate(week = cut.Date(data, breaks = "1 week", labels = FALSE))
 
-frat_daily$period <- frat_daily %>%
-  mutate(period = replace(data, data > 2021-07-05 & data < 2021-07-11, 1))
+#Group Tweets by week
+frat_weekly %>%
+  group_by(week) %>%
+  summarize(date = min(as.Date(data)), ntweets = n())
 
-# Cretae the column for the week test
+frat_weekly %>%
+  group_by(week) %>%
+  summarize(Tweet_uniti)
 
-test <- frat %>%
-  group_by(year = year(date), week = week(date)) %>%
-  summarise_if(is.numeric, sum)
 
-#Group Tweets by period
-frat_daily <- frat %>%
-  group_by(period) %>%
-  summarise(Tweet_uniti = paste(Tweet, collapse = ","))
-
+##############################
 
 
 
