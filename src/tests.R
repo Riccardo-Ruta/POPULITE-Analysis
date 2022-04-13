@@ -30,3 +30,12 @@ filtered_2 <- filter(tw,  id_pol != "#N/D" &
                        CreatoIlCodice!= "#N/D" &
                        !Tweet %like% "RT" )
 ###############################################
+# creazione colonna settimana -- non funziona
+
+frat_daily$period <- frat_daily %>%
+  mutate(period = replace(data, data > "2021-07-05" & data < "2021-07-11", 1))
+
+#Group Tweets by period -- non funziona
+frat_daily <- frat %>%
+  group_by(period) %>%
+  summarise(Tweet_uniti = paste(Tweet, collapse = ","))
