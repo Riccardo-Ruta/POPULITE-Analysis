@@ -6,14 +6,14 @@ here::here("")
 # Source setup scripts:-------------------------------------------------------------------
 source(here::here("src","00_setup.R"))
 
-A <- filter(frat_daily,Tweets_num > 5)
+# A <- filter(frat_daily,Tweets_num > 5)
 
-B <- A %>% select(data,Tweet_uniti)
+# B <- A %>% select(data,Tweet_uniti)
 
 
 
 # create the CORPUS
-tw_corpus <- corpus(B, text_field = "Tweet_uniti")
+tw_corpus <- corpus(single_politician, text_field = "Tweet_uniti")
 summary(tw_corpus)
 
 # number of documents
@@ -24,21 +24,31 @@ head(docvars(tw_corpus))
 tw_corpus
 
 
+
 # tokenize
 
+# tweet_dfm <- tokens(tw_corpus, remove_punct = TRUE,remove_numbers = T, remove_url = T) %>%
+#   dfm(remove = c(stopwords("it"), ("+"), ("<"), (">"), ("00*"), (":"),(","),("?"),("."),("�"),("rt"),("pi")),
+#       tolower = TRUE, stem = TRUE)
+
 tweet_dfm <- tokens(tw_corpus, remove_punct = TRUE,remove_numbers = T, remove_url = T) %>%
-  dfm(remove = c(stopwords("it"), ("+"), ("<"), (">"), ("00*"), (":"),(","),("?"),("."),("�"),("rt"),("pi")),
-      tolower = TRUE, stem = TRUE)
+  dfm(remove = stopwords("it"), tolower = TRUE, stem = TRUE)
+
+
+
+
 head(tweet_dfm)
 
-#convert tokenized tweets in dfm
-tweet_dfm <-dfm_trim(tweet_dfm, min_docfreq = 2, verbose=TRUE)
-topfeatures(tweet_dfm, 5)
-#convert tokenized tweets in dfm 2
-tw_dfm <- dfm(tw_corpus,remove = c(stopwords("it"), ("+"), ("<"), (">"), ("00*"), (":"),(","),("?"),("."),("�")))
-tw_dfm
+#Dfm trimming:only words that occur in the top 20% of the distribution and in less than 30% of documents very frequent but document specific words
 
-topfeatures(tw_dfm, 5)
+system.time(tweet_dfm <- dfm_trim(tweet_dfm, min_termfreq = 0.80, termfreq_type = "quantile",
+                            
+                            max_docfreq = 0.3, docfreq_type = "prop"))
+
+head(tweet_dfm)
+
+topfeatures(tweet_dfm, 5)
+
 
 ####################################################
 # create my own dictionary
@@ -67,9 +77,8 @@ Decadri_Boussalis_dict <- dictionary(list( people = c("abitant*", "cittadin*","c
 summary(Decadri_Boussalis_dict)
 ###################################################
 
-test1 <- dfm(tw_dfm, dictionary = Decadri_Boussalis_dict)
+test1 <- dfm(tweet_dfm, dictionary = Decadri_Boussalis_dict)
 test1
-summary(byPresMat)
 
 ##########################
 
