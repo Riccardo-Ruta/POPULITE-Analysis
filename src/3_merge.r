@@ -11,7 +11,7 @@ source(here::here("src","00_setup.R"))
 # import the data
 #tw <- read.csv("data/large_files/TweetPopulite (1).csv", 
 #               sep = ";", encoding = "utf-8")#, escape_double = FALSE, trim_ws = TRUE)
-tw <- read.csv("data/large_files/estrazione_tweet2020-2022 (1).csv",
+tw <- read.csv("data/large_files/estrazione_tweet2020-2022_modified.csv",
                sep = ";", encoding = "utf-8")
 
 

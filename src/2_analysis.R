@@ -142,8 +142,8 @@ tw$new_time <- as.POSIXct(strptime(tw$created_at, time_format, tz="GMT"), tz="GM
 ##########################################################
 #18/03/2022
 # Controllo se ci sono 255 utenti con il Genere missing o 
-# se ci sono degli id_pol errati (che non corrisopndono ad utenti reali)
-# id_pol corriponde a singolo utente?
+# se ci sono degli id_pol errati (che non corrispOndono ad utenti reali)
+# id_pol corrisponde a singolo utente?
 
 # Conto distinti id_pol filtrati per Genere mancante
 print(paste("Genere",(tw %>% filter(Genere =="#N/D") %>% distinct(id_pol) %>% count())))
