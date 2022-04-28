@@ -1,4 +1,5 @@
-want <- c("here","quanteda","readr","quanteda.textplots","dplyr", "tidyverse", "rio")  # list of required packages
+want <- c("here","quanteda","readr","quanteda.textplots",
+          "dplyr", "tidyverse", "rio", "readtext")  # list of required packages
 have <- want %in% rownames(installed.packages())
 if ( any(!have) ) { install.packages( want[!have] ) }
 rm(have, want)
@@ -13,3 +14,4 @@ library("dplyr")
 library(tidyverse)
 library(rio)
 library(data.table)
+library(readtext)
