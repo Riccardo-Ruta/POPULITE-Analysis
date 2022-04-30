@@ -108,6 +108,7 @@ Decadri_Boussalis_dict <- dictionary(list( people = c("abitant*", "cittadin*","c
                                                      "clientelismo","dittatur* di partito","teatro politico","banchier*",
                                                      "cosiddett* giornalist*"," cosiddetti media","lobbist*")))
 summary(Decadri_Boussalis_dict)
+print(Decadri_Boussalis_dict)
 ###################################################
 # Made the anlysis on a subset
 

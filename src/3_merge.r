@@ -10,7 +10,8 @@ source(here::here("src","00_setup.R"))
 
 # import the data
 #tw <- read.csv("data/large_files/TweetPopulite (1).csv", 
-#               sep = ";", encoding = "utf-8")#, escape_double = FALSE, trim_ws = TRUE)
+ #              sep = ";", encoding = "utf-8")#, escape_double = FALSE, trim_ws = TRUE)
+
 tw <- read.csv("data/large_files/estrazione_tweet2020-2022.csv",
                sep = ";", encoding = "utf-8")
 
@@ -33,6 +34,7 @@ filtered <- filter(filtered, !tweet_text %like% "RT")
 Sys.setlocale("LC_TIME", "C")
 
 #filtered$data <- as.Date(strptime(filtered$CreatoId,"%a %b %d %H:%M:%S %z %Y", tz = "CET"))
+
 filtered$data <- as.Date(strptime(filtered$creato_il,"%a %b %d %H:%M:%S %z %Y", tz = "CET"))
 
 typeof(filtered$data)
