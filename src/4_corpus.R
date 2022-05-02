@@ -28,12 +28,14 @@ colnames(filtered)
 dataset <- filtered %>% select(Cognome, Nome, Genere, GruppoPolitico, Tweet, data )
 colnames(dataset)
 
+
 #############################################
 # CORPUS
 # Create the corpus
 corpus <- corpus(dataset, text = "Tweet")
 ndoc(corpus)
 summary(corpus)
+head(textstat_summary(corpus))
 
 # Inspect the document level variables
 sort(unique(corpus$Cognome))
@@ -56,19 +58,23 @@ doc.tokens <- tokens(doc.tokens, remove_punct = TRUE, remove_numbers = TRUE)
   
 doc.tokens <- tokens_select(doc.tokens, stopwords('italian'), selection='remove')
 
-my_word <- read.csv("data/it_stopwords_new_list.csv", encoding = "utf-8")
+my_word <- read_csv("data/it_stopwords_new_list.csv", show_col_types = FALSE) #(read.csv with utf-8 fails importing accented words )
+
+my_list <- as.list(my_word)
+
+doc.tokens <- tokens_select(doc.tokens, my_list, selection='remove')
 
 doc.tokens <- tokens_remove(doc.tokens, my_word)
 
 # search keyword in context
-View(kwic(doc.tokens, "italiani", window = 3))
+View(kwic(doc.tokens, "fa", window = 3))
 
 #######################################
 # DFM
 # Bag of word approach, non positional
 
-doc.dfm <- dfm(doc.tokens)
-doc.dfm
+doc.dfm <- dfm(doc.tokens, remove = c(stopwords("italian"),my_list), tolower = T, remove_punct = T, remove_numbers = T)
+str(doc.dfm)
 
 # top features
 topfeatures(doc.dfm, 10)
@@ -82,6 +88,17 @@ doc.dfm
 
 # top features after trimming
 topfeatures(doc.dfm, 10)
+
+
+# Plot the frequency of the top features in a text using the topfeatures.
+features_dfm <- textstat_frequency(doc.dfm, n = 20)
+features_dfm
+str(features_dfm)
+
+# plot with GGPLOT
+ggplot(features_dfm, aes(x = feature, y = frequency)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 # Create DFM grouping by date
 dfm_by_date <- dfm_group(doc.dfm, groups= data)
