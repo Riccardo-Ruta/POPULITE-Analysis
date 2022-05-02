@@ -52,32 +52,31 @@ Meloni
 # TOKENS
 
 # Split the corpus into single tokens (remain positional)
-doc.tokens <- tokens(corpus)
-
-doc.tokens <- tokens(doc.tokens, remove_punct = TRUE, remove_numbers = TRUE)
+doc.tokens <- tokens(corpus, remove_punct = TRUE, remove_numbers = TRUE)
   
 doc.tokens <- tokens_select(doc.tokens, stopwords('italian'), selection='remove')
 
-my_word <- read_csv("data/it_stopwords_new_list.csv", show_col_types = FALSE) #(read.csv with utf-8 fails importing accented words )
+my_word <- read_csv("data/it_stopwords_new_list.csv", show_col_types = FALSE) #read.csv with utf-8 fails importing accented words
 
 my_list <- as.list(my_word)
 
-doc.tokens <- tokens_select(doc.tokens, my_list, selection='remove')
+stopwords_removed <- tokens_select(doc.tokens, my_word, selection='keep')
+
+doc.tokens1 <- tokens_select(doc.tokens, my_list, selection='remove')
 
 doc.tokens <- tokens_remove(doc.tokens, my_word)
 
 # search keyword in context
-View(kwic(doc.tokens, "fa", window = 3))
+kwic(doc.tokens, "fa", window = 3)
 
 #######################################
 # DFM
 # Bag of word approach, non positional
 
-doc.dfm <- dfm(doc.tokens, remove = c(stopwords("italian"),my_list), tolower = T, remove_punct = T, remove_numbers = T)
-str(doc.dfm)
-
+# Create dfm
+doc.dfm <- dfm(doc.tokens,tolower = T)
 # top features
-topfeatures(doc.dfm, 10)
+topfeatures(doc.dfm, 20)
 
 #Dfm trimming:only words that occur in the top 20% of the distribution
 #             and in less than 30% of documents
