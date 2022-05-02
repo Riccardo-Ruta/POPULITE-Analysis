@@ -51,6 +51,8 @@ volume <- ggplot(daily, aes(x=data, y=num_tweets)) + geom_line() +
 
 grid.arrange(sentiment , volume , ncol = 1)
 
+###################################################
+
 # try usinng syuzhet
 nrc_data <- get_nrc_sentiment(politician_dataset$Tweet, language="italian")
 str(nrc_data)
