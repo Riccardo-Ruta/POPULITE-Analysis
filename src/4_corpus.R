@@ -10,41 +10,51 @@ source(here::here("src","00_setup.R"))
 #-------------------------------------------------------------------
 
 # import the data
-tw <- read.csv("data/large_files/TweetPopulite (1).csv", 
-               sep = ";", encoding = "utf-8")
+#tw <- read.csv("data/large_files/politicians_all_final_tweets.csv", 
+ #              sep = ",", encoding = "utf-8")
+
+tw <-  read_csv("data/large_files/politicians_all_final_tweets.csv") # with this extraction read_csv works better with accent
+colnames(tw)
 
 # set #N/D as NA
-tw_na <- na_if(tw,"#N/D")
-# Remove NA
-filtered <- tw_na %>% na.omit()
-# Remove Retweets
-filtered <- filter(filtered, !Tweet %like% "RT")
-# Adjust datetime
+tw <- na_if(tw,"#N/D")
+tw <- na_if(tw_na, "")
+
+# Adjust datetime (Run code in this order!)
 Sys.setlocale("LC_TIME", "C")
-filtered$data <- as.Date(strptime(filtered$CreatoId,"%a %b %d %H:%M:%S %z %Y", tz = "CET"))
-# Check the varibles 
-colnames(filtered)
+tw$date <- as.Date(strptime(tw$creato_il,"%a %b %d %H:%M:%S %z %Y", tz = "CET"))
+tw$date <- na.replace(tw$date, as.Date(tw$creato_il))
+
+# check dates
+check_dates <- tw %>% select(creato_il,date)
+
+# Remove NA
+#filtered <- tw %>% na.omit()
+
+# Check the variables 
+colnames(tw)
+
 # Select variables for the analysis
-dataset <- filtered %>% select(Cognome, Nome, Genere, GruppoPolitico, Tweet, data )
+dataset <- tw %>% select(nome, tweet_testo, genere, party_id,chamber,status, date )
 colnames(dataset)
 
 
 #############################################
 # CORPUS
 # Create the corpus
-corpus <- corpus(dataset, text = "Tweet")
+corpus <- corpus(dataset, text = "tweet_testo")
 ndoc(corpus)
 summary(corpus)
 head(textstat_summary(corpus))
 
 # Inspect the document level variables
-sort(unique(corpus$Cognome))
-unique(corpus$data)
-unique(corpus$GruppoPolitico)
-unique(corpus$Genere)
+sort(unique(corpus$nome))
+unique(corpus$date)
+unique(corpus$party_id)
+unique(corpus$genere)
 
 # subset corpus for signle politician
-Meloni <- corpus_subset(corpus, Cognome == "MELONI")
+Meloni <- corpus_subset(corpus, nome %like% "MELONI")
 ndoc(Meloni)
 Meloni
 
@@ -52,21 +62,15 @@ Meloni
 # TOKENS
 
 # Split the corpus into single tokens (remain positional)
-doc.tokens <- tokens(corpus, remove_punct = TRUE, remove_numbers = TRUE)
-  
-doc.tokens <- tokens_select(doc.tokens, stopwords('italian'), selection='remove')
+system.time(doc.tokens <- tokens(corpus, remove_punct = TRUE, remove_numbers = TRUE, remove_symbols = TRUE, remove_url = TRUE))
 
-my_word <- read_csv("data/it_stopwords_new_list.csv", show_col_types = FALSE) #read.csv with utf-8 fails importing accented words
+my_word <- as.list(read_csv("data/it_stopwords_new_list.csv", show_col_types = FALSE)) #read.csv with utf-8 fails importing accented words
 
-my_list <- as.list(my_word)
+my_list <- c("🇮🇹", my_word$stopwords, stopwords('italian'))
 
-stopwords_removed <- tokens_select(doc.tokens, my_word, selection='keep')
+doc.tokens <- tokens_select(doc.tokens, my_list, selection='remove')
 
-doc.tokens1 <- tokens_select(doc.tokens, my_list, selection='remove')
-
-doc.tokens <- tokens_remove(doc.tokens, my_word)
-
-# search keyword in context
+# search some stopwords for check
 kwic(doc.tokens, "fa", window = 3)
 
 #######################################
@@ -75,6 +79,7 @@ kwic(doc.tokens, "fa", window = 3)
 
 # Create dfm
 doc.dfm <- dfm(doc.tokens,tolower = T)
+
 # top features
 topfeatures(doc.dfm, 20)
 
@@ -86,11 +91,11 @@ doc.dfm <- dfm_trim(doc.dfm, min_termfreq = 0.80, termfreq_type = "quantile",
 doc.dfm
 
 # top features after trimming
-topfeatures(doc.dfm, 10)
+topfeatures(doc.dfm, 20)
 
 
 # Plot the frequency of the top features in a text using the topfeatures.
-features_dfm <- textstat_frequency(doc.dfm, n = 20)
+system.time(features_dfm <- textstat_frequency(doc.dfm, n = 20))
 features_dfm
 str(features_dfm)
 
@@ -100,11 +105,11 @@ ggplot(features_dfm, aes(x = feature, y = frequency)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 # Create DFM grouping by date
-dfm_by_date <- dfm_group(doc.dfm, groups= data)
-dfm_grouped
+dfm_by_date <- dfm_group(doc.dfm, groups= date)
+dfm_by_date
 
-# Create DFM grouping by Cognome
-dfm_by_cognome <- dfm_group(doc.dfm, groups= Cognome)
-dfm_by_cognome
+# Create DFM grouping by Nome
+dfm_by_mome <- dfm_group(doc.dfm, groups= nome)
+dfm_by_nome
 
 

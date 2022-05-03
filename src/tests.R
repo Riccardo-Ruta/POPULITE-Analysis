@@ -39,3 +39,40 @@ frat_daily$period <- frat_daily %>%
 frat_daily <- frat %>%
   group_by(period) %>%
   summarise(Tweet_uniti = paste(Tweet, collapse = ","))
+#################################################
+# 03/05/2022
+
+# CREATE DFM FOR SINGLE POLITICIAN using english sentyment dict
+politician_dfm <- dfm(politician,
+                      dictionary = data_dictionary_LSD2015[1:2])
+head(politician_dfm, 10)
+summary(politician_dfm)
+
+# RUN SENTIMENT ANALYSIS (THIS IS IN ENGLISH !!!!!)
+sentiment <- politician_dfm
+
+Dictionary <- as.data.frame(sentiment)
+str(Dictionary )
+Dictionary$Sentiment <- Dictionary$posit-Dictionary$negat
+str(Dictionary )
+summary(Dictionary$Sentiment)
+
+# Let's suppose we want to plot the sentiment vs. the volume
+politician_dataset$Sentiment <- Dictionary$Sentiment # add the sentiment values back to the data frame you got via Twitter
+colnames(politician_dataset)
+
+# get daily summaries of the results (average sentiments and number of tweets)
+daily <- ddply(politician_dataset, ~ data, summarize, num_tweets = length(Sentiment), ave_sentiment = mean(Sentiment  )) 
+str(daily)
+
+# correlation between the volume of discussion and sentiment
+cor(daily$ave_sentiment, daily$num_tweets)
+
+# plot the daily sentiment vs. volume
+sentiment <- ggplot(daily, aes(x=data, y=ave_sentiment)) + geom_line(linetype = "dashed", colour="red") +
+  ggtitle("Sentiment") + xlab("Day") + ylab("Sentiment") + theme_gray(base_size = 12)
+
+volume <- ggplot(daily, aes(x=data, y=num_tweets)) + geom_line() +
+  ggtitle("Politician #") + xlab("Day") + ylab("Volume") + theme_gray(base_size = 12)
+
+grid.arrange(sentiment , volume , ncol = 1)

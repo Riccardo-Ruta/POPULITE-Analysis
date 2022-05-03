@@ -9,15 +9,10 @@ here::here("")
 source(here::here("src","00_setup.R"))
 
 # import tweets
-df <- read.csv("data/large_files/dataset_excell.csv",
-               sep = ";",
-               encoding = "utf-8")
+#df <- read.csv("data/large_files/dataset_excell.csv",
+ #              sep = ";",
+  #             encoding = "utf-8")
 
-# Count the observations
-count(df)
-
-# Check the variables
-colnames(df)
 
 # count NA observation for each variable [PROBABòY NOT WORKING]
 for (i in colnames(df)) {
@@ -68,3 +63,25 @@ length(df$X)
 # Count the number of politicians with at least one tweets missing
 df %>% filter(tweet_text== "") %>% distinct(ï..name) %>% count()
 
+#####################################################
+#03/05/2022
+
+df <-  read_csv("data/large_files/politicians_all_final_tweets.csv")
+
+# HOW MANY NA'S?
+sum(is.na(df))
+
+#where are NA's?
+sum(is.na(df$df_screen_name))
+which(is.na(df$tweet_testo))
+sum(is.na(df$nome))
+sum(is.na(df$url))
+sum(is.na(df$party_id))
+sum(is.na(df$creato_il))
+sum(is.na(df$creato_il_code))
+sum(is.na(df$genere))
+sum(is.na(df$status))
+sum(is.na(df$chamber))
+
+# Check the variables
+colnames(df)
