@@ -28,6 +28,19 @@ tw$date <- na.replace(tw$date, as.Date(tw$creato_il))
 # check dates
 check_dates <- tw %>% select(creato_il,date)
 
+
+# Create week variable
+tw <- tw %>% mutate(week = cut.Date(date, breaks = "1 week", labels = FALSE))
+# Check the results
+difftime(max(tw$date), min(tw$date), units = "weeks")
+
+# Create month variable
+tw <- tw %>%mutate(month = cut.Date(date, breaks = "1 month", labels = FALSE))
+max(tw$month)
+# check the results
+length(seq(from = min(tw$date), to = max(tw$date), by = 'month'))
+
+
 # Remove NA
 #filtered <- tw %>% na.omit()
 
@@ -35,7 +48,7 @@ check_dates <- tw %>% select(creato_il,date)
 colnames(tw)
 
 # Select variables for the analysis
-dataset <- tw %>% select(nome, tweet_testo, genere, party_id,chamber,status, date )
+dataset <- tw %>% select(nome, tweet_testo, genere, party_id,chamber,status, date, week, month )
 colnames(dataset)
 
 
@@ -53,7 +66,7 @@ unique(corpus$date)
 unique(corpus$party_id)
 unique(corpus$genere)
 
-# subset corpus for signle politician
+# subset corpus for single politician
 Meloni <- corpus_subset(corpus, nome %like% "MELONI")
 ndoc(Meloni)
 Meloni
@@ -103,13 +116,5 @@ str(features_dfm)
 ggplot(features_dfm, aes(x = feature, y = frequency)) +
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-# Create DFM grouping by date
-dfm_by_date <- dfm_group(doc.dfm, groups= date)
-dfm_by_date
-
-# Create DFM grouping by Nome
-dfm_by_mome <- dfm_group(doc.dfm, groups= nome)
-dfm_by_nome
 
 

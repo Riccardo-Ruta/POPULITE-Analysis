@@ -133,9 +133,72 @@ comparison.cloud(tdm, random.order=FALSE,
                  title.size=1.5, max.words=250)
 
 ##########################################################
-# Dictionary analysis
-test <- dfm_lookup(doc.dfm,dictionary = Decadri_Boussalis_dict[1:3])
-test
-str(Decadri_Boussalis_dict)
+# Populism dictionary analysis
+
+# select the right corpus and create the DFM
+DFM <- dfm(tokens(corpus,  remove_punct = TRUE, remove_numbers = TRUE, remove_symbols = TRUE, remove_url = TRUE), remove = my_list)
+
+DFM_trimmed <- dfm_trim(DFM, min_termfreq = 0.80, termfreq_type = "quantile",
+                        max_docfreq = 0.3, docfreq_type = "prop")
+
+# Daily Dictionary analysis with Decadri_Boussalis_dict on the whole dataset
+dfm_dict1  <- dfm_lookup(DFM_trimmed, dictionary = Decadri_Boussalis_dict)
+# Group by date
+dfm_by_date1 <- dfm_group(dfm_dict1, groups= date)
+dfm_by_date1
+# Group by week
+dfm_by_week <- dfm_group(dfm_dict1, groups= week)
+dfm_by_week
+# Group by month
+dfm_by_month <- dfm_group(dfm_dict1, groups= month)
+dfm_by_month
+
+
+# Daily Dictionary analysis with Roodujin_dict on the whole dataset
+dfm_dict2  <- dfm_lookup(DFM_trimmed, dictionary = Roodujin_dict)
+# Group by date
+dfm_by_date2 <- dfm_group(dfm_dict2, groups= date)
+dfm_by_date2
+# Group by week
+dfm_by_week2 <- dfm_group(dfm_dict2, groups= week)
+dfm_by_week2
+# Group by month
+dfm_by_month2 <- dfm_group(dfm_dict2, groups= month)
+dfm_by_month2
+
+
+# ### MELONI ####
+# select the right corpus and create the DFM
+meloni_DFM <- dfm(tokens(Meloni,  remove_punct = TRUE, remove_numbers = TRUE, remove_symbols = TRUE, remove_url = TRUE), remove = my_list)
+
+meloni_DFM_trimmed <- dfm_trim(DFM, min_termfreq = 0.80, termfreq_type = "quantile",
+                        max_docfreq = 0.3, docfreq_type = "prop")
+
+# Daily Dictionary analysis with Decadri_Boussalis_dict
+dfm_dict1  <- dfm_lookup(meloni_DFM_trimmed, dictionary = Decadri_Boussalis_dict)
+dfm_dict1
+# Group by date
+dfm_by_date1 <- dfm_group(dfm_dict1, groups= date)
+dfm_by_date1
+# Group by week
+dfm_by_week <- dfm_group(dfm_dict1, groups= week)
+dfm_by_week
+# Group by month
+dfm_by_month <- dfm_group(dfm_dict1, groups= month)
+dfm_by_month
+
+# Daily Dictionary analysis with Roodujin_dict on the whole dataset
+dfm_dict2  <- dfm_lookup(meloni_DFM_trimmed, dictionary = Roodujin_dict)
+dfm_dict2
+# Group by date
+dfm_by_date2 <- dfm_group(dfm_dict2, groups= date)
+dfm_by_date2
+# Group by week
+dfm_by_week2 <- dfm_group(dfm_dict2, groups= week)
+dfm_by_week2
+# Group by month
+dfm_by_month2 <- dfm_group(dfm_dict2, groups= month)
+dfm_by_month2
+
 
 

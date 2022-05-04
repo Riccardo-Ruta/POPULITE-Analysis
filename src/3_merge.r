@@ -12,38 +12,25 @@ source(here::here("src","00_setup.R"))
 #tw <- read.csv("data/large_files/TweetPopulite (1).csv", 
  #              sep = ";", encoding = "utf-8")#, escape_double = FALSE, trim_ws = TRUE)
 
-tw <- read.csv("data/large_files/estrazione_tweet2020-2022.csv",
-               sep = ";", encoding = "utf-8")
-
-
-View(tw)
-
+tw <- read_csv("data/large_files/politicians_all_final_tweets.csv") # with this extraction read_csv works better with accent
 colnames(tw)
 
 #set #N/D as NA
-tw_na <- na_if(tw,"#N/D")
+tw <- na_if(tw,"#N/D")
 
-#remove NA
-filtered <- tw_na %>% na.omit()
+# Remove NA (uncomment just in case you wont to omit all NA)
+#filtered <- tw_na %>% na.omit()
 
-# remove Retweets
-#filtered <- filter(filtered, !Tweet %like% "RT")
-filtered <- filter(filtered, !tweet_text %like% "RT")
-
-#Adjust datetime
+# Adjust datetime (Run code in this order!)
 Sys.setlocale("LC_TIME", "C")
-
-#filtered$data <- as.Date(strptime(filtered$CreatoId,"%a %b %d %H:%M:%S %z %Y", tz = "CET"))
-
-filtered$data <- as.Date(strptime(filtered$creato_il,"%a %b %d %H:%M:%S %z %Y", tz = "CET"))
-
-typeof(filtered$data)
-
-View(filtered)
+tw$date <- as.Date(strptime(tw$creato_il,"%a %b %d %H:%M:%S %z %Y", tz = "CET"))
+tw$date <- na.replace(tw$date, as.Date(tw$creato_il))
+tw$date <- as.Date(tw$date)
+# check dates
+check_dates <- tw %>% select(creato_il,date)
 
 # FILTER FOR THE NAME OF ONE POLITICIANS
-#single_politician <- filter(filtered, Cognome %like% "FRATOIANNI")
-single_politician <- filter(filtered, ï..name %like% "MELONI")
+single_politician <- filter(tw, nome %like% "MELONI")
 
 
 # GROUP BY DAY
@@ -52,9 +39,9 @@ single_politician <- filter(filtered, ï..name %like% "MELONI")
 #  group_by(data) %>%
 #  summarise(Tweet_uniti = paste(Tweet, collapse = ","))
 
-daily <- single_politician %>%
-  group_by(data) %>%
-  summarise(Tweet_uniti = paste(tweet_text, collapse = ","))
+daily <- single_politician %>% 
+  group_by(date) %>%
+  summarise(Tweet_uniti = paste(tweet_testo, collapse = ","))
 
 
 # Add column with the count of the daily tweets  
@@ -70,9 +57,9 @@ daily <- single_politician %>%
 #  summarise(Tweet_uniti = paste(Tweet, collapse = ","))
 
 weekly <- single_politician %>%
-  mutate(week = cut.Date(data, breaks = "1 week", labels = FALSE)) %>% 
+  mutate(week = cut.Date(date, breaks = "1 week", labels = FALSE)) %>% 
   group_by(week) %>%
-  summarise(Tweet_uniti = paste(tweet_text, collapse = ","))
+  summarise(Tweet_uniti = paste(tweet_testo, collapse = ","))
 
 #Group Tweets by week
 #frat_weekly %>%
@@ -90,9 +77,9 @@ weekly <- single_politician %>%
 #  summarise(Tweet_uniti = paste(Tweet, collapse = ","))
 
 monthly <- single_politician %>%
-  mutate(month = cut.Date(data, breaks = "1 month", labels = FALSE)) %>% 
+  mutate(month = cut.Date(date, breaks = "1 month", labels = FALSE)) %>% 
   group_by(month) %>%
-  summarise(Tweet_uniti = paste(tweet_text, collapse = ","))
+  summarise(Tweet_uniti = paste(tweet_testo, collapse = ","))
 
 monthly_df <- as.data.frame(monthly)
 

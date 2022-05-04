@@ -76,3 +76,15 @@ volume <- ggplot(daily, aes(x=data, y=num_tweets)) + geom_line() +
   ggtitle("Politician #") + xlab("Day") + ylab("Volume") + theme_gray(base_size = 12)
 
 grid.arrange(sentiment , volume , ncol = 1)
+#################################################
+# 04/05/2022
+
+# Create DFM grouping by date
+dfm_by_date <- dfm_group(doc.dfm, groups= date)
+dfm_by_date
+
+# Create DFM grouping by Nome
+dfm_by_mome <- dfm_group(doc.dfm, groups= nome)
+dfm_by_nome
+
+###############################################
