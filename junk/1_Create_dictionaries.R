@@ -6,53 +6,10 @@ here::here("")
 # Source setup scripts:-------------------------------------------------------------------
 source(here::here("src","00_setup.R"))
 
-#import tweets
-tw <- read_delim("data/tweets.csv",
-                 delim = ";",
-                 escape_double = FALSE,
-                 col_types = cols(id = col_character()),
-                 trim_ws = TRUE)
 
-View(tw)
-unique(tw[1])
-
-########################################################
-# try subset using regex
-df <- fread("data/tweets.csv")
-subset <- df[id %like% "1450"]
-summary(subset)
-subset
-#######################################################
-# create the CORPUS
-tw_corpus <- corpus(tw, text_field = "tweet_text")
-summary(tw_corpus)
-
-# number of documents
-ndoc(tw_corpus)
-
-# inspect the document-level variables
-head(docvars(tw_corpus))
-tw_corpus
-
-######################################################
-# Some cleaning
-tw_corpus <- tokens(tw_corpus, remove_punct = T, remove_numbers = T, remove_url = T) # remove punct, numb and links
-tw_corpus <- tokens_select(tw_corpus, stopwords('it'), selection = 'remove') # remove italian stopwords
-tw_corpus <- tokens_wordstem(tw_corpus) # stemming
-tw_corpus <- tokens_tolower(tw_corpus) # standardizes lower
-
-summary(tw_corpus)
-
-#####################################################
-#convert tokenized tweets in dfm
-tw_dfm <- dfm(tw_corpus,remove = c(stopwords("it"), ("+"), ("<"), (">"), ("00*"), (":"),(","),("?"),("."),("�")))
-tw_dfm
-
-topfeatures(tw_dfm, 5)
-
-##############################################################
+#------------------------------
 #import dictionaries file
-populism_dictionaries <- read_delim("data/populism_dictionaries_delim.csv",
+populism_dictionaries <- read_delim("data/populism_dictionaries.xlsx",
                                     delim = ";",
                                     escape_double = FALSE,
                                     trim_ws = TRUE)
@@ -83,7 +40,7 @@ Groundi_dict <- dictionary(Groundi)
 
 Decadri_dict <- dictionary(Decadri)
 
-####################################################
+#------------------------------
 # create my own dictionary
 
 Roodujin_dict <- dictionary(list(populism = c("antidemocratic*", "casta", "consens*", "corrot*", "disonest*", "elit*", "establishment",
@@ -109,7 +66,7 @@ Decadri_Boussalis_dict <- dictionary(list( people = c("abitant*", "cittadin*","c
                                                      "cosiddett* giornalist*"," cosiddetti media","lobbist*")))
 summary(Decadri_Boussalis_dict)
 print(Decadri_Boussalis_dict)
-###################################################
+#------------------------------
 # Made the anlysis on a subset
 
 recent_corpus <- corpus_subset(tw_corpus,  like > 2)
@@ -119,7 +76,7 @@ byPresMat <- dfm(recent_corpus, dictionary = Decadri_Boussalis_dict)
 byPresMat
 summary(byPresMat)
 
-######################################################
+#------------------------------
 # 2) new Test 07/03/2022
 #import tweets
 tweets <- read_delim("data/tweets.csv", delim = ";", 

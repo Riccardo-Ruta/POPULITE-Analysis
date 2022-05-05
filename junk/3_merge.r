@@ -61,14 +61,6 @@ weekly <- single_politician %>%
   group_by(week) %>%
   summarise(Tweet_uniti = paste(tweet_testo, collapse = ","))
 
-#Group Tweets by week
-#frat_weekly %>%
-#  group_by(week) %>%
-#  summarize(date = min(as.Date(data)), ntweets = n())
-
-#frat_weekly <- frat_weekly %>%
-#  group_by(week) %>%
-#  summarize(Tweet)
 
 # Group by month
 #monthly <- single_politician %>%

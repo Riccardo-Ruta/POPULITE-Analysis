@@ -10,15 +10,8 @@ source(here::here("src","00_setup.R"))
 #-------------------------------------------------------------------
 
 # import the data
-#tw <- read.csv("data/large_files/politicians_all_final_tweets.csv", 
- #              sep = ",", encoding = "utf-8")
-
 tw <-  read_csv("data/large_files/politicians_all_final_tweets.csv") # with this extraction read_csv works better with accent
 colnames(tw)
-
-# set #N/D as NA
-tw <- na_if(tw,"#N/D")
-tw <- na_if(tw_na, "")
 
 # Adjust datetime (Run code in this order!)
 Sys.setlocale("LC_TIME", "C")
@@ -27,7 +20,7 @@ tw$date <- na.replace(tw$date, as.Date(tw$creato_il))
 
 # check dates
 check_dates <- tw %>% select(creato_il,date)
-
+view(check_dates)
 
 # Create week variable
 tw <- tw %>% mutate(week = cut.Date(date, breaks = "1 week", labels = FALSE))
@@ -35,17 +28,34 @@ tw <- tw %>% mutate(week = cut.Date(date, breaks = "1 week", labels = FALSE))
 difftime(max(tw$date), min(tw$date), units = "weeks")
 
 # Create month variable
-tw <- tw %>%mutate(month = cut.Date(date, breaks = "1 month", labels = FALSE))
+tw <- tw %>% mutate(month = cut.Date(date, breaks = "1 month", labels = FALSE))
 max(tw$month)
+
 # check the results
 length(seq(from = min(tw$date), to = max(tw$date), by = 'month'))
 
-
-# Remove NA
-#filtered <- tw %>% na.omit()
+# Remove missing from tweets column (using remove_na tidyverse)
+sum(is.na(tw$tweet_testo))
+tw <- tw %>% drop_na(tweet_testo)
 
 # Check the variables 
 colnames(tw)
+
+# Check single variable content
+unique(tw$party_id)
+unique(tw$genere)
+unique(tw$chamber)
+unique(tw$status)
+
+# remove space from genere variable [RUN ONLY ONCE!]
+a <- unique(tw$genere)
+a[3]
+which(tw$genere == a[3])
+tw$genere <- gsub(a[3],"male",tw$genere)
+
+# check result
+which(tw$genere == a[3])
+unique(tw$genere)
 
 # Select variables for the analysis
 dataset <- tw %>% select(nome, tweet_testo, genere, party_id,chamber,status, date, week, month )
@@ -58,18 +68,13 @@ colnames(dataset)
 corpus <- corpus(dataset, text = "tweet_testo")
 ndoc(corpus)
 summary(corpus)
-head(textstat_summary(corpus))
+system.time(head(textstat_summary(corpus)))
 
 # Inspect the document level variables
 sort(unique(corpus$nome))
 unique(corpus$date)
 unique(corpus$party_id)
 unique(corpus$genere)
-
-# subset corpus for single politician
-Meloni <- corpus_subset(corpus, nome %like% "MELONI")
-ndoc(Meloni)
-Meloni
 
 ############################################
 # TOKENS
@@ -87,34 +92,6 @@ doc.tokens <- tokens_select(doc.tokens, my_list, selection='remove')
 kwic(doc.tokens, "fa", window = 3)
 
 #######################################
-# DFM
-# Bag of word approach, non positional
 
-# Create dfm
-doc.dfm <- dfm(doc.tokens,tolower = T)
-
-# top features
-topfeatures(doc.dfm, 20)
-
-#Dfm trimming:only words that occur in the top 20% of the distribution
-#             and in less than 30% of documents
-#             very frequent but document specific words
-doc.dfm <- dfm_trim(doc.dfm, min_termfreq = 0.80, termfreq_type = "quantile",
-                                max_docfreq = 0.3, docfreq_type = "prop")
-doc.dfm
-
-# top features after trimming
-topfeatures(doc.dfm, 20)
-
-
-# Plot the frequency of the top features in a text using the topfeatures.
-system.time(features_dfm <- textstat_frequency(doc.dfm, n = 20))
-features_dfm
-str(features_dfm)
-
-# plot with GGPLOT
-ggplot(features_dfm, aes(x = feature, y = frequency)) +
-  geom_point() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 
