@@ -47,7 +47,7 @@ unique(tw$genere)
 unique(tw$chamber)
 unique(tw$status)
 
-# remove space from genere variable [RUN ONLY ONCE!]
+# Remove space from genere variable [RUN ONLY ONCE!]
 a <- unique(tw$genere)
 a[3]
 which(tw$genere == a[3])
