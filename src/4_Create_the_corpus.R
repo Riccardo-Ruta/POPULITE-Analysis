@@ -89,7 +89,11 @@ my_list <- c("🇮🇹","c'è","+","🔴", my_word$stopwords, stopwords('italian
 doc.tokens <- tokens_select(doc.tokens, my_list, selection='remove')
 
 # search some stopwords for check
-kwic(doc.tokens, "fa", window = 3)
+kwic(doc.tokens, "🇮🇹", window = 3)
+
+topfeature <- dfm(doc.tokens)
+
+topfeatures(topfeature, 20)
 
 #######################################
 

@@ -21,7 +21,7 @@ source(here::here("src","00_setup.R"))
 
 ```{r summary, results="hide"}
 # import the data
-tw <-  read_csv("data/large_files/politicians_all_final_tweets.csv")
+tw <-  read_csv("data/large_files/politicians_all_final_tweets.csv",show_col_types = FALSE)
 
 # Adjust datetime (Run code in this order!)
 Sys.setlocale("LC_TIME", "C")
@@ -52,20 +52,26 @@ dataset <- tw %>% select(nome, tweet_testo, genere, party_id,chamber,status, dat
 corp <- corpus(dataset, text = "tweet_testo")
 ```
 
-
 ### 3) Create the Dfm removing stopwords and trimming
-```{r 3}
-my_word <- as.list(read_csv("data/it_stopwords_new_list.csv", show_col_types = FALSE)) #read.csv with utf-8 fails importing accented words
 
-my_list <- c("🇮🇹","c'è","+","🔴", my_word$stopwords, stopwords('italian'))
+```{r 3, message=FALSE, warning=FALSE}
+my_word <- as.list(read_csv("data/it_stopwords_new_list.csv", show_col_types = FALSE))
 
-rev_dfm <- dfm(corp, remove =c(stopwords("italian"), my_list),
-               tolower = TRUE, stem = FALSE, remove_punct = TRUE, remove_numbers=TRUE)
+my_list <- c("🇮🇹","c'è","+","🔴",my_word$stopwords, stopwords('italian'))
+
+rev_dfm <- dfm(tokens(corp, remove_symbols = TRUE, remove_url = TRUE),
+               remove = my_list, tolower = TRUE,
+               remove_punct = TRUE, remove_numbers=TRUE)
+
 rev_dfm <-   dfm_trim(rev_dfm, min_termfreq = 0.95, termfreq_type = "quantile",
                       max_docfreq = 0.1, docfreq_type = "prop")
-rev_dfm <- dfm_group(rev_dfm, groups= month)
 
-kable(topfeatures(rev_dfm, 20), col.names = "TopFeatures")
+rev_dfm <- dfm_group(rev_dfm, groups= month)
+```
+
+```{r 4}
+topfeatures(rev_dfm, 20)
+kable(topfeatures(rev_dfm, 20),col.names = "topfeature")
 ```
 
 ### 4) Convert the Document Feature Matrix (Dfm) in a Topic Model (Dtm)
@@ -78,7 +84,7 @@ dtm <- quanteda::convert(rev_dfm, to = "topicmodels")
 
 ### 1) First try K = 20:80
 
-```{r 7, include=TRUE, eval=TRUE}
+```{r 7, include=FALSE, eval=TRUE}
 load("data/results1.Rda")
 ```
 
@@ -104,10 +110,9 @@ system.time(
 # save(results1,file="data/results1.Rda")
 ```
 
-```{r 7.2}
+```{r 7.2, echo=FALSE}
 kable(head(results1))
 kable(tail(results1))
-str(results1)
 
 
 plot1 <- as.ggplot(~plot(results1$coherence, results1$exclusivity,
@@ -125,7 +130,7 @@ From this first try it's seems that the correct number of K is ......
 
 ### 2) Second try K = 70:90
 
-```{r 8, include=TRUE, eval=TRUE}
+```{r 8, include=FALSE, eval=TRUE}
 load("data/results2.Rda")
 ```
 
@@ -151,10 +156,8 @@ system.time(
 # save(results2,file="data/results2.Rda")
 ```
 
-```{r 8.2}
+```{r 8.2, echo=FALSE}
 kable(results2)
-str(results2)
-
 
 plot2 <- as.ggplot(~plot(results2$coherence, results2$exclusivity, main="Scatterplot K=70:90",
                          xlab="Semantic Coherence", ylab="Exclusivity ", pch=19,
@@ -193,9 +196,8 @@ system.time(
  #save(results1,file="data/results_k_10-40.Rda")
 ```
 
-```{r 9.2}
+```{r 9.2, echo=FALSE}
 kable(results1)
-str(results1)
 
 ## k= 10-40
 plot3 <- as.ggplot(~plot(results1$coherence, results1$exclusivity, main="Scatterplot k=10:40",
@@ -213,13 +215,66 @@ grid <- plot_grid(plot1, plot2, plot3,
 grid
 ```
 
+### 4) Fourth try k = 5:20 iteration n = 2000
 
+```{r 9.3, include=FALSE, eval=TRUE}
+load("data/k_5-20.Rda")
+```
+
+```{r 9.4, eval=FALSE}
+## Finding the best K
+top1234 <- c(5:20)
+top1234
+
+## let's create an empty data frame
+results1 <- data.frame(first=vector(), second=vector(), third=vector()) 
+results1 
+
+system.time(
+  for (i  in top1234) 
+  { 
+    set.seed(123)
+    lda1 <- LDA(dtm, method= "Gibbs", k = (i),  control=list(verbose=50L, iter=2000))
+    topic <- (i)
+    coherence <- mean(topic_coherence(lda1, dtm))
+    exclusivity <- mean(topic_exclusivity(lda1))
+    results1 <- rbind(results1 , cbind(topic, coherence, exclusivity ))
+  }
+)
+# save(results1,file="data/k_5-20.Rda")
+```
+
+```{r 9.5, echo=FALSE}
+kable(results1)
+
+## k= 5-20
+plot4 <- as.ggplot(~plot(results1$coherence, results1$exclusivity, main="Scatterplot k=5:20",
+     xlab="Semantic Coherence", ylab="Exclusivity ", pch=19,
+     col=ifelse(results1$coherence<=-153.9 | results1$exclusivity<9.9610 ,"black","red")) + 
+       text(results1$coherence,
+            results1$exclusivity, labels=results1$topic, cex= 1,  pos=4))
+plot4
+#ggsave("figs/plot_k_5-20.png", plot = plot4)
+
+grid2 <- plot_grid(plot1, plot2, plot3, plot4,
+                  labels = list("k=20:80", "k=70:90", "k=10:40", "k=5:20"), label_x = .15, nrow = 3)
+
+# ggsave("figs/plot_grid2.png", plot = grid2)
+grid2
+```
+
+```{r 9.6, echo=FALSE}
+plot1
+plot2
+plot3
+plot4
+```
 
 ### After this try i can state that 30(81) is the best choice
 
 ## PART III - ANALISYS OF THE TOPICS
 
-```{r 10, include=TRUE, eval=TRUE}
+```{r 10, include=FALSE, eval=TRUE}
 load("data/lda_k_30.Rda")
 ```
 
@@ -230,7 +285,7 @@ system.time(lda <- LDA(dtm, method= "Gibbs", k = 30, control = list(seed = 123))
 
 ### Here i extract the most important terms from the model
 
-```{r 11}
+```{r 11, echo=FALSE}
 terms <- get_terms(lda, 10)
 dt1 <- terms[,1:10]
 dt2 <- terms[,11:20]
@@ -252,7 +307,7 @@ knitr::kable(dt3, col.names = c("Top terms 21","Top terms 22","Top terms 23",
 
 ### Using 30 topics I imagined that..... COMMENT HERE
 
-```{r 12}
+```{r 12, echo=FALSE}
 titles <- c("1", "2", "3", "4", "5", "6", "7", "8",
             "9", "10","11", "12","13", "14", "15", "16",
             "17", "18", "19", "20",
@@ -277,12 +332,43 @@ kable(t3)%>%
 
 ### This method turns out to be cumbersome and not very informative because for many "topics" it is difficult for me to find a label.
 
-### So, I also decided to repeat the search using a much lower K trying to interpret the topics as a films genere.
+### So, I also decided to repeat the search using a much lower K.
+
+```{r 13, include=FALSE}
+load("data/lda_k_10.Rda")
+```
+
+```{r 14, eval=FALSE}
+system.time(lda_k_10 <- LDA(dtm, method= "Gibbs", k = 10, control = list(seed = 123)))
+# save(lda, file = "data/lda_k_30.Rda")
+```
+
+```{r 15, echo=FALSE}
+terms <- get_terms(lda_k_10, 10)
+dt1 <- terms[,1:10]
+
+
+knitr::kable(dt1, col.names = c("Top terms 01","Top terms 02","Top terms 03",
+                         "Top terms 04","Top terms 05","Top terms 06","Top terms 07","Top terms 08","Top terms 09","Top terms 10"))%>%
+  kable_styling(latex_options = "scale_down")
+```
+
+### Titles:
+
+```{r 16, echo=FALSE}
+titles <- c("1", "2", "3", "4", "5", "6", "7", "8",
+            "9", "10")
+
+table_titles <- rbind (titles, terms)
+
+t1 <- table_titles[,1:10]
+
+kable(t1)%>%
+  kable_styling(latex_options = "scale_down")
+
+```
 
 ## PART IV - RE-ANALISYS OF THE TOPICS as GENRE
-
-
-
 
 ```{=tex}
 \hfill\break
