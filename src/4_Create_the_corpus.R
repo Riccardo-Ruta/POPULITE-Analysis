@@ -84,7 +84,7 @@ system.time(doc.tokens <- tokens(corpus, remove_punct = TRUE, remove_numbers = T
 
 my_word <- as.list(read_csv("data/it_stopwords_new_list.csv", show_col_types = FALSE)) #read.csv with utf-8 fails importing accented words
 
-my_list <- c("🇮🇹", my_word$stopwords, stopwords('italian'))
+my_list <- c("🇮🇹","c'è","+","🔴", my_word$stopwords, stopwords('italian'))
 
 doc.tokens <- tokens_select(doc.tokens, my_list, selection='remove')
 
