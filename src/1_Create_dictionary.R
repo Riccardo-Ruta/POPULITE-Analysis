@@ -35,6 +35,8 @@ Decadri_Boussalis_Grundl$people
 Decadri_Boussalis_Grundl$common_will
 Decadri_Boussalis_Grundl$elite
 
+#------------------------------
+
 my_dictionary <- dictionary(list(populism = c(Rooduijn_Pauwels_Italian$populism,
                                               Grundl_Italian_adapted$populism,
                                               Decadri_Boussalis$populism,

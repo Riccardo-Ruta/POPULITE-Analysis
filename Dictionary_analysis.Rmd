@@ -1,0 +1,166 @@
+---
+title: "Dictionary Analysis"
+author: "Riccardo Ruta"
+date: "7/5/2022"
+output: 
+  pdf_document:
+    toc: yes
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source(here::here("src","00_setup.R"))
+```
+
+### RICORSO ALLA RETORICA POPULISTA.
+
+### A livello di partiti politici, quali fanno maggiormente ricorso alla retorica populista?
+
+### A livello di singoli politici, quali fanno maggiormente ricorso alla retorica populista?
+
+Per rispondere a questa domanda, ricorrere ai seguenti dizionari 3(+1) dizionari:
+
+-   Rooduijn & Pauwels: Rooduijn, M., and T. Pauwels. 2011. "Measuring Populism: Comparing Two Methods of Content Analysis." West European Politics 34 (6): 1272--1283.
+
+-   Decadri & Boussalis: Decadri, S., & Boussalis, C. (2020). Populism, party membership, and language complexity in the Italian chamber of deputies. Journal of Elections, Public Opinion and Parties, 30(4), 484-503.
+
+-   Grundl: Gründl J. Populist ideas on social media: A dictionary-based measurement of populist communication. New Media & Society. December 2020.
+
+-   Decadri & Boussalis + Grundl: questo è semplicemente una versione più estesa del dizionario D&B, che contiene anche alcuni termini presi da Grundl.
+
+### 1) First step, import the words and create the dictionary
+
+```{r}
+# import dictionaries file
+dict <-  read_excel("data/populism_dictionaries.xlsx")
+variable.names(dict)
+
+# create the dictionary
+Rooduijn_Pauwels_Italian <-
+  dictionary(list(populism =
+                    (dict$Rooduijn_Pauwels_Italian
+                     [!is.na(dict$Rooduijn_Pauwels_Italian)])))
+
+Grundl_Italian_adapted <-
+  dictionary(list(populism =
+                    dict$Grundl_Italian_adapted
+                  [!is.na(dict$Grundl_Italian_adapted)]))
+
+Decadri_Boussalis <-
+  dictionary(list(populism =
+                    dict$Decadri_Boussalis
+                  [!is.na(dict$Decadri_Boussalis)]))
+
+Decadri_Boussalis_Grundl <-
+  dictionary(list(people =
+                    dict$Decadri_Boussalis_Grundl_People
+                  [!is.na(dict$Decadri_Boussalis_Grundl_People)],
+                  common_will =
+                    dict$`Decadri_Boussalis_Grundl_Common Will`
+                  [!is.na(dict$`Decadri_Boussalis_Grundl_Common Will`)],
+                  elite =
+                    dict$Decadri_Boussalis_Grundl_Elite
+                  [!is.na(dict$Decadri_Boussalis_Grundl_Elite)]))
+
+
+```
+
+#### I also create one extra dictionary that include all the populist words
+
+```{r}
+my_dictionary <- dictionary(list(populism = c(Rooduijn_Pauwels_Italian$populism,
+                                              Grundl_Italian_adapted$populism,
+                                              Decadri_Boussalis$populism,
+                                              Decadri_Boussalis_Grundl$people,
+                                              Decadri_Boussalis_Grundl$common_will,
+                                              Decadri_Boussalis_Grundl$elite)))
+head(my_dictionary$populism)
+tail(my_dictionary$populism)
+```
+
+### 2) Import the DFM prepared in previous steps and apply dictionaries
+
+```{r, include=FALSE}
+load("data/dfm_trimmed.Rda")
+```
+
+#### Decadri_Boussalis_Grundl
+
+```{r}
+# Daily Dictionary analysis with Decadri_Boussalis_Grundl on the whole dataset
+dfm_dict1  <- dfm_lookup(DFM_trimmed, dictionary = Decadri_Boussalis_Grundl)
+# Group by date
+dfm_by_date1 <- dfm_group(dfm_dict1, groups= date)
+dfm_by_date1
+# Group by week
+dfm_by_week1 <- dfm_group(dfm_dict1, groups= week)
+dfm_by_week1
+# Group by month
+dfm_by_month1 <- dfm_group(dfm_dict1, groups= month)
+dfm_by_month1
+```
+
+#### Rooduijn_Pauwels_Italian
+
+```{r}
+# Daily Dictionary analysis with Rooduijn_Pauwels_Italian on the whole dataset
+dfm_dict2  <- dfm_lookup(DFM_trimmed, dictionary = Rooduijn_Pauwels_Italian)
+# Group by date
+dfm_by_date2 <- dfm_group(dfm_dict2, groups= date)
+dfm_by_date2
+# Group by week
+dfm_by_week2 <- dfm_group(dfm_dict2, groups= week)
+dfm_by_week2
+# Group by month
+dfm_by_month2 <- dfm_group(dfm_dict2, groups= month)
+dfm_by_month2
+```
+
+#### Grundl_Italian_adapted
+
+```{r}
+# Daily Dictionary analysis with Grundl_Italian_adapted on the whole dataset
+dfm_dict3  <- dfm_lookup(DFM_trimmed, dictionary = Grundl_Italian_adapted)
+# Group by date
+dfm_by_date3<- dfm_group(dfm_dict3, groups= date)
+dfm_by_date3
+# Group by week
+dfm_by_week3 <- dfm_group(dfm_dict3, groups= week)
+dfm_by_week3
+# Group by month
+dfm_by_month3 <- dfm_group(dfm_dict3, groups= month)
+dfm_by_month3
+```
+
+#### Decadri_Boussalis
+
+```{r}
+# Daily Dictionary analysis with Decadri_Boussalis on the whole dataset
+dfm_dict4  <- dfm_lookup(DFM_trimmed, dictionary = Decadri_Boussalis)
+# Group by date
+dfm_by_date4<- dfm_group(dfm_dict4, groups= date)
+dfm_by_date4
+# Group by week
+dfm_by_week4 <- dfm_group(dfm_dict4, groups= week)
+dfm_by_week4
+# Group by month
+dfm_by_month4 <- dfm_group(dfm_dict4, groups= month)
+dfm_by_month4
+```
+
+#### My dictionary
+
+```{r}
+# Daily Dictionary analysis with my_dictionary on the whole dataset
+dfm_dict5  <- dfm_lookup(DFM_trimmed, dictionary = my_dictionary)
+# Group by date
+dfm_by_date5<- dfm_group(dfm_dict5, groups= date)
+dfm_by_date5
+# Group by week
+dfm_by_week5 <- dfm_group(dfm_dict5, groups= week)
+dfm_by_week5
+# Group by month
+dfm_by_month5 <- dfm_group(dfm_dict5, groups= month)
+dfm_by_month5
+```

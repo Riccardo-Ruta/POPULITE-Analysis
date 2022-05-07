@@ -2,7 +2,7 @@ want <- c("here","quanteda","readr","quanteda.textplots","plyr",
           "dplyr", "tidyverse", "rio", "readtext", "quanteda.textstats",
           "sure", "syuzhet", "tm","wordcloud","readxl","na.tools", "ggplotify",
           "kableExtra", "knitr","ggplot2", "topicmodels","topicdoc", "cowplot",
-          "quanteda.textmodels")  # list of required packages
+          "quanteda.textmodels","rtweet")  # list of required packages
 have <- want %in% rownames(installed.packages())
 if ( any(!have) ) { install.packages( want[!have] ) }
 rm(have, want)
@@ -34,3 +34,4 @@ library(topicmodels)
 library(topicdoc)
 library(cowplot)
 library(quanteda.textmodels)
+library(rtweet)

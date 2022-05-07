@@ -67,7 +67,6 @@ colnames(dataset)
 # Create the corpus
 corpus <- corpus(dataset, text = "tweet_testo")
 ndoc(corpus)
-summary(corpus)
 system.time(head(textstat_summary(corpus)))
 
 # Inspect the document level variables
@@ -82,8 +81,10 @@ unique(corpus$genere)
 # Split the corpus into single tokens (remain positional)
 system.time(doc.tokens <- tokens(corpus, remove_punct = TRUE, remove_numbers = TRUE, remove_symbols = TRUE, remove_url = TRUE))
 
+# Import my stopwords
 my_word <- as.list(read_csv("data/it_stopwords_new_list.csv", show_col_types = FALSE)) #read.csv with utf-8 fails importing accented words
 
+# Trasform it into a list and add unrecognized symbols
 my_list <- c("🇮🇹","c'è","+","🔴", my_word$stopwords, stopwords('italian'))
 
 doc.tokens <- tokens_select(doc.tokens, my_list, selection='remove')
@@ -91,9 +92,9 @@ doc.tokens <- tokens_select(doc.tokens, my_list, selection='remove')
 # search some stopwords for check
 kwic(doc.tokens, "🇮🇹", window = 3)
 
-topfeature <- dfm(doc.tokens)
+DFM <- dfm(doc.tokens)
 
-topfeatures(topfeature, 20)
+topfeatures(DFM, 20)
 
 #######################################
 
