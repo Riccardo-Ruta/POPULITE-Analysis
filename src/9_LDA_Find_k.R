@@ -6,50 +6,20 @@ here::here("")
 # Source setup scripts:
 source(here::here("src","00_setup.R"))
 
-# import the data
-tw <-  read_csv("data/large_files/politicians_all_final_tweets.csv")
+# Load dfm trimmed
+load("data/dfm_trimmed.Rda")
 
-# Adjust datetime (Run code in this order!)
-Sys.setlocale("LC_TIME", "C")
-tw$date <- as.Date(strptime(tw$creato_il,"%a %b %d %H:%M:%S %z %Y", tz = "CET"))
-tw$date <- na.replace(tw$date, as.Date(tw$creato_il))
+dtm <- quanteda::convert(DFM_trimmed, to = "topicmodels")
 
-# Create week variable
-tw <- tw %>% mutate(week = cut.Date(date, breaks = "1 week", labels = FALSE))
+##############################################################################
+# 20 : 80
+top1 <- c(20:80)
 
-# Create month variable
-tw <- tw %>% mutate(month = cut.Date(date, breaks = "1 month", labels = FALSE))
-
-# Remove missing from tweets column (using remove_na tidyverse)
-tw <- tw %>% drop_na(tweet_testo)
-
-# Remove space from genere variable
-a <- unique(tw$genere)
-tw$genere <- gsub(a[3],"male",tw$genere)
-
-# Select variables for the analysis
-dataset <- tw %>% select(nome, tweet_testo, genere, party_id,chamber,status, date, week, month )
-
-corp <- corpus(dataset, text = "tweet_testo")
-
-my_word <- as.list(read_csv("data/it_stopwords_new_list.csv", show_col_types = FALSE)) #read.csv with utf-8 fails importing accented words
-
-my_list <- c("🇮🇹", my_word$stopwords, stopwords('italian'))
-
-rev_dfm <- dfm(corp, remove =c(stopwords("italian"), my_list),
-               tolower = TRUE, stem = FALSE, remove_punct = TRUE, remove_numbers=TRUE)
-
-rev_dfm <-   dfm_trim(rev_dfm, min_termfreq = 0.95, termfreq_type = "quantile",
-                      max_docfreq = 0.1, docfreq_type = "prop")
-
-dtm <- quanteda::convert(rev_dfm, to = "topicmodels")
-
-## Finding the best K
-top_k <- c(10:40)
 ## let's create an empty data frame
 results1 <- data.frame(first=vector(), second=vector(), third=vector()) 
+
 system.time(
-  for (i  in top_k) 
+  for (i  in top1) 
   { 
     set.seed(123)
     lda1 <- LDA(dtm, method= "Gibbs", k = (i),  control=list(verbose=50L, iter=1000))
@@ -59,19 +29,69 @@ system.time(
     results1 <- rbind(results1 , cbind(topic, coherence, exclusivity ))
   }
 )
- #save(results1,file="data/results_k_10-40.Rda")
+ save(results1,file="data/results_K_20-80.Rda")
+
+
+##################################################################################
+# 70 : 90
+ top2 <- c(70:90)
  
-kable(head(results1))
-kable(tail(results1))
-str(results1)
+ results2 <- data.frame(first=vector(), second=vector(), third=vector()) 
+ 
+ system.time(
+   for (i  in top2) 
+   { 
+     set.seed(123)
+     lda2 <- LDA(dtm, method= "Gibbs", k = (i),  control=list(verbose=50L, iter=10))
+     topic <- (i)
+     coherence <- mean(topic_coherence(lda2, dtm))
+     exclusivity <- mean(topic_exclusivity(lda2))
+     results2 <- rbind(results2 , cbind(topic, coherence, exclusivity ))
+   }
+ )
+ 
+  save(results2,file="data/results_K_70-90.Rda") 
 
 
-plot1 <- as.ggplot(~plot(results1$coherence, results1$exclusivity,
-                         main="Scatterplot K=10:40",xlab="Semantic Coherence",
-                         ylab="Exclusivity ", pch=19,
-                         col=ifelse(results1$coherence<=-155.8,"black","red")) +
-                     text(results1$coherence, results1$exclusivity,
-                          labels=results1$topic, cex= 1,  pos=4))
+###########################################################################
+# 10 : 40
+top3 <- c(10:40)
 
-# ggsave("figs/plot_k_10-40.png", plot = plot1)
-plot1
+## let's create an empty data frame
+results3 <- data.frame(first=vector(), second=vector(), third=vector()) 
+
+system.time(
+  for (i  in top_3) 
+  { 
+    set.seed(123)
+    lda1 <- LDA(dtm, method= "Gibbs", k = (i),  control=list(verbose=50L, iter=1000))
+    topic <- (i)
+    coherence <- mean(topic_coherence(lda1, dtm))
+    exclusivity <- mean(topic_exclusivity(lda1))
+    results3 <- rbind(results3 , cbind(topic, coherence, exclusivity ))
+  }
+)
+ save(results3,file="data/results_k_10-40.Rda")
+ 
+ 
+#########################################################################
+# 5 : 20
+top4 <- c(5:20)
+
+## let's create an empty data frame
+results4 <- data.frame(first=vector(), second=vector(), third=vector()) 
+
+system.time(
+ for (i  in top4) 
+ { 
+   set.seed(123)
+   lda1 <- LDA(dtm, method= "Gibbs", k = (i),  control=list(verbose=50L, iter=2000))
+   topic <- (i)
+   coherence <- mean(topic_coherence(lda1, dtm))
+   exclusivity <- mean(topic_exclusivity(lda1))
+   results4 <- rbind(results4 , cbind(topic, coherence, exclusivity ))
+ }
+)
+ save(results4,file="data/results_k_5-20.Rda") 
+
+ 

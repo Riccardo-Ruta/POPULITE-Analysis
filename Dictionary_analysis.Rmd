@@ -29,7 +29,7 @@ Per rispondere a questa domanda, ricorrere ai seguenti dizionari 3(+1) dizionari
 
 -   Decadri & Boussalis + Grundl: questo è semplicemente una versione più estesa del dizionario D&B, che contiene anche alcuni termini presi da Grundl.
 
-### 1) First step, import the words and create the dictionary
+## 1) First step, import the words and create the dictionary
 
 ```{r}
 # import dictionaries file
@@ -79,7 +79,7 @@ head(my_dictionary$populism)
 tail(my_dictionary$populism)
 ```
 
-### 2) Import the DFM prepared in previous steps and apply dictionaries
+## 2) Import the DFM prepared in previous steps and apply dictionaries
 
 ```{r, include=FALSE}
 load("data/dfm_trimmed.Rda")
