@@ -44,8 +44,8 @@ rev_dfm <-   dfm_trim(rev_dfm, min_termfreq = 0.95, termfreq_type = "quantile",
 dtm <- quanteda::convert(rev_dfm, to = "topicmodels")
 
 # Run the analysis with k = 35
-system.time(lda_34 <- LDA(dtm, method= "Gibbs", k = 34, control = list(seed = 123)))
-save(lda_34, file = "data/lda_34.Rda")
+#system.time(lda_34 <- LDA(dtm, method= "Gibbs", k = 34, control = list(seed = 123)))
+#save(lda_34, file = "data/lda_34.Rda")
 
 terms <- get_terms(lda_34, 15)
 dt1 <- terms[,1:10]
