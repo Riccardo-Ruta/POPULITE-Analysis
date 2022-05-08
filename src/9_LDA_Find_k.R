@@ -9,7 +9,9 @@ source(here::here("src","00_setup.R"))
 # Load dfm trimmed
 load("data/dfm_trimmed.Rda")
 
-dtm <- quanteda::convert(DFM_trimmed, to = "topicmodels")
+DFM_grouped <- dfm_group(DFM_trimmed, groups = month)
+
+dtm <- quanteda::convert(DFM_grouped, to = "topicmodels")
 
 ##############################################################################
 # 20 : 80
@@ -33,24 +35,7 @@ system.time(
 
 
 ##################################################################################
-# 70 : 90
- top2 <- c(70:90)
- 
- results2 <- data.frame(first=vector(), second=vector(), third=vector()) 
- 
- system.time(
-   for (i  in top2) 
-   { 
-     set.seed(123)
-     lda2 <- LDA(dtm, method= "Gibbs", k = (i),  control=list(verbose=50L, iter=10))
-     topic <- (i)
-     coherence <- mean(topic_coherence(lda2, dtm))
-     exclusivity <- mean(topic_exclusivity(lda2))
-     results2 <- rbind(results2 , cbind(topic, coherence, exclusivity ))
-   }
- )
- 
-  save(results2,file="data/results_K_70-90.Rda") 
+# 70 : 90 removed
 
 
 ###########################################################################
