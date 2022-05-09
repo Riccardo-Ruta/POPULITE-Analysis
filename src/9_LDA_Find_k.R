@@ -9,6 +9,23 @@ source(here::here("src","00_setup.R"))
 # Load dfm trimmed
 load("data/dfm_trimmed.Rda")
 
+##################################################
+# START TO BE REMOVED !!!
+##################################################
+# try on half dataset
+test <- dfm_subset(DFM_trimmed, month %in% 1:14)
+DFM_trimmed <- test
+# THE CODE BREAKS IN CALCULATING EXCLUSIVITY,
+# BUT THE COMMAND WORKS:
+library(topicmodels)
+data("AssociatedPress", package = "topicmodels")
+lda <- LDA(AssociatedPress[1:20,], control = list(alpha = 0.1), k = 2)
+topic_exclusivity(lda)
+##################################################
+# END TO BE REMOVED !!!
+##################################################
+
+
 DFM_grouped <- dfm_group(DFM_trimmed, groups = month)
 
 dtm <- quanteda::convert(DFM_grouped, to = "topicmodels")
@@ -24,7 +41,7 @@ system.time(
   for (i  in top1) 
   { 
     set.seed(123)
-    lda1 <- LDA(dtm, method= "Gibbs", k = (i),  control=list(verbose=50L, iter=1000))
+    lda1 <- LDA(dtm, method= "Gibbs", k = (i),  control=list(verbose=50L, iter=100))
     topic <- (i)
     coherence <- mean(topic_coherence(lda1, dtm))
     exclusivity <- mean(topic_exclusivity(lda1))

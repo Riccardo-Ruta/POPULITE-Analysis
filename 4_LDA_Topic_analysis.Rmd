@@ -281,7 +281,7 @@ kable(t3)%>%
   kable_styling(latex_options = c("HOLD_position","scale_down"))
 ```
 
-### \[COMMENT  HERE\]
+### \[COMMENT HERE\]
 
 ### Repeat the search using a much lower K.
 
@@ -306,7 +306,7 @@ knitr::kable(dt1, col.names = c("Top terms 01","Top terms 02","Top terms 03",
   kable_styling(latex_options = c("HOLD_position","scale_down"))
 ```
 
-### \[COMMENT  HERE\]
+### \[COMMENT HERE\]
 
 ### Titles:
 
@@ -331,6 +331,11 @@ kable(t1)%>%
 
 ```{r 17, include=FALSE}
 load("data/lda_k_5.Rda")
+```
+
+```{r}
+str(lda_k_5)
+lda_k_5@gamma
 ```
 
 ```{r 18, eval=FALSE}
