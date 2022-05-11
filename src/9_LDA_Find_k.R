@@ -30,6 +30,31 @@ DFM_grouped <- dfm_group(DFM_trimmed, groups = month)
 
 dtm <- quanteda::convert(DFM_grouped, to = "topicmodels")
 
+###########################################################
+# START TO BE REMOVED 2
+###########################################################
+# 2 : 3 iter 10
+top1 <- c(2:3)
+
+## let's create an empty data frame
+risultati <- data.frame(first=vector(), second=vector(), third=vector()) 
+
+system.time(
+  for (i  in top1) 
+  { 
+    set.seed(123)
+    lda_test <- LDA(dtm, method= "Gibbs", k = (i),  control=list(verbose=50L, iter=10))
+    topic <- (i)
+    coherence_test <- mean(topic_coherence(lda_test, dtm))
+    exclusivity_test <- mean(topic_exclusivity(lda_test))
+    risultati <- rbind(risultati , cbind(topic, coherence_test, exclusivity_test ))
+  }
+)
+########################################################
+# END TO BE REMOVED 2
+#######################################################
+
+
 ##############################################################################
 # 20 : 80
 top1 <- c(20:80)

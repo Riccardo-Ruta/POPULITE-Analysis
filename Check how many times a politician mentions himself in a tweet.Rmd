@@ -1,0 +1,78 @@
+---
+title: "Check how many times a politician mentions himself in a tweet"
+author: "Riccardo Ruta"
+date: '2022-05-10'
+output: 
+  pdf_document: 
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source(here::here("src","00_setup.R"))
+tw <-  read_csv("data/large_files/politicians_all_final_tweets.csv", show_col_types = FALSE )
+```
+
+## Check how many times a politician mentions himself in a tweet
+
+
+```{r}
+aaa <- subset(tw, grepl("^@matteosalvinimi",tw$tweet_testo))
+```
+
+
+```{r}
+politicians <- unique(aaa$tw_screen_name)
+
+for (i in politicians)
+{
+  aaa %>% select(tw_screen_name,nome,tweet_testo) %>% filter(tw_screen_name == i) %>% filter(grepl(paste("@",i, sep = "",collapse=NULL),tweet_testo))
+  }
+```
+
+```{r}
+kable(tw %>% select(tw_screen_name,nome,tweet_testo) %>% filter(tw_screen_name == "matteosalvinimi") %>% filter(grepl("@matteosalvinimi",tweet_testo)))
+
+```
+
+```{r}
+politicians <- unique(tw$tw_screen_name)
+
+for (i in politicians)
+  {
+  kable(tw %>% select(tw_screen_name,nome,tweet_testo) %>%
+    filter(tw_screen_name == i) %>%
+    filter(grepl(paste("@",i, sep = "",collapse=NULL),tweet_testo)))
+  }
+```
+
+```{r}
+a <- tw %>% filter(tw$nome %like% "VARIATI")
+b <- unique(a$tw_screen_name)
+c <- paste("@",b, sep = "",collapse=NULL)
+c
+a$tweet_testo = gsub(c, "", a$tweet_testo)
+
+#a$tweet_testo = gsub("#FrancoMarini", "MARONI", a$tweet_testo)
+
+```
+
+
+```{r}
+politicians <- unique(tw$tw_screen_name)
+
+for (i in politicians)
+{
+  if_else(aaa$tw_screen_name == i,
+          aaa$tweet_testo <- gsub(paste("@",i, sep = ""),
+                                  "SOST",
+                                  aaa$tweet_testo),
+          print("no_change")
+  )
+  }
+```
+
+```{r}
+bbb <- subset(tw, grepl("^#PD",tw$tweet_testo))
+```
+

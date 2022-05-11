@@ -1,0 +1,57 @@
+---
+title: "All the chunk removed from the main Rmd"
+author: "Riccardo Ruta"
+date: '2022-05-11'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+# Extra dictionary
+
+### I also added one extra dictionary including all the populist words
+
+```{r, warning=FALSE}
+# Daily Dictionary analysis with my_dictionary on the whole dataset
+dfm_dict5  <- dfm_lookup(DFM_trimmed, dictionary = my_dictionary)
+# Group by date
+dfm_by_date5<- dfm_group(dfm_dict5, groups= date)
+#kable(head(dfm_by_date5,10))
+# Group by week
+dfm_by_week5 <- dfm_group(dfm_dict5, groups= week)
+#kable(head(dfm_by_week5,10))
+# Group by month
+dfm_by_month5 <- dfm_group(dfm_dict5, groups= month)
+#kable(head(dfm_by_month5))
+```
+
+## General level of populism in time
+
+```{r, echo=FALSE}
+dat_smooth <- ksmooth(x = dfm_by_date5$date, 
+                      y = dfm_by_date5[,"populism"] - !dfm_by_date5[,"populism"],
+                      kernel = "normal", bandwidth = 30)
+plot(dat_smooth$x, dat_smooth$y, type = "l", ylab = "Populism level", xlab = "")
+grid()
+abline(h = 0, lty = 2)
+```
+
+## Most populist party
+
+```{r}
+# Most populist party
+dict_5_tstat_party <- textstat_frequency(dfm_dict5, groups = party_id)
+kable(dict_5_tstat_party %>% slice_max(frequency, n = 10))
+```
+
+## Most populist politician
+
+```{r}
+dict_5_tstat_nome <- textstat_frequency(dfm_dict5, groups = nome)
+
+kable(dict_5_tstat_nome %>% slice_max(frequency, n = 10))
+```

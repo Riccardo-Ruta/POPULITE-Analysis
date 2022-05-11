@@ -157,7 +157,7 @@ plot3
 
 In this iteration the best choice can be 28 but the general level of coherence has fallen very low
 
-```{r}
+```{r, echo =FALSE, eval = FALSE}
 grid <- plot_grid(plot1, plot2, plot3,
                   labels = list("k=20:80", "k=70:90", "k=10:40"), label_x = .15, nrow = 3)
 
@@ -195,7 +195,6 @@ system.time(
 ```
 
 ```{r 9.5, echo=FALSE}
-
 ## k= 5-20
 plot4 <- as.ggplot(~plot(results1$coherence, results1$exclusivity, main="Scatterplot k=5:20",
      xlab="Semantic Coherence", ylab="Exclusivity ", pch=19,
@@ -204,7 +203,9 @@ plot4 <- as.ggplot(~plot(results1$coherence, results1$exclusivity, main="Scatter
             results1$exclusivity, labels=results1$topic, cex= 1,  pos=4))
 plot4
 #ggsave("figs/plot_k_5-20.png", plot = plot4)
+```
 
+```{r 9.6}
 grid2 <- plot_grid(plot1, plot2, plot3, plot4,
                   labels = list("k=20:80", "k=70:90", "k=10:40", "k=5:20"), label_x = .15, nrow = 3)
 
@@ -212,7 +213,7 @@ grid2 <- plot_grid(plot1, plot2, plot3, plot4,
 grid2
 ```
 
-```{r 9.6, echo=FALSE}
+```{r 9.7, echo=FALSE}
 plot1
 plot2
 plot3
@@ -220,6 +221,46 @@ plot4
 ```
 
 After all these tests, I believe that 10 is the best choice because it achieves good levels of coherence and exclusivity and is consistent with the choice of looking for substantive policy themes
+
+### 5) Fifth try k = 10:50 iteration n = 1000
+
+```{r 9.8.1, include=FALSE, eval=TRUE}
+load("data/results_k_10-50.Rda")
+```
+
+```{r 9.8.2, eval = FALSE}
+# 10 : 50 iter 10
+top1 <- c(10:50)
+
+## let's create an empty data frame
+risultati <- data.frame(first=vector(), second=vector(), third=vector()) 
+
+system.time(
+  for (i  in top1) 
+  { 
+    set.seed(123)
+    lda_test <- LDA(dtm, method= "Gibbs", k = (i),
+                    control=list(verbose=50L, iter=1000))
+    topic <- (i)
+    coherence_test <- mean(topic_coherence(lda_test, dtm))
+    exclusivity_test <- mean(topic_exclusivity(lda_test))
+    risultati <- rbind(risultati,
+                       cbind(topic, coherence_test, exclusivity_test ))
+  }
+)
+# save(risultati,file="data/results_K_10-50.Rda")
+```
+
+```{r 9.9, echo=FALSE}
+## k= 5-20
+plot5 <- as.ggplot(~plot(risultati$coherence_test, risultati$exclusivity_test, main="Scatterplot k=10:50",
+     xlab="Semantic Coherence", ylab="Exclusivity ", pch=19,
+     col=ifelse(risultati$coherence_test<=-7 | risultati$exclusivity_test<9.7 ,"black","red")) + 
+       text(risultati$coherence_test,
+            risultati$exclusivity_test, labels=risultati$topic, cex= 1,  pos=4))
+plot5
+# ggsave("figs/plot_k_10-50.png", plot = plot5)
+```
 
 ## PART III - ANALISYS OF THE TOPICS
 
@@ -256,7 +297,7 @@ knitr::kable(dt3, col.names = c("Top terms 21","Top terms 22","Top terms 23",
   kable_styling(latex_options = c("HOLD_position","scale_down"))
 ```
 
-### \[COMMENT HERE\]
+### $$COMMENT HERE$$
 
 ```{r 12, echo=FALSE}
 titles <- c("1", "2", "3", "4", "5", "6", "7", "8",
@@ -281,7 +322,7 @@ kable(t3)%>%
   kable_styling(latex_options = c("HOLD_position","scale_down"))
 ```
 
-### \[COMMENT HERE\]
+### $$COMMENT HERE$$
 
 ### Repeat the search using a much lower K.
 
@@ -306,7 +347,7 @@ knitr::kable(dt1, col.names = c("Top terms 01","Top terms 02","Top terms 03",
   kable_styling(latex_options = c("HOLD_position","scale_down"))
 ```
 
-### \[COMMENT HERE\]
+### $$COMMENT HERE$$
 
 ### Titles:
 
@@ -323,7 +364,7 @@ kable(t1)%>%
 
 ```
 
-### \[COMMENT HERE\]
+### $$COMMENT HERE$$
 
 ### Repeat the search using a much lower K.
 
@@ -331,11 +372,6 @@ kable(t1)%>%
 
 ```{r 17, include=FALSE}
 load("data/lda_k_5.Rda")
-```
-
-```{r}
-str(lda_k_5)
-lda_k_5@gamma
 ```
 
 ```{r 18, eval=FALSE}
@@ -353,7 +389,7 @@ knitr::kable(dt1, col.names = c("Top terms 01","Top terms 02","Top terms 03",
   kable_styling(latex_options = c("HOLD_position","scale_down"))
 ```
 
-### \[COMMENT HERE\]
+### $$COMMENT HERE$$
 
 ### Titles:
 
@@ -369,4 +405,45 @@ kable(t1)%>%
 
 ```
 
-### \[COMMENT HERE\]
+### $$COMMENT HERE$$
+
+## Final try k = 22
+
+### Try with k = 22
+
+```{r 30, include=FALSE, eval=TRUE}
+load("data/lda_k_22.Rda")
+```
+
+```{r 30.1, eval=FALSE}
+system.time(lda_22 <- LDA(dtm, method= "Gibbs", k = 22, control = list(seed = 123)))
+# save(lda, file = "data/lda_k_22.Rda")
+```
+
+### Here i extract the most important terms from the model
+
+```{r 30.2, echo=FALSE}
+terms <- get_terms(lda_22, 10)
+dt1 <- terms[,1:6]
+dt2 <- terms[,7:12]
+dt3 <- terms[,13:18]
+dt4 <- terms[,19:22]
+
+
+knitr::kable(dt1, col.names = c("Top terms 01","Top terms 02","Top terms 03",
+                         "Top terms 04","Top terms 05","Top terms 06"))%>%
+  kable_styling(latex_options = c("HOLD_position","scale_down"))
+
+knitr::kable(dt2, col.names = c("Top terms 7","Top terms 8","Top terms 9",
+                                "Top terms 10","Top terms 11","Top terms 12"))%>%
+  kable_styling(latex_options = c("HOLD_position","scale_down"))
+
+knitr::kable(dt3, col.names = c("Top terms 13","Top terms 14","Top terms 15",
+                         "Top terms 16","Top terms 17","Top terms 18"))%>%
+  kable_styling(latex_options = c("HOLD_position","scale_down"))
+
+knitr::kable(dt4, col.names = c("Top terms 19","Top terms 20","Top terms 21",
+                         "Top terms 22"))%>%
+  kable_styling(latex_options = c("HOLD_position","scale_down"))
+
+```
