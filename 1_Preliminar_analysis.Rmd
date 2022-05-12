@@ -6,33 +6,16 @@ output:
   pdf_document: 
     toc: yes
     latex_engine: xelatex
-header-includes:
-  - \usepackage{titling}
-  - \pretitle{\begin{center}
-    \includegraphics[width=2in,height=2in]{logo.jpg}\LARGE\\}
-  - \posttitle{\end{center}}
 ---
 
-<!-- Optionally include a page break. This will force the start
-of the document to the second page -->
-
-\newpage
-
-This is your report.
-
-```{r, include=FALSE}
-# copy the R logo to the current directory
-file.copy(file.path(R.home("doc"), "html", "figs/tesiSCIENZE_POLITICHE.jpg"), '.')
-```
-
-```{r setup, include=FALSE}
+```{r setup_1, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 source(here::here("src","00_setup.R"))
 ```
 
-# Part I: Data cleaning
+# Data cleaning
 
-## 1) First import the dataset and check variables
+## Import the dataset and check variables
 
 ```{r}
 # import the data
@@ -41,7 +24,7 @@ tw <-  read_csv("data/large_files/politicians_final_corrected.csv", show_col_typ
 kable(colnames(tw), col.names = "variables")
 ```
 
-## 2) Adjust date.time format
+## Adjust date.time format
 
 ```{r, results = "hide"}
 # RUN IN THIS ORDER !!
@@ -58,13 +41,15 @@ kable(head(check_dates), col.names = c("Old date", "New date"))
 kable(tail(check_dates), col.names = c("Old date", "New date"))
 ```
 
-## 3) Create the week variable
+## Create the week variable
 
 ```{r}
 tw <- tw %>% mutate(week = cut.Date(date, breaks = "1 week", labels = FALSE))
 ```
 
-#### Inspect the first and the last dates and check if the number of weeks is correct
+### Check the variable 
+
+Inspect the first and the last dates and check if the number of weeks is correct
 
 ```{r}
 max(tw$date)
@@ -72,26 +57,26 @@ min(tw$date)
 difftime(max(tw$date), min(tw$date), units = "weeks")
 ```
 
-### Create the month variable
+## Create the month variable
 
 ```{r}
 tw <- tw %>% mutate(month = cut.Date(date, breaks = "1 month", labels = FALSE))
 ```
 
-#### Check the number of month
+### Check the number of month
 
 ```{r}
 max(tw$month)
 length(seq(from = min(tw$date), to = max(tw$date), by = 'month'))
 ```
 
-### Count the number of missing values
+## Count the number of missing values
 
 ```{r}
 sum(is.na(tw))
 ```
 
-### Inspect where are those missings
+### Inspect where are the missings
 
 ```{r}
 
@@ -115,16 +100,16 @@ kable(missing_df)
 
 ```
 
-### From that analysis i obtain 148178 url missing, this is because the url is collected only when the tweets has an external link to other sources, for our analysis we can ignore those missings, with this check also results 6494 tweets missing those are the cases when someone post only images or video without text, so the extraction is correct.
+From that analysis i obtain 148178 url missing, this is because the url is collected only when the tweets has an external link to other sources, for our analysis we can ignore those missings, with this check also results 6494 tweets missing those are the cases when someone post only images or video without text, so the extraction is correct.
 
-## 4) Remove the rows with missing tweets
+### Remove rows with missing tweets
 
 ```{r}
 sum(is.na(tw$tweet_testo))
 tw <- tw %>% drop_na(tweet_testo)
 ```
 
-## 5) Check that the variables make sense
+## Check that the variables make sense
 
 ```{r}
 unique(tw$party_id)
@@ -133,7 +118,7 @@ unique(tw$chamber)
 unique(tw$status)
 ```
 
-### The variable genere needs to be corrected
+### Adjust the variable genere
 
 ```{r}
 # Remove space from genere variable [RUN ONLY ONCE!]
@@ -143,16 +128,16 @@ which(tw$genere == a[3])
 tw$genere <- gsub(a[3],"male",tw$genere)
 ```
 
-### Check the substitution
+### Verify the substitution
 
 ```{r}
 which(tw$genere == a[3])
 unique(tw$genere)
 ```
 
-### Now all the variables are ready for next steps
+*Now all the variables are ready for next steps*
 
-## 6) Create a new dataset with only necessary informations
+## Create a new dataset selecting only necessary informations
 
 ```{r}
 # Select variables for the analysis
@@ -164,7 +149,7 @@ colnames(dataset)
 #save(dataset,file="data/dataset.Rda")
 ```
 
-## 7) Create the corpus
+## Create the corpus
 
 ```{r}
 corpus <- corpus(dataset, text = "tweet_testo")
@@ -175,7 +160,7 @@ ndoc(corpus)
 #save(corpus,file="data/corpus.Rda")
 ```
 
-## 8) Create the DFM
+## Create the DFM
 
 ```{r}
 # Split the corpus into single tokens (remain positional)
@@ -200,9 +185,9 @@ doc.tokens <- tokens_select(doc.tokens, my_list, selection='remove')
 DFM <- dfm(doc.tokens, tolower = TRUE)
 ```
 
-## 9) Trim the data
+## Trim the data
 
-### Only words that occur in the top 20% of the distribution and in less than 30% of documents. Very frequent but document specific words.
+Only words that occur in the top 20% of the distribution and in less than 30% of documents. Very frequent but document specific words.
 
 ```{r}
 DFM_trimmed <- dfm_trim(DFM, min_termfreq = 0.80, termfreq_type = "quantile",
@@ -212,7 +197,7 @@ DFM_trimmed <- dfm_trim(DFM, min_termfreq = 0.80, termfreq_type = "quantile",
 topfeatures(DFM_trimmed,15)
 ```
 
-## 10) Remove the emoji
+## Remove the emoji
 
 ```{r, results="hide"}
 # Create a copy of the dfm
@@ -243,7 +228,7 @@ DFM_trimmed <- dfm_remove(DFM_trimmed, emoji)
 
 ![Emoji removed](output/emoji.png)
 
-## 11) Weight the feature frequencies in the dfm
+## Take the proportion of the frequencies
 
 ```{r}
 # Weight the frequency
@@ -257,9 +242,11 @@ dfm_weight <- DFM_trimmed %>%
 #save(dfm_weight,file="data/dfm_weight.Rda")
 ```
 
-# Part II: Preliminar analysis
+\newpage
 
-## 1) Topfeatures frquency
+# Preliminar analysis
+
+## Topfeatures frquency
 
 ```{r, warning=FALSE, echo=FALSE}
 # Textplotwordcloud
@@ -302,7 +289,7 @@ ggplot(data = freq_weight, aes(x = nrow(freq_weight):1, y = frequency)) +
      labs(x = NULL, y = "Relative frequency")
 ```
 
-## 2) Most common hashtag
+## Most common hashtag
 
 ```{r}
 tag_dfm <- dfm_select(dfm_weight, pattern = "#*")
@@ -366,7 +353,7 @@ ht <- unlist(ht)
 head(sort(table(ht), decreasing = TRUE))
 ```
 
-## 3) Most frequently mentioned usernames
+## Most frequently mentioned usernames
 
 ```{r}
 user_dfm <- dfm_select(dfm_weight, pattern = "@*")

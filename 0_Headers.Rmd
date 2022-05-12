@@ -33,7 +33,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 \vspace{3cm}
 
-```{r uni_logo, echo=FALSE, out.width="70%"}
+```{r uni_logo, echo=FALSE, out.width="100%"}
 knitr::include_graphics("figs/logo.jpg")
 ```
 
@@ -113,6 +113,11 @@ no more than 250 words for the abstract
 
 \newpage
 
+```{r 1_Preliminar_analysis, child = '1_Preliminar_analysis.Rmd'}
+```
+
+\newpage
+
 ```{r 2_Dictionary_analysis, child = '2_Dictionary_analysis.Rmd'}
 ```
 
@@ -123,7 +128,7 @@ no more than 250 words for the abstract
 
 \newpage
 
-```{r 4_LDA_Topic_analysis, child = '4_LDA_Topic_analysis.Rmd'}
+```{r 4_LDA_Topic_analysis, child = '4_LDA_Topic_analysis(NEW).Rmd'}
 ```
 
 \newpage

@@ -10,8 +10,9 @@ output:
   word_document:
     toc: yes
 ---
+# FER: Facial Emotion Recognition Analysis
 
-### Report on the analysis made with FER Puthon package
+## Report on the analysis made with FER Puthon package
 
 The package use the FER-2013 dataset created by Pierre Luc Carrier and Aaron Courville.
 

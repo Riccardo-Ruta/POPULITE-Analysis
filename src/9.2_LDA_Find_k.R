@@ -1,4 +1,4 @@
-# 10 : 50 iter 10
+# 10 : 50 iter 1000
 top1 <- c(10:50)
 
 ## let's create an empty data frame

@@ -25,6 +25,13 @@ load("data/dfm_trimmed.Rda")
 
 ### 1) Convert the Document Feature Matrix (Dfm) in a Topic Model (Dtm)
 
+#### For the purpose of this analysis let's remove all the account's mentions
+
+```{r}
+DFM_trimmed@Dimnames$features <- gsub("^@", "", DFM_trimmed@Dimnames$features)
+```
+
+
 ```{r 6}
 dtm <- quanteda::convert(DFM_trimmed, to = "topicmodels")
 ```
