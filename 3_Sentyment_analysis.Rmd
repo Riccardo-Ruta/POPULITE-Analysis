@@ -9,7 +9,7 @@ output:
     latex_engine: xelatex
 ---
 
-```{r setup, include=FALSE}
+```{r setup3, include=FALSE}
  knitr::opts_chunk$set(echo = FALSE)
 source(here::here("src","00_setup.R"))
 ```

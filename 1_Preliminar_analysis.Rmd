@@ -6,7 +6,24 @@ output:
   pdf_document: 
     toc: yes
     latex_engine: xelatex
+header-includes:
+  - \usepackage{titling}
+  - \pretitle{\begin{center}
+    \includegraphics[width=2in,height=2in]{logo.jpg}\LARGE\\}
+  - \posttitle{\end{center}}
 ---
+
+<!-- Optionally include a page break. This will force the start
+of the document to the second page -->
+
+\newpage
+
+This is your report.
+
+```{r, include=FALSE}
+# copy the R logo to the current directory
+file.copy(file.path(R.home("doc"), "html", "figs/tesiSCIENZE_POLITICHE.jpg"), '.')
+```
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
