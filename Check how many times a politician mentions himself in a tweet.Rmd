@@ -75,4 +75,83 @@ for (i in politicians)
 ```{r}
 bbb <- subset(tw, grepl("^#PD",tw$tweet_testo))
 ```
+##############################
+#############################
+12/05/22
+#########################
+```{r}
+if_else(grepl(paste("@","Alberto_Cirio", sep = "",collapse=NULL),test$tweet_testo),
+        print(vero),
+        next)
+```
+
+```{r}
+
+pattern = paste("@","sole24ore", sep = "")
+replacement =  "##########"
+
+test$tweet_testo <-  gsub(pattern, replacement, test$tweet_testo) #,ignore.case = TRUE, perl = FALSE,fixed = FALSE)
+
+```
+
+
+
+
+
+```{r}
+# set test ambient
+test <- tw %>% select(tw_screen_name, nome,tweet_testo, genere, party_id, chamber, status, date, week, month)
+test <- test %>% filter(month == 1)
+test <- test %>% select(tw_screen_name, tweet_testo,party_id)
+```
+
+
+```{r}
+
+politicians <- unique(tw$tw_screen_name)
+replacement =  "## ELIMINATO ##"
+
+for (i in politicians)
+{
+  pattern = paste("@",i, sep = "")
+  if_else (grep(pattern, test$tweet_testo),
+           gsub(pattern, replacement, test$tweet_testo),
+  print("ok"))
+
+  }
+
+```
+
+
+
+
+
+```{r}
+for (i in test$tw_screen_name)
+{
+  if_else(str_detect(test$tweet_testo, i),
+  print(paste(i,grep(i,test$tweet_testo))),
+  )
+  
+}
+```
+
+
+```{r}
+test %>%
+  group_by(party_id) %>%
+  grep(unique(test$party_id), test$tweet_testo)
+```
+
+
+
+
+
+
+
+
+
+
+
+
 

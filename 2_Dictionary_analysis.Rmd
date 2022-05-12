@@ -73,6 +73,9 @@ Decadri_Boussalis_Grundl <-
 load("data/dfm_weight.Rda")
 ```
 
+
+
+
 \newpage
 
 ## Decadri_Boussalis_Grundl
@@ -113,6 +116,19 @@ ggplot(data = tstat1, aes(x = factor(nrow(tstat1):1), y = frequency)) +
 ```
 
 Looking at the populist rhetoric for each party divided into the 3 components people-centrism, anti-elitism and common-will, we note that the most frequent components is People-centrism.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \newpage
 
@@ -166,6 +182,14 @@ dict2_tstat_nome <- textstat_frequency(dfm_dict2, groups = nome)
 
 kable(dict2_tstat_nome %>% slice_max(frequency, n = 20))
 ```
+
+
+
+
+
+
+
+
 
 
 \newpage
@@ -230,6 +254,13 @@ kable(dict_3_tstat_nome %>% slice_max(frequency, n = 20))
 
 
 
+
+
+
+
+
+
+
 \newpage
 
 ## Decadri_Boussalis
@@ -276,6 +307,15 @@ dict_4_tstat_party <- textstat_frequency(dfm_dict4, groups = party_id)
 kable(dict_4_tstat_party %>% slice_max(frequency, n = 20))
 ```
 
+### DISTRIBUTION OF PARTY POPULISM
+```{r}
+x <- dict_4_tstat_party$frequency
+
+d <- density(dict_4_tstat_party$frequency) 
+d$y <- d$y * length(dict_4_tstat_party$frequency)
+plot(d)
+```
+
 ### Most populist politician
 
 ```{r}
@@ -283,6 +323,17 @@ dict_4_tstat_nome <- textstat_frequency(dfm_dict4, groups = nome)
 
 kable(dict_4_tstat_nome %>% slice_max(frequency, n = 20))
 ```
+
+### DISTRIBUTION OF POLITICIAN POPULISM
+```{r}
+x <- dict_4_tstat_nome$frequency
+
+d <- density(dict_4_tstat_nome$frequency) 
+d$y <- d$y * length(dict_4_tstat_nome$frequency)
+plot(d)
+```
+
+
 
 
 \newpage

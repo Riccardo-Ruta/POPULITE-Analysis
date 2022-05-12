@@ -76,7 +76,7 @@ system.time(
 # VISUALIZE RESULTS
 plot5 <- as.ggplot(~plot(risultati$coherence_test, risultati$exclusivity_test, main="Scatterplot k=10:50",
                          xlab="Semantic Coherence", ylab="Exclusivity ", pch=19,
-                         col=ifelse(risultati$coherence_test<=-7 | risultati$exclusivity_test<9.7 ,"black","red")) + 
+                         col=ifelse(risultati$coherence_test > -270 & risultati$exclusivity_test>9.90 ,"red","black")) + 
                      text(risultati$coherence_test,
                           risultati$exclusivity_test, labels=risultati$topic, cex= 1,  pos=4))
 plot5
@@ -96,7 +96,7 @@ load("data/lda_k_22.Rda")
 
 ```{r 30.1, eval=FALSE}
 system.time(lda_22 <- LDA(dtm, method= "Gibbs", k = 22, control = list(seed = 123)))
-# save(lda, file = "data/lda_k_22.Rda")
+#save(lda_22, file = "data/lda_k_22.Rda")
 ```
 
 ### The most important terms from the model, for each topic
@@ -126,6 +126,7 @@ knitr::kable(dt4, col.names = c("Top terms 19","Top terms 20","Top terms 21",
   kable_styling(latex_options = c("HOLD_position","scale_down"))
 
 ```
+
 ```{r}
 titles_22 <- c("1", "2", "3", "4", "5","6",
                  "7", "8", "9", "10", "11","12",
