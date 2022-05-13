@@ -334,6 +334,17 @@ plot(d)
 ```
 
 
+## Compare the general level of populism in time for the dictionaries
+
+```{r, echo=FALSE}
+plot_time <- plot(dat_smooth2$x, dat_smooth2$y, type = "l", ylab = "Populism level", xlab = "Time", col = "red") + 
+  abline(h = 0, lty = 2)
+lines(dat_smooth3$x, dat_smooth3$y, type = "l", ylab = "Populism level", xlab = "Time", col = "blue") +
+  abline(h = 0, lty = 2)
+lines(dat_smooth4$x, dat_smooth4$y, type = "l", ylab = "Populism level", xlab = "Time", col = "green") +
+  abline(h = 0, lty = 2)
+legend("topleft", legend = c("Roodujin_pauwels","Grundl_italian","Decadri_Boussalis"), fill = c("red", "blue", "green")) 
+```
 
 
 \newpage
