@@ -125,26 +125,37 @@ for (i in politicians)
 
 
 
-
+How many times a politician cite his/her party
 ```{r}
-for (i in test$tw_screen_name)
+party_citations <- data.frame(first = vector(), second = vector() )
+system.time(
+for (i in unique(tw$party_id))
 {
-  if_else(str_detect(test$tweet_testo, i),
-  print(paste(i,grep(i,test$tweet_testo))),
-  )
-  
+  a <- paste("#", i ,sep = "")
+  b <- tw %>% filter(grepl(a,tweet_testo)&party_id== i) %>% count()
+  party_citations <- rbind(party_citations, cbind(i,b))
+
 }
+)
+
+save(party_citations, file = "data/party_citations.Rda")
 ```
 
-
+How many times a politician cite itself in the tweet
 ```{r}
-test %>%
-  group_by(party_id) %>%
-  grep(unique(test$party_id), test$tweet_testo)
+self_citations <- data.frame(first = vector(), second = vector() )
+system.time(
+for (i in unique(tw$tw_screen_name))
+{
+  a <- paste("@", i ,sep = "")
+  b <- tw %>% filter(grepl(a,tweet_testo) & tw_screen_name== i) %>% count()
+  self_citations <- rbind(self_citations, cbind(i,b))
+}
+)
+#save(self_citations, file = "data/self_citations.Rda")
+
 ```
-
-
-
+2275
 
 
 
