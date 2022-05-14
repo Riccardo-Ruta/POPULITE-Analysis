@@ -1,5 +1,5 @@
 ---
-title: "Check how many times a politician mentions himself in a tweet"
+title: "Check_CITATIONS"
 author: "Riccardo Ruta"
 date: '2022-05-10'
 output: 
@@ -155,7 +155,48 @@ for (i in unique(tw$tw_screen_name))
 #save(self_citations, file = "data/self_citations.Rda")
 
 ```
-2275
+TRY REMOVE CITATIONS
+```{r}
+# remove citations
+test <- tw %>% select(tw_screen_name, nome,tweet_testo, genere, party_id, chamber, status, date, week, month)
+test <- test %>% filter(month == 1)
+test <- test %>% select(tw_screen_name, tweet_testo,party_id)
+
+
+#####################################################################################################
+# test
+self_citations <- data.frame(first = vector(), second = vector(), third = vector() )
+aaa <- "ab"
+bbb <-  "aa"
+ccc <- "aa"
+
+self_citations <- rbind(self_citations, cbind(aaa,bbb,ccc))
+self_citations
+
+i = "aa"
+a <- paste("@", i ,sep = "")
+a
+b <- self_citations %>% filter(grepl(a,bbb) & aaa== i) %>% count()
+b
+self_citations <-  self_citations %>% filter(grepl(a,bbb) & aaa == i) %>% mutate(bbb = gsub(a,"#################", .$bbb))
+self_citations
+######################################################################################################
+
+test <- test %>% filter(tw_screen_name == "AcquaroliF" |tw_screen_name == "Alberto_Cirio" )
+
+test <- test %>% mutate(tweet_testo = gsub("#FDI", "@AcquaroliF", tweet_testo))
+test <- test %>% mutate(tweet_testo = gsub("#FCA", "@Alberto_Cirio", tweet_testo))
+View(test)
+
+politicians <- unique(test$tw_screen_name)
+politicians
+
+for (i in politicians)
+  {
+  a <- paste("@", i ,sep = "")
+  test %>% filter(tw_screen_name == i & grepl(a,.$tweet_testo)) %>% mutate(tweet_testo = gsub(a,"#################", .$tweet_testo))
+  }
+```
 
 
 

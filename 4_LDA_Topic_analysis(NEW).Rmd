@@ -124,16 +124,13 @@ titles_11 <- c("1", "2", "3", "4", "5","6",
 table_titles_11 <- rbind (titles_11, terms)
 
 
-t22.1 <- table_titles_22[,1:6]
-t22.2 <- table_titles_22[,7:11]
+t11.1 <- table_titles_11[,1:6]
+t11.2 <- table_titles_11[,7:11]
 
 kable(t11.1)%>%
   kable_styling(latex_options = c("HOLD_position","scale_down"))
 kable(t11.2)%>%
   kable_styling(latex_options = c("HOLD_position","scale_down"))
-kable(t11.3)%>%
-  kable_styling(latex_options = c("HOLD_position","scale_down"))
-kable(t11.4)%>%
-  kable_styling(latex_options = c("HOLD_position","scale_down"))
+
 ```
 

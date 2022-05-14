@@ -58,7 +58,7 @@ By
 
 \vspace{1.5 cm}
 
-Space for \\ some other \\ text
+DRAFT \\ DRAFT \\ DRAFT
 
 \vspace{1.5 cm}
 
@@ -84,8 +84,8 @@ Space for \\ some other \\ text
 
 no more than 250 words for the abstract
 
-- a description of the research question/knowledge gap – what we know and what we don’t know
-- how your research has attempted to fill this gap
+- a description of the research question – what we know and what we don’t know
+- how rhe research has attempted to answer to this question
 - a brief description of the methods
 - brief results
 - key conclusions that put the research into a larger context

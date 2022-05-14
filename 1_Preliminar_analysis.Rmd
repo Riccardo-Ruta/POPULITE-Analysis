@@ -19,7 +19,8 @@ source(here::here("src","00_setup.R"))
 
 ```{r}
 # import the data
-tw <-  read_csv("data/large_files/politicians_final_corrected.csv", show_col_types = FALSE )
+tw <-  read_csv("data/large_files/politicians_final_corrected.csv",
+                show_col_types = FALSE )
 
 kable(colnames(tw), col.names = "variables")
 ```
@@ -29,7 +30,8 @@ kable(colnames(tw), col.names = "variables")
 ```{r, results = "hide"}
 # RUN IN THIS ORDER !!
 Sys.setlocale("LC_TIME", "C")
-tw$date <- as.Date(strptime(tw$creato_il,"%a %b %d %H:%M:%S %z %Y", tz = "CET"))
+tw$date <- as.Date(strptime(tw$creato_il,"%a %b %d %H:%M:%S %z %Y",
+                            tz = "CET"))
 tw$date <- na.replace(tw$date, as.Date(tw$creato_il))
 ```
 
@@ -135,13 +137,14 @@ which(tw$genere == a[3])
 unique(tw$genere)
 ```
 
-*Now all the variables are ready for next steps*
+**Now all the variables are ready for next steps**
 
 ## Create a new dataset selecting only necessary informations
 
 ```{r}
 # Select variables for the analysis
-dataset <- tw %>% select(nome, tweet_testo, genere, party_id,chamber,status, date, week, month )
+dataset <- tw %>% select(nome, tweet_testo, genere, party_id,
+                         chamber,status, date, week, month )
 colnames(dataset)
 ```
 
@@ -175,7 +178,8 @@ my_word <- as.list(read_csv("data/it_stopwords_new_list.csv",
                             show_col_types = FALSE))
 
 # Attach unrecognized symbols
-my_list <- c("🇮🇹","c'è","+","🔴", my_word$stopwords, stopwords('italian'), stopwords("english"))
+my_list <- c("🇮🇹","c'è","+","🔴", my_word$stopwords,
+             stopwords('italian'), stopwords("english"))
 
 # Save my_list
 #save(my_list,file="data/my_list.Rda")
@@ -255,7 +259,7 @@ textplot_wordcloud(dfm_weight,min_count = 20,max_words = 300,
      color = c('red', 'pink', 'green', 'purple', 'blue'))
 ```
 
-```{r}
+```{r, echo=FALSE}
 # Plot frequency of the topfeatures in the DFM
 features_dfm <- textstat_frequency(dfm_weight, n = 50)
 
@@ -271,11 +275,11 @@ ggplot(features_dfm, aes(x = feature, y = frequency)) +
 
 ### Relative frequency of the topfeatures by Party ID
 
-```{r}
-kable(unique(DFM_trimmed$party_id),col.names = "Party")
+```{r,echo=FALSE}
+#kable(unique(DFM_trimmed$party_id),col.names = "Party")
 ```
 
-```{r}
+```{r, echo=FALSE}
 # Plot relative frequency by party_id
 freq_weight <- textstat_frequency(dfm_weight, n = 7, 
                                   groups = dfm_weight$party_id)
@@ -297,7 +301,7 @@ toptag <- names(topfeatures(tag_dfm, 20))
 toptag
 ```
 
-```{r}
+```{r, echo=FALSE}
 tag_dfm %>% 
   textstat_frequency(n = 20) %>% 
   ggplot(aes(x = reorder(feature, frequency), y = frequency)) +
@@ -327,7 +331,8 @@ ggplot(data = tstat_freq, aes(x = nrow(tstat_freq):1, y = frequency)) +
 
 ### Co-occurrence Plot of hashtags
 
-```{r}
+Not weighted
+```{r, echo=FALSE}
 # NOT WEIGHTED
 tag_dfm_NOT_W <- dfm_select(DFM, pattern = "#*")
 toptag_NOT <- names(topfeatures(tag_dfm_NOT_W, 20))
@@ -338,7 +343,8 @@ topgat_fcm_NOT <- fcm_select(tag_fcm_NOT, pattern = toptag_NOT)
 textplot_network(topgat_fcm_NOT, min_freq = 0.1, edge_alpha = 0.8, edge_size = 5)
 ```
 
-```{r}
+Weighted
+```{r, echo=FALSE}
 # WEIGHTED
 tag_fcm <- fcm(tag_dfm)
 set.seed(123)
@@ -381,7 +387,8 @@ ggplot(data = user_tstat_freq, aes(x = nrow(user_tstat_freq):1, y = frequency)) 
 
 ### Co-occurrence plot of usernames
 
-```{r}
+Weighted
+```{r, echo=FALSE}
 # WEIGHTED
 user_fcm <- fcm(user_dfm)
 set.seed(123)
@@ -389,6 +396,7 @@ user_fcm <- fcm_select(user_fcm, pattern = topuser)
 textplot_network(user_fcm, min_freq = 0.1, edge_color = "orange", edge_alpha = 0.8, edge_size = 5)
 ```
 
+Not weighted
 ```{r}
 # NOT WEIGHTED
 user_dfm_NOT_W <- dfm_select(DFM, pattern = "@*")

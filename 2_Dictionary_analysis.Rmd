@@ -67,7 +67,7 @@ Decadri_Boussalis_Grundl <-
 ```
 
 
-## Apply dictionary
+**Apply dictionary**
 
 ```{r, include=FALSE}
 load("data/dfm_weight.Rda")
@@ -89,7 +89,7 @@ weekly: 0.55%
 monthly: 0%
 
 ```{r, warning=FALSE}
-# Daily Dictionary analysis with Decadri_Boussalis_Grundl on the whole dataset
+# Dictionary analysis with Decadri_Boussalis_Grundl
 dfm_dict1  <- dfm_lookup(dfm_weight, dictionary = Decadri_Boussalis_Grundl)
 # Group by date
 dfm_by_date1 <- dfm_group(dfm_dict1, groups= date)
@@ -100,7 +100,7 @@ dfm_by_week1 <- dfm_group(dfm_dict1, groups= week)
 # Group by month
 dfm_by_month1 <- dfm_group(dfm_dict1, groups= month)
 
-kable(dfm_by_month1)
+#kable(dfm_by_month1)
 ```
 
 ```{r, echo=FALSE}
@@ -117,10 +117,33 @@ ggplot(data = tstat1, aes(x = factor(nrow(tstat1):1), y = frequency)) +
 
 Looking at the populist rhetoric for each party divided into the 3 components people-centrism, anti-elitism and common-will, we note that the most frequent components is People-centrism.
 
+### General level of populism in time divided into 3 components
 
+```{r}
+dat_smooth1.1 <- ksmooth(x = dfm_by_date1$date, 
+                      y = dfm_by_date1[,"people"] - !dfm_by_date1[,"people"],
+                      kernel = "normal", bandwidth = 30)
 
+dat_smooth1.2 <- ksmooth(x = dfm_by_date1$date, 
+                      y = dfm_by_date1[,"common_will"] - !dfm_by_date1[,"common_will"],
+                      kernel = "normal", bandwidth = 30)
 
+dat_smooth1.3 <- ksmooth(x = dfm_by_date1$date, 
+                      y = dfm_by_date1[,"elite"] - !dfm_by_date1[,"elite"],
+                      kernel = "normal", bandwidth = 30)
 
+plot_time_1 <- plot(dat_smooth1.1$x, dat_smooth1.1$y, type = "l", ylab = "Populism level", xlab = "Time",  ylim = c(-1,4))
+  
+  lines(dat_smooth1.2$x, dat_smooth1.2$y, type = "l", ylab = "Populism level", xlab = "Time",col = "blue") 
+  
+  lines(dat_smooth1.3$x, dat_smooth1.3$y, type = "l", ylab = "Populism level", xlab = "Time", col = "green") 
+  
+  legend("topleft", legend = c("people","elite","common_will"), fill = c("black", "green", "blue"))
+  title(main = "General level of populism divided into 3 components")
+
+```
+
+This plot is coherent with the previous one and show us that people is thr Component that score better. 
 
 
 
@@ -142,7 +165,7 @@ weekly: 0.%
 monthly: 0%
 
 ```{r, warning=FALSE}
-# Daily Dictionary analysis with Rooduijn_Pauwels_Italian on the whole dataset
+# Dictionary analysis with Rooduijn_Pauwels_Italian
 dfm_dict2  <- dfm_lookup(dfm_weight, dictionary = Rooduijn_Pauwels_Italian)
 # Group by date
 dfm_by_date2 <- dfm_group(dfm_dict2, groups= date)
@@ -153,7 +176,7 @@ dfm_by_week2 <- dfm_group(dfm_dict2, groups= week)
 # Group by month
 dfm_by_month2 <- dfm_group(dfm_dict2, groups= month)
 
-kable(dfm_by_month2)
+#kable(dfm_by_month2)
 ```
 
 ### General level of populism in time
@@ -162,8 +185,10 @@ kable(dfm_by_month2)
 dat_smooth2 <- ksmooth(x = dfm_by_date2$date, 
                       y = dfm_by_date2[,"populism"] - !dfm_by_date2[,"populism"],
                       kernel = "normal", bandwidth = 30)
+
 plot_time_2 <- plot(dat_smooth2$x, dat_smooth2$y, type = "l", ylab = "Populism level", xlab = "Time") + 
   abline(h = 0, lty = 2)
+title(main = "General level of populism with Rooduijn_Pauwels_Italian dictionary")
 
 ```
 
@@ -173,6 +198,8 @@ plot_time_2 <- plot(dat_smooth2$x, dat_smooth2$y, type = "l", ylab = "Populism l
 # Most populist party
 dfm_dict2_tstat_party <- textstat_frequency(dfm_dict2, groups = party_id)
 kable(dfm_dict2_tstat_party %>% slice_max(frequency, n = 20))
+
+dfm_dict2@docvars$docid
 ```
 
 ### Most populist politician
@@ -206,7 +233,7 @@ weekly: 0.0%
 monthly: 0%
 
 ```{r, warning=FALSE}
-# Daily Dictionary analysis with Grundl_Italian_adapted on the whole dataset
+# Dictionary analysis with Grundl_Italian_adapted
 dfm_dict3  <- dfm_lookup(dfm_weight, dictionary = Grundl_Italian_adapted)
 # Group by date
 dfm_by_date3<- dfm_group(dfm_dict3, groups= date)
@@ -217,7 +244,7 @@ dfm_by_week3 <- dfm_group(dfm_dict3, groups= week)
 # Group by month
 dfm_by_month3 <- dfm_group(dfm_dict3, groups= month)
 
-kable(dfm_by_month3)
+#kable(dfm_by_month3)
 ```
 
 
@@ -274,7 +301,7 @@ weekly: 0.0%
 monthly: 0%
 
 ```{r, warning=FALSE}
-# Daily Dictionary analysis with Decadri_Boussalis on the whole dataset
+# Dictionary analysis with Decadri_Boussalis
 dfm_dict4  <- dfm_lookup(dfm_weight, dictionary = Decadri_Boussalis)
 # Group by date
 dfm_by_date4<- dfm_group(dfm_dict4, groups= date)
@@ -285,7 +312,7 @@ dfm_by_week4 <- dfm_group(dfm_dict4, groups= week)
 # Group by month
 dfm_by_month4 <- dfm_group(dfm_dict4, groups= month)
 
-kable(dfm_by_month4)
+#kable(dfm_by_month4)
 ```
 
 ### General level of populism in time
@@ -306,6 +333,12 @@ plot_time_4 <- plot(dat_smooth4$x, dat_smooth4$y, type = "l", ylab = "Populism l
 dict_4_tstat_party <- textstat_frequency(dfm_dict4, groups = party_id)
 kable(dict_4_tstat_party %>% slice_max(frequency, n = 20))
 ```
+
+
+
+
+
+
 
 ### DISTRIBUTION OF PARTY POPULISM
 ```{r}
@@ -336,13 +369,10 @@ plot(d)
 
 ## Compare the general level of populism in time for the dictionaries
 
-```{r, echo=FALSE}
-plot_time <- plot(dat_smooth2$x, dat_smooth2$y, type = "l", ylab = "Populism level", xlab = "Time", col = "red") + 
-  abline(h = 0, lty = 2)
-lines(dat_smooth3$x, dat_smooth3$y, type = "l", ylab = "Populism level", xlab = "Time", col = "blue") +
-  abline(h = 0, lty = 2)
-lines(dat_smooth4$x, dat_smooth4$y, type = "l", ylab = "Populism level", xlab = "Time", col = "green") +
-  abline(h = 0, lty = 2)
+```{r, echo=FALSE, warning=FALSE}
+comparison_time <- plot(dat_smooth4$x, dat_smooth4$y, type = "l", ylab = "Populism level", xlab = "Time", col = "green", ylim = c(0,5)) + abline(h = 0, lty = 2) +
+  lines(dat_smooth3$x, dat_smooth3$y, type = "l", ylab = "Populism level", xlab = "Time", col = "blue") + abline(h = 0, lty = 2) +
+  lines(dat_smooth2$x, dat_smooth2$y, type = "l", ylab = "Populism level", xlab = "Time", col = "red") +abline(h = 0, lty = 2)
 legend("topleft", legend = c("Roodujin_pauwels","Grundl_italian","Decadri_Boussalis"), fill = c("red", "blue", "green")) 
 ```
 
