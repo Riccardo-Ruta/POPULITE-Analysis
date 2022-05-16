@@ -1,0 +1,209 @@
+---
+title: "Check_CITATIONS"
+author: "Riccardo Ruta"
+date: '2022-05-10'
+output: 
+  pdf_document: 
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source(here::here("src","00_setup.R"))
+tw <-  read_csv("data/large_files/politicians_all_final_tweets.csv", show_col_types = FALSE )
+```
+
+## Check how many times a politician mentions himself in a tweet
+
+
+```{r}
+aaa <- subset(tw, grepl("^@matteosalvinimi",tw$tweet_testo))
+```
+
+
+```{r}
+politicians <- unique(aaa$tw_screen_name)
+
+for (i in politicians)
+{
+  aaa %>% select(tw_screen_name,nome,tweet_testo) %>% filter(tw_screen_name == i) %>% filter(grepl(paste("@",i, sep = "",collapse=NULL),tweet_testo))
+  }
+```
+
+```{r}
+kable(tw %>% select(tw_screen_name,nome,tweet_testo) %>% filter(tw_screen_name == "matteosalvinimi") %>% filter(grepl("@matteosalvinimi",tweet_testo)))
+
+```
+
+```{r}
+politicians <- unique(tw$tw_screen_name)
+
+for (i in politicians)
+  {
+  kable(tw %>% select(tw_screen_name,nome,tweet_testo) %>%
+    filter(tw_screen_name == i) %>%
+    filter(grepl(paste("@",i, sep = "",collapse=NULL),tweet_testo)))
+  }
+```
+
+```{r}
+a <- tw %>% filter(tw$nome %like% "VARIATI")
+b <- unique(a$tw_screen_name)
+c <- paste("@",b, sep = "",collapse=NULL)
+c
+a$tweet_testo = gsub(c, "", a$tweet_testo)
+
+#a$tweet_testo = gsub("#FrancoMarini", "MARONI", a$tweet_testo)
+
+```
+
+
+```{r}
+politicians <- unique(tw$tw_screen_name)
+
+for (i in politicians)
+{
+  if_else(aaa$tw_screen_name == i,
+          aaa$tweet_testo <- gsub(paste("@",i, sep = ""),
+                                  "SOST",
+                                  aaa$tweet_testo),
+          print("no_change")
+  )
+  }
+```
+
+```{r}
+bbb <- subset(tw, grepl("^#PD",tw$tweet_testo))
+```
+##############################
+#############################
+12/05/22
+#########################
+```{r}
+if_else(grepl(paste("@","Alberto_Cirio", sep = "",collapse=NULL),test$tweet_testo),
+        print(vero),
+        next)
+```
+
+```{r}
+
+pattern = paste("@","sole24ore", sep = "")
+replacement =  "##########"
+
+test$tweet_testo <-  gsub(pattern, replacement, test$tweet_testo) #,ignore.case = TRUE, perl = FALSE,fixed = FALSE)
+
+```
+
+
+
+
+
+```{r}
+# set test ambient
+test <- tw %>% select(tw_screen_name, nome,tweet_testo, genere, party_id, chamber, status, date, week, month)
+test <- test %>% filter(month == 1)
+test <- test %>% select(tw_screen_name, tweet_testo,party_id)
+```
+
+
+```{r}
+
+politicians <- unique(tw$tw_screen_name)
+replacement =  "## ELIMINATO ##"
+
+for (i in politicians)
+{
+  pattern = paste("@",i, sep = "")
+  if_else (grep(pattern, test$tweet_testo),
+           gsub(pattern, replacement, test$tweet_testo),
+  print("ok"))
+
+  }
+
+```
+
+
+
+
+How many times a politician cite his/her party
+```{r}
+party_citations <- data.frame(first = vector(), second = vector() )
+system.time(
+for (i in unique(tw$party_id))
+{
+  a <- paste("#", i ,sep = "")
+  b <- tw %>% filter(grepl(a,tweet_testo)&party_id== i) %>% count()
+  party_citations <- rbind(party_citations, cbind(i,b))
+
+}
+)
+
+save(party_citations, file = "data/party_citations.Rda")
+```
+
+How many times a politician cite itself in the tweet
+```{r}
+self_citations <- data.frame(first = vector(), second = vector() )
+system.time(
+for (i in unique(tw$tw_screen_name))
+{
+  a <- paste("@", i ,sep = "")
+  b <- tw %>% filter(grepl(a,tweet_testo) & tw_screen_name== i) %>% count()
+  self_citations <- rbind(self_citations, cbind(i,b))
+}
+)
+#save(self_citations, file = "data/self_citations.Rda")
+
+```
+TRY REMOVE CITATIONS
+```{r}
+# remove citations
+test <- tw %>% select(tw_screen_name, nome,tweet_testo, genere, party_id, chamber, status, date, week, month)
+test <- test %>% filter(month == 1)
+test <- test %>% select(tw_screen_name, tweet_testo,party_id)
+
+
+#####################################################################################################
+# test
+self_citations <- data.frame(first = vector(), second = vector(), third = vector() )
+aaa <- "ab"
+bbb <-  "aa"
+ccc <- "aa"
+
+self_citations <- rbind(self_citations, cbind(aaa,bbb,ccc))
+self_citations
+
+i = "aa"
+a <- paste("@", i ,sep = "")
+a
+b <- self_citations %>% filter(grepl(a,bbb) & aaa== i) %>% count()
+b
+self_citations <-  self_citations %>% filter(grepl(a,bbb) & aaa == i) %>% mutate(bbb = gsub(a,"#################", .$bbb))
+self_citations
+######################################################################################################
+
+test <- test %>% filter(tw_screen_name == "AcquaroliF" |tw_screen_name == "Alberto_Cirio" )
+
+test <- test %>% mutate(tweet_testo = gsub("#FDI", "@AcquaroliF", tweet_testo))
+test <- test %>% mutate(tweet_testo = gsub("#FCA", "@Alberto_Cirio", tweet_testo))
+View(test)
+
+politicians <- unique(test$tw_screen_name)
+politicians
+
+for (i in politicians)
+  {
+  a <- paste("@", i ,sep = "")
+  test %>% filter(tw_screen_name == i & grepl(a,.$tweet_testo)) %>% mutate(tweet_testo = gsub(a,"#################", .$tweet_testo))
+  }
+```
+
+
+
+
+
+
+
+
+
+

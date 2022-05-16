@@ -1,0 +1,28 @@
+---
+title: "FER Facial Emotion Recognition Analysis"
+author: "Riccardo Ruta"
+date: "05/2022"
+output:
+  pdf_document: 
+    toc: yes
+    latex_engine: xelatex
+  html_document: default
+  word_document:
+    toc: yes
+---
+# FER: Facial Emotion Recognition Analysis
+
+## Report on the analysis made with FER Puthon package
+
+The package use the FER-2013 dataset created by Pierre Luc Carrier and Aaron Courville.
+
+The dataset was created using the Google image search API to search for images of faces that match a set of 184 emotion-related keywords like “blissful”, “enraged,” etc.
+These keywords were combined with words related to gender, age or ethnicity, to obtain nearly 600 strings which were used as facial image search queries.
+The first 1000 images returned for each query were kept for the next stage of processing.
+OpenCV face recognition was used to obtain bounding boxes around each face in the collected images. Human labelers than rejected incorrectly labeled images, corrected the cropping if necessary, and filtered out some duplicate images.
+Approved, cropped images were then resized to 48x48 pixels and converted to grayscale.
+Mehdi Mirza and Ian Goodfellow prepared a subset of the images for this contest,and mapped the fine-grained emotion keywords into the same seven broad categories used in the Toronto Face Database [Joshua Susskind, Adam Anderson, and Geoffrey E. Hinton. The Toronto face dataset. Technical Report UTML TR 2010-001, U. Toronto, 2010.].
+The resulting dataset contains 35887 images, with 4953 “Anger” images, 547 “Disgust” images, 5121 “Fear” images, 8989 “Happiness” images, 6077 “Sadness” images, 4002 “Surprise” images, and 6198 “Neutral” images.
+FER-2013 could theoretical suffer from label errors due to the way it was collected, but Ian Goodfellow found that human accuracy on FER-2013 was 65±5%.
+
+66% ACCURACY REPORTED BY OCTAVIO ARRIAGA, Matias Valdenegro-Toro, Paul Plöger (Real-time Convolutional Neural Networks for Emotion and Gender Classification)
