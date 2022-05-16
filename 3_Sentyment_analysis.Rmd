@@ -173,6 +173,7 @@ barplot(
   main = "Emotions in tweets by Giuseppe Conte", xlab="Percentage"
 )
 ```
+
 ### Wordcloud of emotions
 
 ```{r, warning=FALSE, echo=FALSE}

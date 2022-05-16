@@ -407,3 +407,51 @@ set.seed(6)
 topuser_fcm_NOT <- fcm_select(user_fcm_NOT, pattern = topuser_NOT)
 textplot_network(topuser_fcm_NOT, min_freq = 0.1, edge_alpha = 0.8, edge_size = 5)
 ```
+
+## How many times a politician cite his/her party
+```{r, include=FALSE}
+load("data/party_citations.Rda")
+```
+
+
+```{r, eval =FALSE}
+party_citations <- data.frame(first = vector(), second = vector() )
+system.time(
+for (i in unique(tw$party_id))
+{
+  a <- paste("#", i ,sep = "")
+  b <- tw %>% filter(grepl(a,tweet_testo)&party_id== i) %>% count()
+  party_citations <- rbind(party_citations, cbind(i,b))
+
+}
+)
+
+#save(party_citations, file = "data/party_citations.Rda")
+```
+```{r}
+kable(party_citations, col.names = c("Party","Number of citations"))
+```
+
+## How many times a politician cite itself in the tweet
+```{r, include=FALSE}
+load("data/self_citations.Rda")
+```
+
+```{r, eval=FALSE}
+self_citations <- data.frame(first = vector(), second = vector() )
+system.time(
+for (i in unique(tw$tw_screen_name))
+{
+  a <- paste("@", i ,sep = "")
+  b <- tw %>% filter(grepl(a,tweet_testo) & tw_screen_name== i) %>% count()
+  self_citations <- rbind(self_citations, cbind(i,b))
+}
+)
+#save(self_citations, file = "data/self_citations.Rda")
+```
+
+```{r}
+
+kable(self_citations %>% filter(n >2), col.names = c("Politician","Number of citations"))
+```
+

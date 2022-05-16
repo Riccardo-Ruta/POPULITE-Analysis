@@ -64,7 +64,8 @@ Decadri_Boussalis_Grundl <-
                   [!is.na(dict$Decadri_Boussalis_Grundl_Elite)]))
 ```
 ```{r}
-dictionaries <- c("Rooduijn_Pauwels_Italian", "Grundl_Italian_adapted","Decadri_Boussalis","Decadri_Boussalis_Grundl")
+dictionaries <- c("Rooduijn_Pauwels_Italian", "Grundl_Italian_adapted",
+                  "Decadri_Boussalis","Decadri_Boussalis_Grundl")
 n.words <- c(length(Rooduijn_Pauwels_Italian$populism),
            length(Grundl_Italian_adapted$populism),
            length(Decadri_Boussalis$populism),
@@ -142,13 +143,17 @@ dat_smooth1.3 <- ksmooth(x = dfm_by_date1$date,
                       y = dfm_by_date1[,"elite"] - !dfm_by_date1[,"elite"],
                       kernel = "normal", bandwidth = 30)
 
-plot_time_1 <- plot(dat_smooth1.1$x, dat_smooth1.1$y, type = "l", ylab = "Populism level", xlab = "Time",  ylim = c(-1,4))
+plot_time_1 <- plot(dat_smooth1.1$x, dat_smooth1.1$y,
+                    type = "l", ylab = "Populism level", xlab = "Time",  ylim = c(-1,4))
   
-  lines(dat_smooth1.2$x, dat_smooth1.2$y, type = "l", ylab = "Populism level", xlab = "Time",col = "blue") 
+  lines(dat_smooth1.2$x, dat_smooth1.2$y,
+        type = "l", ylab = "Populism level", xlab = "Time",col = "blue") 
   
-  lines(dat_smooth1.3$x, dat_smooth1.3$y, type = "l", ylab = "Populism level", xlab = "Time", col = "green") 
+  lines(dat_smooth1.3$x, dat_smooth1.3$y,
+        type = "l", ylab = "Populism level", xlab = "Time", col = "green") 
   
-  legend("topleft", legend = c("people","elite","common_will"), fill = c("black", "green", "blue"))
+  legend("topleft", legend = c("people","elite","common_will"),
+         fill = c("black", "green", "blue"))
   title(main = "General level of populism divided into 3 components")
 
 ```
@@ -160,14 +165,20 @@ This plot is coherent with the previous one and show us that people is the Compo
 dat_smooth1 <- ksmooth(x = dfm_by_date1$date, 
                        y = ((dfm_by_date1[,"people"]+
                               dfm_by_date1[,"common_will"]+
-                              dfm_by_date1[,"elite"])/3) - ((!dfm_by_date1[,"people"]+
-                                                           !dfm_by_date1[,"common_will"]+
-                                                           !dfm_by_date1[,"elite"])/3),
+                              dfm_by_date1[,"elite"])/3) -
+                         ((!dfm_by_date1[,"people"]+
+                             !dfm_by_date1[,"common_will"]+
+                             !dfm_by_date1[,"elite"])/3),
                        kernel = "normal", bandwidth = 30)
 
-plot_time_1 <- plot(dat_smooth1$x, dat_smooth1$y, type = "l", ylab = "Populism level", xlab = "Time")
+plot_time_1 <- plot(dat_smooth1$x, dat_smooth1$y,
+                    type = "l", ylab = "Populism level", xlab = "Time")
 title(main = "General level of populism with Decadri_Boussalis_Grundl dictionary")
 ```
+
+
+
+
 
 
 
@@ -213,14 +224,22 @@ title(main = "General level of populism with Rooduijn_Pauwels_Italian dictionary
 
 ```
 
+
+
 ### Most populist party
 
 ```{r}
 # Most populist party
 dfm_dict2_tstat_party <- textstat_frequency(dfm_dict2, groups = party_id)
 kable(dfm_dict2_tstat_party %>% slice_max(frequency, n = 20))
-
 ```
+
+### Distribution of party populism 
+```{r}
+summary(dfm_dict2_tstat_party$frequency)
+#TBD
+```
+
 
 ### Most populist politician
 
@@ -229,6 +248,18 @@ dict2_tstat_nome <- textstat_frequency(dfm_dict2, groups = nome)
 
 kable(dict2_tstat_nome %>% slice_max(frequency, n = 20))
 ```
+
+### Distribution of politician populism 
+
+```{r}
+summary(dict2_tstat_nome$frequency)
+#TBD
+```
+
+
+
+
+
 
 
 
@@ -286,7 +317,14 @@ title(main = "General level of populism with Grundl_Italian_adapted dictionary")
 ```{r}
 # Most populist party
 dict_3_tstat_party <- textstat_frequency(dfm_dict3, groups = party_id)
+
 kable(dict_3_tstat_party %>% slice_max(frequency, n = 20))
+```
+
+### Distribution of party populism 
+```{r}
+#TBD
+summary(dict_3_tstat_party$frequency)
 ```
 
 ### Most populist politician
@@ -296,6 +334,18 @@ dict_3_tstat_nome <- textstat_frequency(dfm_dict3, groups = nome)
 
 kable(dict_3_tstat_nome %>% slice_max(frequency, n = 20))
 ```
+
+### Distribution of party populism 
+
+```{r}
+# TBD
+summary(dict_3_tstat_nome$frequency)
+
+```
+
+
+
+
 
 
 
@@ -354,18 +404,16 @@ title(main = "General level of populism with Decadri_Boussalis dictionary")
 ```{r}
 # Most populist party
 dict_4_tstat_party <- textstat_frequency(dfm_dict4, groups = party_id)
+
 kable(dict_4_tstat_party %>% slice_max(frequency, n = 20))
 ```
 
 
-
-
-
-
-
-### DISTRIBUTION OF PARTY POPULISM
+### Distribution of party populism
 ```{r}
 #TBD
+summary(dict_4_tstat_party$frequency)
+
 ```
 
 ### Most populist politician
@@ -376,20 +424,28 @@ dict_4_tstat_nome <- textstat_frequency(dfm_dict4, groups = nome)
 kable(dict_4_tstat_nome %>% slice_max(frequency, n = 20))
 ```
 
-### DISTRIBUTION OF POLITICIAN POPULISM
+### Distribution of politician populism
 ```{r}
 #TBD
+summary(dict_4_tstat_nome$frequency)
+
 ```
 
 
-## Compare the general level of populism in time for the dictionaries
+Il## Compare the general level of populism in time for the dictionaries
 
 ```{r, echo=FALSE, warning=FALSE}
-comparison_time <- plot(dat_smooth4$x, dat_smooth4$y, type = "l", ylab = "Populism level", xlab = "Time", col = "green", ylim = c(0.5,6))+
-  lines(dat_smooth3$x, dat_smooth3$y, type = "l", ylab = "Populism level", xlab = "Time", col = "blue")+
-  lines(dat_smooth2$x, dat_smooth2$y, type = "l", ylab = "Populism level", xlab = "Time", col = "red") +
-  lines(dat_smooth1$x, dat_smooth1$y, type = "l", ylab = "Populism level", xlab = "Time", col = "black")
-legend("topleft", legend = c("Roodujin_pauwels","Grundl_italian","Decadri_Boussalis", "Decadri_Boussalis_Grundl"), fill = c("red", "blue", "green", "Black"))
+comparison_time <- plot(dat_smooth4$x, dat_smooth4$y,
+                        type = "l", ylab = "Populism level", xlab = "Time", col = "green", ylim = c(0.5,6))+
+  lines(dat_smooth3$x, dat_smooth3$y,
+        type = "l", ylab = "Populism level", xlab = "Time", col = "blue")+
+  lines(dat_smooth2$x, dat_smooth2$y,
+        type = "l", ylab = "Populism level", xlab = "Time", col = "red") +
+  lines(dat_smooth1$x, dat_smooth1$y,
+        type = "l", ylab = "Populism level", xlab = "Time", col = "black")
+legend("topleft", legend = c("Roodujin_pauwels","Grundl_italian",
+                             "Decadri_Boussalis", "Decadri_Boussalis_Grundl"),
+       fill = c("red", "blue", "green", "Black"))
 title(main = "Compare how the different dictionaries score")
 ```
 ```{r}
@@ -400,17 +456,21 @@ comparison_time <- plot(dat_smooth3$x, dat_smooth3$y, type = "l", ylab = "Populi
 legend("topleft", legend = c("Roodujin_pauwels","Grundl_italian", "Decadri_Boussalis_Grundl"), fill = c("red", "blue", "Black"))
 title(main = "Compare how the different dictionaries score")
 ```
+
 ## Compare how the dictionaries score for the most populist party
 ```{r}
-# Create the columns with the "populist score, 11 for the "most populist" and 1 for the least
+# Create the columns with the "populist score"
+# 11 for the "most populist" and 1 for the least
 dfm_dict2_tstat_party$my_rank <- rank(dfm_dict2_tstat_party$frequency)
 dict_3_tstat_party$my_rank <- rank(dict_3_tstat_party$frequency)
 dict_4_tstat_party$my_rank <- rank(dict_4_tstat_party$frequency)
 
 # define the party list
-party <- c("LEGA","PD","M5S","FI","FDI","MISTO","LEU","CI","IV","INDIPENDENTE","REG_LEAGUES")
+party <- c("LEGA","PD","M5S","FI","FDI","MISTO",
+           "LEU","CI","IV","INDIPENDENTE","REG_LEAGUES")
 # create an empty df
-party_rank <- data.frame(first = vector(), second = vector(), third = vector(), fourth = vector() )
+party_rank <- data.frame(first = vector(), second = vector(),
+                         third = vector(), fourth = vector() )
 
 # loop the rank for each party
 for (i in party)
@@ -420,7 +480,8 @@ for (i in party)
   rank_dict_4 <- (dict_4_tstat_party %>% filter(group == i ) %>% .$my_rank)
   
   party <- (i)
-  party_rank <- rbind(party_rank, cbind(party, rank_dict_2, rank_dict_3, rank_dict_4))
+  party_rank <- rbind(party_rank, cbind(party, rank_dict_2,
+                                        rank_dict_3, rank_dict_4))
 }
 
 # change the format of the columns in numeric
@@ -437,7 +498,7 @@ kable(party_rank)
 \newpage
 
 
-```{r}
+```{r, include=FALSE, eval=FALSE}
 # TEST
 ggplot(dict_4_tstat_nome, aes(x=frequency)) +
   geom_histogram(binwidth=.5, colour="black", fill="white") +
