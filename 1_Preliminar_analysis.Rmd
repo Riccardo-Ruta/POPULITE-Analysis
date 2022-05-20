@@ -137,6 +137,8 @@ which(tw$genere == a[3])
 unique(tw$genere)
 ```
 
+
+
 **Now all the variables are ready for next steps**
 
 ## Create a new dataset selecting only necessary informations
@@ -223,7 +225,6 @@ d <- DFM_trimmed@Dimnames$features
 diff <- setdiff(d,c)
 emoji <- diff[diff %>% nchar() < 4] 
 emoji <- list(emoji)
-emoji
 # Now i can remove this list from the dfm
 DFM_trimmed <- dfm_remove(DFM_trimmed, emoji)
 
@@ -249,6 +250,25 @@ dfm_weight <- DFM_trimmed %>%
 \newpage
 
 # Preliminar analysis
+
+## Who is inside this dataset?
+
+```{r}
+# Number of parliamentarians
+n_parl <- length(unique(dataset$nome))
+n_parl
+# How many parliamentarians for each party?
+n_parl_party <- dataset %>% group_by(party_id) %>% count()
+kable(n_parl_party)
+
+# Gneder composition
+n_gender <- dataset %>% group_by(genere) %>% count()
+kable(n_gender)
+
+# Wich is the period of analysis?
+max(tw$date)
+min(tw$date)
+```
 
 ## Topfeatures frquency
 
@@ -421,16 +441,70 @@ for (i in unique(tw$party_id))
 {
   a <- paste("#", i ,sep = "")
   b <- tw %>% filter(grepl(a,tweet_testo)&party_id== i) %>% count()
-  party_citations <- rbind(party_citations, cbind(i,b))
+  c <- tw %>% filter(party_id == i) %>% count()
+  d <- (b/c) * 100
+  party_citations <- rbind(party_citations, cbind(i,b,c,d))
 
 }
 )
 
 #save(party_citations, file = "data/party_citations.Rda")
 ```
+
 ```{r}
-kable(party_citations, col.names = c("Party","Number of citations"))
+colnames(party_citations) <- c("party","n_citations", "Number of tweets", "perc")
+
+kable(party_citations %>% arrange(desc(perc)), col.names = c("Party","Number of citations",
+                                     "number of tweets", "% of citations"))
 ```
+In the above script i search the # for the parliamentary group, but is very unlikely, for example, that someone use the #IV for talking about the "Italia Viva" party, so i decided to enrich the dataframe creating a new variable with the name of the official twitter page for every party, and repeat the search using it.
+
+I created the variable party_Page for only those parliamentary group that has a direct connection with a party (i excluded Reg_leagues, misto and indipendente)
+
+### Create the variable with the name of the official Twitter account
+
+```{r}
+tw <- tw %>% mutate(party_page = if_else(party_id == "PD", "@pdnetwork",
+if_else( party_id == "FDI", "@FratellidItalia",
+      if_else(party_id == "M5S", "@Mov5Stelle",
+              if_else(party_id == "FI", "@forza_italia",
+                      if_else(party_id == "LEGA", "@LegaSalvini",
+                              if_else(party_id == "IV", "@ItaliaViva",
+                                      if_else(party_id == "CI", "@coraggio_italia",
+                                              if_else(party_id == "LEU", "@liberi_uguali",
+                                                      "NA")))))))))
+
+```
+
+### Count for each party how many times a politician cite their respective party
+```{r, include=FALSE}
+load("data/party_citations_page.Rda")
+```
+
+```{r,eval=FALSE}
+party_citations_page <- data.frame(first = vector(), second = vector(),
+                                  third = vector(), fourth = vector())
+system.time(
+  for (i in unique(tw$party_page))
+  {
+    b <- tw %>% filter(grepl(i,tweet_testo)&party_page== i) %>% count()
+    c <- tw %>% filter(party_page == i) %>% count()
+    d <- (b/c) * 100
+    party_citations_page <- rbind(party_citations_page, cbind(i,b,c,d))
+    
+  }
+)
+# save(party_citations_page, file = "data/party_citations_page.Rda")
+```
+
+```{r}
+colnames(party_citations_page) <- c("party","n_citations", "Number of tweets", "perc")
+
+kable(party_citations_page %>% filter(party != "NA") %>%arrange(desc(perc)), col.names = c("Party","Number of citations",
+                                          "number of tweets", "% of citations"))
+```
+
+
 
 ## How many times a politician cite itself in the tweet
 ```{r, include=FALSE}
@@ -444,14 +518,18 @@ for (i in unique(tw$tw_screen_name))
 {
   a <- paste("@", i ,sep = "")
   b <- tw %>% filter(grepl(a,tweet_testo) & tw_screen_name== i) %>% count()
-  self_citations <- rbind(self_citations, cbind(i,b))
+  c <- tw %>% filter(tw_screen_name == i) %>% count()
+  d <- (b/c) * 100
+  self_citations <- rbind(self_citations, cbind(i,b,c,d))
 }
 )
 #save(self_citations, file = "data/self_citations.Rda")
 ```
 
 ```{r}
+colnames(self_citations) <- c("Politician","n_citations", "Number of tweets", "perc")
 
-kable(self_citations %>% filter(n >2), col.names = c("Politician","Number of citations"))
+kable(self_citations %>% filter(n_citations > 2) %>% arrange(desc(perc)), col.names = c("Politician","Number of citations",
+                                                     "Number of tweets", "% of citations"))
 ```
 
