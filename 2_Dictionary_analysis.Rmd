@@ -456,7 +456,7 @@ legend("topleft", legend = c("Roodujin_pauwels","Grundl_italian",
 title(main = "Compare how the different dictionaries score")
 ```
 
-```{r}
+```{r, echo=FALSE}
 # FOCUS ON THE DICTIONARIES THAT SCORE SIMILARLY
 comparison_time <- plot(dat_smooth3$x, dat_smooth3$y, type = "l", ylab = "Populism level", xlab = "Time", col = "blue",ylim = c(0.5,2))+
   lines(dat_smooth2$x, dat_smooth2$y, type = "l", ylab = "Populism level", xlab = "Time", col = "red") +

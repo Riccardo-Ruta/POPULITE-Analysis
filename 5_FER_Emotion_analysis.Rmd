@@ -12,7 +12,7 @@ output:
 ---
 # FER: Facial Emotion Recognition Analysis
 
-## Report on the analysis made with FER Puthon package
+## Report on the analysis made with FER Python package
 
 The package use the FER-2013 dataset created by Pierre Luc Carrier and Aaron Courville.
 

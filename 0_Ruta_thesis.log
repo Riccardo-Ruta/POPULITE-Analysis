@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2022.5.7)  19 MAY 2022 21:21
+This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2022.5.7)  21 MAY 2022 16:47
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -856,22 +856,22 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 \openout5 = `0_Ruta_thesis.toc'.
 
 [6] [1] [2] [3] [4] [5]
-Overfull \hbox (71.22757pt too wide) in paragraph at lines 524--524
+Overfull \hbox (71.22757pt too wide) in paragraph at lines 523--523
 []\TU/lmtt/m/n/12 ##  [1] "PD"           "FDI"          "M5S"          "FI"           "REG_LEAGUES"[] 
  []
 
 
-Overfull \hbox (15.59567pt too wide) in paragraph at lines 524--524
+Overfull \hbox (15.59567pt too wide) in paragraph at lines 523--523
 []\TU/lmtt/m/n/12 ##  [6] "MISTO"        "LEGA"         "IV"           "INDIPENDENTE" "CI"[] 
  []
 
 
-Overfull \hbox (9.42783pt too wide) in paragraph at lines 555--555
+Overfull \hbox (9.42783pt too wide) in paragraph at lines 554--554
 []\TU/lmtt/m/n/12 ## [1] "sottosegretario" "presregione"     "viceministro"    "ministro"[] 
  []
 
 [6]
-Overfull \hbox (15.60776pt too wide) in paragraph at lines 630--630
+Overfull \hbox (15.60776pt too wide) in paragraph at lines 629--629
 []\TU/lmtt/m/n/12 ## [1] "nome"        "tweet_testo" "genere"      "party_id"    "chamber"[] 
  []
 
@@ -880,22 +880,22 @@ Missing character: There is no 🇮 (U+1F1EE) in font [lmmono12-regular]:!
 Missing character: There is no 🇹 (U+1F1F9) in font [lmmono12-regular]:!
 Missing character: There is no 🔴 (U+1F534) in font [lmmono12-regular]:!
 [8]
-Overfull \hbox (58.86766pt too wide) in paragraph at lines 698--698
+Overfull \hbox (58.86766pt too wide) in paragraph at lines 697--697
 []\TU/lmtt/m/n/12 ##    governo     grazie     lavoro      paese       anni presidente     grande[] 
  []
 
 
-Overfull \hbox (58.7956pt too wide) in paragraph at lines 698--698
+Overfull \hbox (58.7956pt too wide) in paragraph at lines 697--697
 []\TU/lmtt/m/n/12 ##      26036      20835      18314      16473      16317      14258      13656[] 
  []
 
 
-Overfull \hbox (58.86768pt too wide) in paragraph at lines 698--698
+Overfull \hbox (58.86768pt too wide) in paragraph at lines 697--697
 []\TU/lmtt/m/n/12 ##   italiani     italia   l'italia        via   politica  cittadini       bene[] 
  []
 
 
-Overfull \hbox (58.78357pt too wide) in paragraph at lines 698--698
+Overfull \hbox (58.78357pt too wide) in paragraph at lines 697--697
 []\TU/lmtt/m/n/12 ##      12011      11980      11752      11504       9964       9360       9311[] 
  []
 
@@ -905,149 +905,159 @@ File: output/emoji.png Graphic file (type bmp)
 [10] [11] [12]
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-24-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-24-1.pdf>
+[13]
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-25-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-25-1.pdf>
-[13]
-File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-27-1.pdf Graphic file (type pdf)
-<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-27-1.pdf>
 [14]
-Overfull \hbox (83.57579pt too wide) in paragraph at lines 879--879
+File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-26-1.pdf Graphic file (type pdf)
+<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-26-1.pdf>
+[15]
+Overfull \hbox (83.57579pt too wide) in paragraph at lines 915--915
 []\TU/lmtt/m/n/12 ##  [1] "#iostoconsalvini" "#coronavirus"     "#covid19"         "#fratelliditalia"[] 
  []
 
 
-Overfull \hbox (21.78767pt too wide) in paragraph at lines 879--879
+Overfull \hbox (21.78767pt too wide) in paragraph at lines 915--915
 []\TU/lmtt/m/n/12 ##  [5] "#lega"            "#salvini"         "#governo"         "#conte"[] 
  []
 
 
-Overfull \hbox (27.95566pt too wide) in paragraph at lines 879--879
+Overfull \hbox (27.95566pt too wide) in paragraph at lines 915--915
 []\TU/lmtt/m/n/12 ##  [9] "#oggivotolega"    "#m5s"             "#roma"            "#draghi"[] 
  []
 
 
-Overfull \hbox (46.50772pt too wide) in paragraph at lines 879--879
+Overfull \hbox (46.50772pt too wide) in paragraph at lines 915--915
 []\TU/lmtt/m/n/12 ## [13] "#meloni"          "#senato"          "#forzalombardia"  "#greenpass"[] 
  []
 
 
-Overfull \hbox (9.4277pt too wide) in paragraph at lines 879--879
+Overfull \hbox (9.4277pt too wide) in paragraph at lines 915--915
 []\TU/lmtt/m/n/12 ## [17] "#nocoprifuoco"    "#covid"           "#italia"          "#mes"[] 
  []
 
-File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-29-1.pdf Graphic file (type pdf)
-<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-29-1.pdf>
-[15]
+File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-28-1.pdf Graphic file (type pdf)
+<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-28-1.pdf>
+[16]
+File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-30-1.pdf Graphic file (type pdf)
+<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-30-1.pdf>
+[17]
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-31-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-31-1.pdf>
-[16]
+[18]
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-32-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-32-1.pdf>
-[17]
-File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-33-1.pdf Graphic file (type pdf)
-<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-33-1.pdf>
-[18] [19]
+[19] [20]
+File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-36-1.pdf Graphic file (type pdf)
+<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-36-1.pdf>
+[21]
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-37-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-37-1.pdf>
-[20]
+[22]
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-38-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-38-1.pdf>
-[21]
-File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-39-1.pdf Graphic file (type pdf)
-<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-39-1.pdf>
-[22]
+[23]
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 1009.
-[23] [24] [25] [26] [27] [28] [29] [30]
+(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 1058.
+[24] [25] [26] [27] [28] [29] [30] [31] [32]
+File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-53-1.pdf Graphic file (type pdf)
+<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-53-1.pdf>
+[33] [34]
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-54-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-54-1.pdf>
-[31] [32]
+[35] [36]
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-55-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-55-1.pdf>
-[33] [34]
-File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-56-1.pdf Graphic file (type pdf)
-<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-56-1.pdf>
-[35]
-File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-58-1.pdf Graphic file (type pdf)
-<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-58-1.pdf>
-[36] [37] [38]
-Overfull \hbox (5.64389pt too wide) in paragraph at lines 1546--1591
+[37]
+File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-57-1.pdf Graphic file (type pdf)
+<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-57-1.pdf>
+[38] [39] [40]
+Overfull \hbox (5.64389pt too wide) in paragraph at lines 1605--1650
 [][] 
  []
 
-[39] [40] [41]
+[41] [42] [43]
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-65-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-65-1.pdf>
-[42] [43]
-Overfull \hbox (5.64389pt too wide) in paragraph at lines 1718--1763
-[][] 
- []
-
 [44] [45]
-File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-71-1.pdf Graphic file (type pdf)
-<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-71-1.pdf>
-[46] [47]
-Overfull \hbox (4.62389pt too wide) in paragraph at lines 1885--1930
+Overfull \hbox (5.64389pt too wide) in paragraph at lines 1826--1871
 [][] 
  []
 
-[48] [49]
-File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-76-1.pdf Graphic file (type pdf)
-<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-76-1.pdf>
-File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-77-1.pdf Graphic file (type pdf)
-<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-77-1.pdf>
-[50] [51] [52] [53] [54] [55]
-Overfull \vbox (0.55798pt too high) detected at line 2151
+[46] [47] [48]
+File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-72-1.pdf Graphic file (type pdf)
+<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-72-1.pdf>
+[49] [50]
+Overfull \hbox (4.62389pt too wide) in paragraph at lines 2042--2087
+[][] 
  []
 
-[56] [57]
-File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-86-1.pdf Graphic file (type pdf)
-<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-86-1.pdf>
-File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-87-1.pdf Graphic file (type pdf)
-<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-87-1.pdf>
-[58] [59]
+[51] [52]
+File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-78-1.pdf Graphic file (type pdf)
+<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-78-1.pdf>
+[53]
+File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-79-1.pdf Graphic file (type pdf)
+<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-79-1.pdf>
+[54] [55] [56] [57]
+Underfull \vbox (badness 10000) detected at line 2284
+ []
+
+
+Underfull \vbox (badness 10000) detected at line 2284
+ []
+
+[58] [59] [60] [61]
+Overfull \vbox (0.55798pt too high) detected at line 2400
+ []
+
+[62] [63]
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-88-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-88-1.pdf>
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-89-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-89-1.pdf>
-[60] [61]
+[64] [65]
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-90-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-90-1.pdf>
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-91-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-91-1.pdf>
-[62] [63]
+[66] [67]
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-92-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-92-1.pdf>
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-93-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-93-1.pdf>
-[64] [65]
+[68] [69]
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-94-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-94-1.pdf>
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-95-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-95-1.pdf>
-[66] [67]
+[70] [71]
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-96-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-96-1.pdf>
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-97-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-97-1.pdf>
-[68] [69]
+[72] [73]
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-98-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-98-1.pdf>
 File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-99-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-99-1.pdf>
-[70] [71]
+[74] [75]
+File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-100-1.pdf Graphic file (type pdf)
+<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-100-1.pdf>
+File: 0_Ruta_thesis_files/figure-latex/unnamed-chunk-101-1.pdf Graphic file (type pdf)
+<use 0_Ruta_thesis_files/figure-latex/unnamed-chunk-101-1.pdf>
+[76] [77]
 
 LaTeX Font Warning: Font shape `TU/lmtt/bx/it' in size <12> not available
-(Font)              Font shape `TU/lmtt/b/sl' tried instead on input line 2309.
+(Font)              Font shape `TU/lmtt/b/sl' tried instead on input line 2558.
 
-[72]
+[78]
 File: 0_Ruta_thesis_files/figure-latex/7.2-1.pdf Graphic file (type pdf)
 <use 0_Ruta_thesis_files/figure-latex/7.2-1.pdf>
-[73] [74] [75] [76] 
+[79] [80] [81] [82] 
 AED: lastpage setting LastPage
 (./0_Ruta_thesis.aux)
 Package rerunfilecheck Info: File `0_Ruta_thesis.out' has not changed.
-(rerunfilecheck)             Checksum: 99D1C0F9A595AD6C7B44BE28F4740417;21808.
+(rerunfilecheck)             Checksum: 92439809DE8BFFA8764AA6B38C37A8DD;23532.
  )
 (\end occurred inside a group at level 2)
 
@@ -1055,12 +1065,12 @@ Package rerunfilecheck Info: File `0_Ruta_thesis.out' has not changed.
 ### semi simple group (level 1) entered at line 105 (\begingroup)
 ### bottom level 
 Here is how much of TeX's memory you used:
- 19889 strings out of 478132
- 376329 string characters out of 5851318
- 846207 words of memory out of 5000000
- 40221 multiletter control sequences out of 15000+600000
+ 19892 strings out of 478132
+ 376634 string characters out of 5851318
+ 848343 words of memory out of 5000000
+ 40224 multiletter control sequences out of 15000+600000
  472890 words of font info for 61 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 86i,10n,121p,557b,9949s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 86i,10n,121p,537b,9949s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on 0_Ruta_thesis.pdf (83 pages).
+Output written on 0_Ruta_thesis.pdf (89 pages).

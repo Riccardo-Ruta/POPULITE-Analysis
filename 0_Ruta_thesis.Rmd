@@ -90,7 +90,7 @@ no more than 250 words for the abstract
 - brief results
 - key conclusions that put the research into a larger context
 
-\pagenumbering{roman}
+\pagenumbering{Roman}
 
 \newpage
 
