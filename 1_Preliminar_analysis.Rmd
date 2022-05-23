@@ -49,7 +49,7 @@ kable(tail(check_dates), col.names = c("Old date", "New date"))
 tw <- tw %>% mutate(week = cut.Date(date, breaks = "1 week", labels = FALSE))
 ```
 
-### Check the variable 
+### Check the variable
 
 Inspect the first and the last dates and check if the number of weeks is correct
 
@@ -102,7 +102,7 @@ kable(missing_df)
 
 ```
 
-From that analysis i obtain 148178 url missing, this is because the url is collected only when the tweets has an external link to other sources, for our analysis we can ignore those missings, with this check also results 6494 tweets missing those are the cases when someone post only images or video without text, so the extraction is correct.
+From this check I'll obtain 148178 urls missing, this variable is not collected properly and we will not use in the analysis, and also results 6494 tweets missings, those are the cases when someone post only images or video without text, so the extraction is correct.
 
 ### Remove rows with missing tweets
 
@@ -223,7 +223,6 @@ d <- DFM_trimmed@Dimnames$features
 diff <- setdiff(d,c)
 emoji <- diff[diff %>% nchar() < 4] 
 emoji <- list(emoji)
-emoji
 # Now i can remove this list from the dfm
 DFM_trimmed <- dfm_remove(DFM_trimmed, emoji)
 
@@ -250,22 +249,39 @@ dfm_weight <- DFM_trimmed %>%
 
 # Preliminar analysis
 
-## Topfeatures frquency
+## Who is inside this dataset?
 
-```{r, warning=FALSE, echo=FALSE}
+```{r}
+# Number of parliamentarians
+n_parl <- length(unique(dataset$nome))
+n_parl
+# How many parliamentarians for each party?
+n_parl_party <- dataset %>% group_by(party_id) %>% count()
+kable(n_parl_party)
+
+# Gneder composition
+n_gender <- dataset %>% group_by(genere) %>% count()
+kable(n_gender)
+
+# Wich is the period of analysis?
+max(tw$date)
+min(tw$date)
+```
+
+## Topfeatures frequency
+
+```{r, warning=FALSE}
 # Textplotwordcloud
 set.seed(123)
 textplot_wordcloud(dfm_weight,min_count = 20,max_words = 300,
      color = c('red', 'pink', 'green', 'purple', 'blue'))
 ```
 
-```{r, echo=FALSE}
+```{r}
 # Plot frequency of the topfeatures in the DFM
 features_dfm <- textstat_frequency(dfm_weight, n = 50)
-
 # Sort by reverse frequency order
 features_dfm$feature <- with(features_dfm, reorder(feature, -frequency))
-
 ggplot(features_dfm, aes(x = feature, y = frequency)) +
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
@@ -275,11 +291,7 @@ ggplot(features_dfm, aes(x = feature, y = frequency)) +
 
 ### Relative frequency of the topfeatures by Party ID
 
-```{r,echo=FALSE}
-#kable(unique(DFM_trimmed$party_id),col.names = "Party")
-```
-
-```{r, echo=FALSE}
+```{r}
 # Plot relative frequency by party_id
 freq_weight <- textstat_frequency(dfm_weight, n = 7, 
                                   groups = dfm_weight$party_id)
@@ -331,8 +343,9 @@ ggplot(data = tstat_freq, aes(x = nrow(tstat_freq):1, y = frequency)) +
 
 ### Co-occurrence Plot of hashtags
 
-Not weighted
-```{r, echo=FALSE}
+**Not weighted**
+
+```{r}
 # NOT WEIGHTED
 tag_dfm_NOT_W <- dfm_select(DFM, pattern = "#*")
 toptag_NOT <- names(topfeatures(tag_dfm_NOT_W, 20))
@@ -343,8 +356,9 @@ topgat_fcm_NOT <- fcm_select(tag_fcm_NOT, pattern = toptag_NOT)
 textplot_network(topgat_fcm_NOT, min_freq = 0.1, edge_alpha = 0.8, edge_size = 5)
 ```
 
-Weighted
-```{r, echo=FALSE}
+**Weighted**
+
+```{r}
 # WEIGHTED
 tag_fcm <- fcm(tag_dfm)
 set.seed(123)
@@ -387,7 +401,8 @@ ggplot(data = user_tstat_freq, aes(x = nrow(user_tstat_freq):1, y = frequency)) 
 
 ### Co-occurrence plot of usernames
 
-Weighted
+**Weighted**
+
 ```{r, echo=FALSE}
 # WEIGHTED
 user_fcm <- fcm(user_dfm)
@@ -396,8 +411,9 @@ user_fcm <- fcm_select(user_fcm, pattern = topuser)
 textplot_network(user_fcm, min_freq = 0.1, edge_color = "orange", edge_alpha = 0.8, edge_size = 5)
 ```
 
-Not weighted
-```{r}
+**Not weighted**
+
+```{r, echo=FALSE}
 # NOT WEIGHTED
 user_dfm_NOT_W <- dfm_select(DFM, pattern = "@*")
 topuser_NOT <- names(topfeatures(user_dfm_NOT_W, 20, scheme = "docfreq"))
@@ -406,4 +422,116 @@ user_fcm_NOT <- fcm(user_dfm_NOT_W)
 set.seed(6)
 topuser_fcm_NOT <- fcm_select(user_fcm_NOT, pattern = topuser_NOT)
 textplot_network(topuser_fcm_NOT, min_freq = 0.1, edge_alpha = 0.8, edge_size = 5)
+```
+
+## How many times a politician cite his/her party
+
+```{r, include=FALSE}
+load("data/party_citations.Rda")
+```
+
+```{r, eval =FALSE}
+party_citations <- data.frame(first = vector(), second = vector() )
+system.time(
+for (i in unique(tw$party_id))
+{
+  a <- paste("#", i ,sep = "")
+  b <- tw %>% filter(grepl(a,tweet_testo)&party_id== i) %>% count()
+  c <- tw %>% filter(party_id == i) %>% count()
+  d <- (b/c) * 100
+  party_citations <- rbind(party_citations, cbind(i,b,c,d))
+
+}
+)
+
+#save(party_citations, file = "data/party_citations.Rda")
+```
+
+```{r}
+colnames(party_citations) <- c("party","n_citations", "Number of tweets", "perc")
+
+kable(party_citations %>% arrange(desc(perc)),
+      col.names = c("Party","Number of citations",
+                    "number of tweets", "% of citations"))
+```
+
+In the above script i search the \# for the parliamentary group, but is very unlikely, for example, that someone use the #IV for talking about the "Italia Viva" party, so i decided to enrich the dataframe creating a new variable with the name of the official twitter page for every party, and repeat the search using it.
+
+I created the variable party_Page for only those parliamentary group that has a direct connection with a party (i excluded Reg_leagues, misto and indipendente)
+
+### Create the variable with the name of the official Twitter account
+
+```{r}
+tw <- tw %>% mutate(party_page = if_else(party_id == "PD", "@pdnetwork",
+if_else( party_id == "FDI", "@FratellidItalia",
+    if_else(party_id == "M5S", "@Mov5Stelle",
+      if_else(party_id == "FI", "@forza_italia",
+        if_else(party_id == "LEGA", "@LegaSalvini",                                          if_else(party_id == "IV", "@ItaliaViva",
+            if_else(party_id == "CI", "@coraggio_italia",
+              if_else(party_id == "LEU", "@liberi_uguali",
+                                                      "NA")))))))))
+
+```
+
+### Count for each party how many times a politician cite their respective party
+
+```{r, include=FALSE}
+load("data/party_citations_page.Rda")
+```
+
+```{r,eval=FALSE}
+party_citations_page <- data.frame(first = vector(), second = vector(),
+                                  third = vector(), fourth = vector())
+system.time(
+  for (i in unique(tw$party_page))
+  {
+    b <- tw %>% filter(grepl(i,tweet_testo)&party_page== i) %>% count()
+    c <- tw %>% filter(party_page == i) %>% count()
+    d <- (b/c) * 100
+    party_citations_page <- rbind(party_citations_page, cbind(i,b,c,d))
+    
+  }
+)
+# save(party_citations_page, file = "data/party_citations_page.Rda")
+```
+
+```{r}
+colnames(party_citations_page) <- c("party","n_citations",
+                                    "Number of tweets", "perc")
+
+kable(party_citations_page %>% filter(party != "NA") %>%
+        arrange(desc(perc)),
+      col.names = c("Party","Number of citations",
+                    "number of tweets", "% of citations"))
+```
+
+## How many times a politician cite itself in the tweet
+
+```{r, include=FALSE}
+load("data/self_citations.Rda")
+```
+
+```{r, eval=FALSE}
+self_citations <- data.frame(first = vector(), second = vector() )
+system.time(
+for (i in unique(tw$tw_screen_name))
+{
+  a <- paste("@", i ,sep = "")
+  b <- tw %>% filter(grepl(a,tweet_testo) & tw_screen_name== i) %>% count()
+  c <- tw %>% filter(tw_screen_name == i) %>% count()
+  d <- (b/c) * 100
+  self_citations <- rbind(self_citations, cbind(i,b,c,d))
+}
+)
+#save(self_citations, file = "data/self_citations.Rda")
+```
+
+```{r}
+colnames(self_citations) <- c("Politician","n_citations",
+                              "Number of tweets", "perc")
+
+kable(self_citations %>% filter(n_citations > 2) %>%
+        arrange(desc(perc)),
+      col.names = c("Politician","Number of citations",
+                    "Number of tweets", "% of citations"))
 ```
