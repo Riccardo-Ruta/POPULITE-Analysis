@@ -1,0 +1,41 @@
+---
+title: "Untitled"
+author: "Riccardo Ruta"
+date: '2022-05-25'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+
+```{r}
+dat_smooth2 <- ksmooth(x = dfm_by_date2$date, 
+                      y = !dfm_by_date2[,"populism"],
+                      kernel = "normal", bandwidth = 30)
+
+plot_time_2 <- plot(dat_smooth2$x, dat_smooth2$y, type = "l", ylab = "Populism level", xlab = "Time") + 
+  abline(h = 0, lty = 2)
+grid()
+title(main = "General level of populism with Rooduijn_Pauwels_Italian dictionary")
+```
+
+```{r}
+matplot(dfm_by_date1$date, dfm_by_date1, type = "l", lty = 1, col = 1:2,
+        ylab = "Frequency", xlab = "")
+grid()
+legend("topleft", col = 1:2, legend = colnames(dfm_by_date1), lty = 1, bg = "white")
+```
+
+```{r}
+dat_smooth <- ksmooth(x = dfm_by_date1$date, 
+                      y = dfm_by_date1@Dimnames$features)
+plot(dat_smooth$x, dat_smooth$y, type = "l", ylab = "Sentiment", xlab = "")
+grid()
+abline(h = 0, lty = 2)
+```
+

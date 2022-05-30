@@ -64,17 +64,25 @@ Decadri_Boussalis_Grundl <-
                   elite =
                     dict$Decadri_Boussalis_Grundl_Elite
                   [!is.na(dict$Decadri_Boussalis_Grundl_Elite)]))
+# Create an extra dictionary combining 3 components into one
+d_b_g_Populism <-
+  dictionary(list(populism =
+                    c(Decadri_Boussalis_Grundl$people,
+                      Decadri_Boussalis_Grundl$common_will,
+                      Decadri_Boussalis_Grundl$elite)))
+
 ```
 
 ```{r}
 dictionaries <- c("Rooduijn_Pauwels_Italian", "Grundl_Italian_adapted",
-                  "Decadri_Boussalis","Decadri_Boussalis_Grundl")
+                  "Decadri_Boussalis","Decadri_Boussalis_Grundl","d_b_g_Populism")
 n.words <- c(length(Rooduijn_Pauwels_Italian$populism),
            length(Grundl_Italian_adapted$populism),
            length(Decadri_Boussalis$populism),
            (length(Decadri_Boussalis_Grundl$people)+
               length(Decadri_Boussalis_Grundl$common_will)+
-              length(Decadri_Boussalis_Grundl$elite))
+              length(Decadri_Boussalis_Grundl$elite)),
+           length(d_b_g_Populism$populism)
             )
 number_of_words <- data.frame(dictionaries,n.words)
 kable(number_of_words)
@@ -88,13 +96,17 @@ load("data/dfm.Rda")
 
 ```{r}
 # By party & month
-dfm_weigh_p_month <- dfm_group(DFM, groups = interaction(party_id, month)) %>% dfm_weight(scheme = "prop")
+dfm_weigh_p_month <- dfm_group(DFM, groups = interaction(party_id, month))%>%
+  dfm_weight(scheme = "prop")
 # By party & quarter
-dfm_weigh_p_quart <- dfm_group(DFM, groups = interaction(party_id, quarter)) %>% dfm_weight(scheme = "prop")
+dfm_weigh_p_quart <- dfm_group(DFM, groups = interaction(party_id, quarter))%>%
+  dfm_weight(scheme = "prop")
 # By party & year
-dfm_weigh_p_year <- dfm_group(DFM, groups = interaction(party_id, year)) %>% dfm_weight(scheme = "prop")
+dfm_weigh_p_year <- dfm_group(DFM, groups = interaction(party_id, year))%>%
+  dfm_weight(scheme = "prop")
 # By party & day
-dfm_weigh_p_day <- dfm_group(DFM, groups = interaction(party_id, date)) %>% dfm_weight(scheme = "prop")
+dfm_weigh_p_day <- dfm_group(DFM, groups = interaction(party_id, date))%>%
+  dfm_weight(scheme = "prop")
 
 ```
 
@@ -102,17 +114,10 @@ dfm_weigh_p_day <- dfm_group(DFM, groups = interaction(party_id, date)) %>% dfm_
 
 \newpage
 
-**Apply dictionary**
+**Apply the dictionaries**
 
 ## Decadri_Boussalis_Grundl
 
-### Level of sparsity
-
-daily: 12.08%
-
-weekly: 0.55%
-
-monthly: 0%
 
 ```{r, warning=FALSE}
 # Dictionary analysis with Decadri_Boussalis_Grundl
@@ -126,7 +131,7 @@ dfm_by_date1 <- dfm_lookup(dfm_weigh_p_day, dictionary = Decadri_Boussalis_Grund
 ```{r, echo=FALSE}
 tstat1 <- textstat_frequency(dfm_dict1, groups = party_id)
 
-ggplot(data = tstat1, aes(x = factor(nrow(tstat1):1), y = frequency)) +
+ggplot(data = tstat1, aes(x = factor(nrow(tstat1):1), y = frequency *100)) +
     geom_point() +
     facet_wrap(~ group, scales = "free") +
     coord_flip() +
@@ -141,19 +146,20 @@ Looking at the populist rhetoric for each party divided into the 3 components pe
 
 ```{r}
 dat_smooth1.1 <- ksmooth(x = dfm_by_date1$date, 
-                      y = dfm_by_date1[,"people"] - !dfm_by_date1[,"people"],
+                      y =!dfm_by_date1[,"people"]*100,
                       kernel = "normal", bandwidth = 30)
 
 dat_smooth1.2 <- ksmooth(x = dfm_by_date1$date, 
-                      y = dfm_by_date1[,"common_will"] - !dfm_by_date1[,"common_will"],
+                      y = !dfm_by_date1[,"common_will"]*100,
                       kernel = "normal", bandwidth = 30)
 
 dat_smooth1.3 <- ksmooth(x = dfm_by_date1$date, 
-                      y = dfm_by_date1[,"elite"] - !dfm_by_date1[,"elite"],
+                      y =!dfm_by_date1[,"elite"]*100,
                       kernel = "normal", bandwidth = 30)
 
 plot_time_1 <- plot(dat_smooth1.1$x, dat_smooth1.1$y,
-                    type = "l", ylab = "Populism level", xlab = "Time",  ylim = c(-1,0), xlim = c(min(dfm_by_date1$date),max(dfm_by_date1$date)))
+                    type = "l", ylab = "Populism level", xlab = "Time", 
+                    ylim = c(0,1.5), xaxt="n")
   
   lines(dat_smooth1.2$x, dat_smooth1.2$y,
         type = "l", ylab = "Populism level", xlab = "Time",col = "blue") 
@@ -163,54 +169,115 @@ plot_time_1 <- plot(dat_smooth1.1$x, dat_smooth1.1$y,
   
   legend("topleft", legend = c("people","elite","common_will"),
          fill = c("black", "green", "blue"))
-  axis(1, dfm_by_date1$date,
-     format(dfm_by_date1$date, "%y-%m"))
+  
+  axis.Date(1, at=seq(min(dfm_by_date1$date), max(dfm_by_date1$date), by="months"), format="%m-%Y")
   grid()
   title(main = "General level of populism divided into 3 components")
   
 
 ```
 
-This plot is coherent with the previous one and show us that people is the Component that score better.
+This plot is coherent with the previous one and show us that "people" is the Component that score better.
 
 ### General level of populism in time
 
 ```{r}
 dat_smooth1 <- ksmooth(x = dfm_by_date1$date, 
-                       y = ((dfm_by_date1[,"people"]+
+                       y = (!(dfm_by_date1[,"people"]+
                               dfm_by_date1[,"common_will"]+
-                              dfm_by_date1[,"elite"])/3) -
-                         !((dfm_by_date1[,"people"]+
-                              dfm_by_date1[,"common_will"]+
-                              dfm_by_date1[,"elite"])/3),
+                              dfm_by_date1[,"elite"]) * 100 ),
                        kernel = "normal", bandwidth = 30)
 
 plot_time_1 <- plot(dat_smooth1$x, dat_smooth1$y,
-                    type = "l", ylab = "Populism level", xlab = "Time")
-                    axis(1, dat_smooth1$x,
-                         format(dat_smooth1$x, "%y-%m"))
-                    grid()
+                    type = "l", ylab = "Populism level", xlab = "Time",xaxt="n")
+axis.Date(1, at=seq(min(dat_smooth1$x), max(dat_smooth1$x), by="months"), format="%m-%Y")
+grid()
 title(main = "General level of populism with Decadri_Boussalis_Grundl dictionary")
 ```
+
 ### Most populist parliamentary group for each component
+
 
 ```{r}
 # Most populist parliamentary group
 dfm_dict1_tstat_party <- textstat_frequency(dfm_dict1, groups = party_id)
-kable(dfm_dict1_tstat_party %>% filter(feature == "people") %>% slice_max(frequency, n = 20))
-kable(dfm_dict1_tstat_party %>% filter(feature == "elite") %>% slice_max(frequency, n = 20))
-kable(dfm_dict1_tstat_party %>% filter(feature == "common_will") %>% slice_max(frequency, n = 20))
+
+dfm_dict1_tstat_party$perc <-dfm_dict1_tstat_party$frequency * 100
+
+kable(dfm_dict1_tstat_party %>% filter(feature == "people") %>% arrange(desc(perc)))
+
+kable(dfm_dict1_tstat_party %>% filter(feature == "elite") %>% arrange(desc(perc)))
+
+kable(dfm_dict1_tstat_party %>% filter(feature == "common_will") %>% arrange(desc(perc)))
 ```
 ### Most populist parliamentary group
 
 ```{r}
 # Add variable for the general level of populism
 dfm_dict1_tstat_party <- dfm_dict1_tstat_party %>%
-  group_by(group) %>% mutate(populism = mean(frequency))
+  group_by(group) %>% mutate(populism = sum(frequency),
+                             populism_perc = sum(perc))
+
 dfm_dict1_tstat_party_filtered <- dfm_dict1_tstat_party %>%
-  select(group,populism) %>% unique() %>% arrange(desc(populism))
+  select(group,populism, populism_perc) %>% unique() %>% arrange(desc(populism))
 kable(dfm_dict1_tstat_party_filtered)
 ```
+
+### Distribution of parliamentary group populism
+
+```{r, eval=T}
+summary(dfm_dict1_tstat_party_filtered$populism_perc)
+```
+
+
+\newpage
+
+## Decadri_Boussalis_Grundl (with only populist component)
+
+Now i replicate the previous analysis with the same dictionary but with the 3 components collapsed into one single component called "populism", this for check the consistency of the results
+
+```{r, warning=FALSE}
+# Dictionary analysis with d_b_g_Populism
+# By quarter
+dfm_dict5  <- dfm_lookup(dfm_weigh_p_quart, dictionary = d_b_g_Populism)
+# Group by date
+dfm_by_date5 <- dfm_lookup(dfm_weigh_p_day, dictionary = d_b_g_Populism)
+# Group by month
+dfm_by_month5 <- dfm_lookup(dfm_weigh_p_month, dictionary = d_b_g_Populism)
+```
+
+### General level of populism in time
+
+```{r, echo=FALSE}
+dat_smooth5 <- ksmooth(x = dfm_by_date5$date, 
+                      y = !dfm_by_date5[,"populism"]*100,
+                      kernel = "normal", bandwidth = 30)
+
+plot_time_5 <- plot(dat_smooth5$x, dat_smooth5$y, type = "l", ylab = "Populism level", xlab = "Time", xaxt="n") + 
+  abline(h = 0, lty = 2)
+axis.Date(1, at=seq(min(dat_smooth5$x), max(dat_smooth5$x), by="months"), format="%m-%Y")
+grid()
+title(main = "General level of populism with d_b_g_Populism dictionary")
+```
+
+### Most populist parliamentary group
+
+```{r}
+# Most populist parliamentary group
+dfm_dict5_tstat_party <- textstat_frequency(dfm_dict5, groups = party_id)
+dfm_dict5_tstat_party$perc <- dfm_dict5_tstat_party$frequency * 100
+kable(dfm_dict5_tstat_party  %>% arrange(desc(perc)))
+
+
+```
+
+
+### Distribution of parliamentary group populism
+
+```{r, eval=T}
+summary(dfm_dict5_tstat_party$perc)
+```
+
 
 
 
@@ -218,13 +285,6 @@ kable(dfm_dict1_tstat_party_filtered)
 
 ## Rooduijn_Pauwels_Italian
 
-### Level of sparsity
-
-daily: 0.60%
-
-weekly: 0.%
-
-monthly: 0%
 
 ```{r, warning=FALSE}
 # Dictionary analysis with Rooduijn_Pauwels_Italian
@@ -232,26 +292,20 @@ monthly: 0%
 dfm_dict2  <- dfm_lookup(dfm_weigh_p_quart, dictionary = Rooduijn_Pauwels_Italian)
 # Group by date
 dfm_by_date2 <- dfm_lookup(dfm_weigh_p_day, dictionary = Rooduijn_Pauwels_Italian)
-#dfm_by_date2
-
-# Group by week
-#dfm_by_week2 <- dfm_group(dfm_dict2, groups= week)
-#dfm_by_week2
 # Group by month
-#dfm_by_month2 <- dfm_group(dfm_dict2, groups= month)
-
-#kable(dfm_by_month2)
+dfm_by_month2 <- dfm_lookup(dfm_weigh_p_month, dictionary = Rooduijn_Pauwels_Italian)
 ```
 
 ### General level of populism in time
 
 ```{r, echo=FALSE}
 dat_smooth2 <- ksmooth(x = dfm_by_date2$date, 
-                      y = dfm_by_date2[,"populism"] - !dfm_by_date2[,"populism"],
+                      y = !dfm_by_date2[,"populism"]*100,
                       kernel = "normal", bandwidth = 30)
 
-plot_time_2 <- plot(dat_smooth2$x, dat_smooth2$y, type = "l", ylab = "Populism level", xlab = "Time") + 
+plot_time_2 <- plot(dat_smooth2$x, dat_smooth2$y, type = "l", ylab = "Populism level", xlab = "Time", xaxt="n") + 
   abline(h = 0, lty = 2)
+axis.Date(1, at=seq(min(dat_smooth2$x), max(dat_smooth2$x), by="months"), format="%m-%Y")
 grid()
 title(main = "General level of populism with Rooduijn_Pauwels_Italian dictionary")
 
@@ -262,39 +316,29 @@ title(main = "General level of populism with Rooduijn_Pauwels_Italian dictionary
 ```{r}
 # Most populist parliamentary group
 dfm_dict2_tstat_party <- textstat_frequency(dfm_dict2, groups = party_id)
-kable(dfm_dict2_tstat_party %>% slice_max(frequency, n = 20))
+dfm_dict2_tstat_party$perc <- dfm_dict2_tstat_party$frequency * 100
+kable(dfm_dict2_tstat_party %>% arrange(desc(perc)))
+
+
 ```
 
 ### Distribution of parliamentary group populism
 
 ```{r, eval=T}
-summary(dfm_dict2_tstat_party$frequency)
+summary(dfm_dict2_tstat_party$perc)
 ```
 
-```{r, eval=FALSE}
-#TBD
-hist(dfm_dict2_tstat_party$frequency, prob=T)
-points(density(dfm_dict2_tstat_party$frequency),type="l",col="blue")
-rug(dfm_dict2_tstat_party$frequency,col="red")
 
-m <- mean(dfm_dict2_tstat_party$frequency)
-std<-sqrt(var(dfm_dict2_tstat_party$frequency))
-
-hist(dfm_dict2_tstat_party$frequency,prob=T,main="Frequency")
-
-curve(dnorm(x, mean=m, sd=std), col="darkblue", lwd=2, add=TRUE)
-
-```
 
 ```{r}
 # above the median
-kable(dfm_dict2_tstat_party  %>% filter(frequency > median(frequency)))
+kable(dfm_dict2_tstat_party  %>% filter(perc > median(perc)))
 # above the mean
-kable(dfm_dict2_tstat_party %>% filter(frequency > mean(frequency)))
+kable(dfm_dict2_tstat_party %>% filter(perc > mean(perc)))
 # below the first quantiles
-kable(dfm_dict2_tstat_party %>% filter(frequency < 0.0070015))
+kable(dfm_dict2_tstat_party %>% filter(perc < 0.70015))
 # above the third quantiles
-kable(dfm_dict2_tstat_party %>% filter(frequency > 0.0158277))
+kable(dfm_dict2_tstat_party %>% filter(perc > 1.58277))
 ```
 
 
@@ -306,13 +350,7 @@ kable(dfm_dict2_tstat_party %>% filter(frequency > 0.0158277))
 
 ## Grundl_Italian_adapted
 
-### Level of sparsity
 
-daily: 0.24%
-
-weekly: 0.0%
-
-monthly: 0%
 
 ```{r, warning=FALSE}
 # Dictionary analysis with Grundl_Italian_adapted
@@ -327,10 +365,11 @@ dfm_by_date3 <- dfm_lookup(dfm_weigh_p_day, dictionary = Grundl_Italian_adapted)
 
 ```{r, echo=FALSE}
 dat_smooth3 <- ksmooth(x = dfm_by_date3$date, 
-                      y = dfm_by_date3[,"populism"] - !dfm_by_date3[,"populism"],
+                      y = !dfm_by_date3[,"populism"] * 100,
                       kernel = "normal", bandwidth = 30)
-plot_time_3 <- plot(dat_smooth3$x, dat_smooth3$y, type = "l", ylab = "Populism level", xlab = "Time") +
+plot_time_3 <- plot(dat_smooth3$x, dat_smooth3$y, type = "l", ylab = "Populism level", xlab = "Time", xaxt ="n") +
   abline(h = 0, lty = 2)
+axis.Date(1, at=seq(min(dat_smooth3$x), max(dat_smooth3$x), by="months"), format="%m-%Y")
 grid()
 title(main = "General level of populism with Grundl_Italian_adapted dictionary")
 
@@ -341,15 +380,15 @@ title(main = "General level of populism with Grundl_Italian_adapted dictionary")
 ```{r}
 # Most populist parliamentary group
 dict_3_tstat_party <- textstat_frequency(dfm_dict3, groups = party_id)
-
-kable(dict_3_tstat_party %>% slice_max(frequency, n = 20))
+dict_3_tstat_party$perc <- dict_3_tstat_party$frequency * 100
+kable(dict_3_tstat_party  %>% arrange(desc(perc)))
 ```
 
 ### Distribution of parliamentary grouppopulism
 
 ```{r}
 #TBD
-summary(dict_3_tstat_party$frequency)
+summary(dict_3_tstat_party$perc)
 ```
 ```{r}
 # above the median
@@ -370,13 +409,7 @@ kable(dict_3_tstat_party %>% filter(frequency > 0.022582 ))
 
 ## Decadri_Boussalis
 
-### Level of sparsity
 
-daily: 0%
-
-weekly: 0.0%
-
-monthly: 0%
 
 ```{r, warning=FALSE}
 # Dictionary analysis with Decadri_Boussalis
@@ -391,11 +424,11 @@ dfm_by_date4 <- dfm_lookup(dfm_weigh_p_day, dictionary = Decadri_Boussalis)
 
 ```{r, echo=FALSE}
 dat_smooth4 <- ksmooth(x = dfm_by_date4$date, 
-                      y = dfm_by_date4[,"populism"] - !dfm_by_date4[,"populism"],
+                      y = !dfm_by_date4[,"populism"] * 100,
                       kernel = "normal", bandwidth = 30)
-plot_time_4 <- plot(dat_smooth4$x, dat_smooth4$y, type = "l", ylab = "Populism level", xlab = "Time") +
+plot_time_4 <- plot(dat_smooth4$x, dat_smooth4$y, type = "l", ylab = "Populism level", xlab = "Time", xaxt="n") +
   abline(h = 0, lty = 2)+
-  points(x = 2021-11-05, y = 4,type="p", pch=21, col="black", bg=NA, cex=1)
+  axis.Date(1, at=seq(min(dat_smooth4$x), max(dat_smooth4$x), by="months"), format="%m-%Y")
 grid()
 title(main = "General level of populism with Decadri_Boussalis dictionary")
 ```
@@ -405,27 +438,31 @@ title(main = "General level of populism with Decadri_Boussalis dictionary")
 ```{r}
 # Most populist parliamentary group
 dict_4_tstat_party <- textstat_frequency(dfm_dict4, groups = party_id)
-
-kable(dict_4_tstat_party %>% slice_max(frequency, n = 20))
+dict_4_tstat_party$perc <- dict_4_tstat_party$frequency * 100
+kable(dict_4_tstat_party  %>% arrange(desc(perc)))
 ```
 
 ### Distribution of party populism
 
 ```{r}
 #TBD
-summary(dict_4_tstat_party$frequency)
+summary(dict_4_tstat_party$perc)
 
 ```
 
 ```{r}
 # above the median
-kable(dict_4_tstat_party  %>% filter(frequency > median(frequency)))
+kable(dict_4_tstat_party  %>% filter(frequency > median(frequency))
+      %>% arrange(desc(perc)), caption = "Above the median")
 # above the mean
-kable(dict_4_tstat_party %>% filter(frequency > mean(frequency)))
+kable(dict_4_tstat_party %>% filter(frequency > mean(frequency))
+      %>% arrange(desc(perc)), caption = "Above the mean")
 # below the first quantiles
-kable(dict_4_tstat_party %>% filter(frequency < 0.04892 ))
+kable(dict_4_tstat_party %>% filter(frequency < 0.04892)
+      %>% arrange(desc(perc)), caption = "Below the first quantiles" )
 # above the third quantiles
-kable(dict_4_tstat_party %>% filter(frequency > 0.06287  ))
+kable(dict_4_tstat_party %>% filter(frequency > 0.06287)
+      %>% arrange(desc(perc)),caption = "Above the third quantiles")
 ```
 
 
@@ -433,7 +470,7 @@ kable(dict_4_tstat_party %>% filter(frequency > 0.06287  ))
 
 ```{r, echo=FALSE, warning=FALSE}
 comparison_time <- plot(dat_smooth4$x, dat_smooth4$y,
-                        type = "l", ylab = "Populism level", xlab = "Time", col = "green", ylim = c(-0.7,-0.1))+
+                        type = "l", ylab = "Populism level", xlab = "Time", col = "green", ylim = c(0.2,0.9))+
   lines(dat_smooth3$x, dat_smooth3$y,
         type = "l", ylab = "Populism level", xlab = "Time", col = "blue")+
   lines(dat_smooth2$x, dat_smooth2$y,
@@ -486,7 +523,12 @@ party_rank$rank_dict_4 <- as.numeric(party_rank$rank_dict_4)
 
 # Create the column with the sum of the single score
 party_rank$total_score <- rowSums(party_rank[,-1])
-kable(party_rank %>% arrange(desc(total_score)))
+kable(party_rank %>% arrange(desc(total_score)), col.names = c("Party",
+                                                               "Dec_Bous_Grun",
+                                                               "Rood_Pau_it",
+                                                               "Grun_it",
+                                                               "Dec_Bous",
+                                                               "Total"))
 ```
 
 
