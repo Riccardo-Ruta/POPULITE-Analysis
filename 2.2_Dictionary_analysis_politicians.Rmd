@@ -1,0 +1,282 @@
+---
+title: "Dictionary Analysis II"
+subtitle: "analysis at politicians level" 
+author: "Riccardo Ruta"
+date: "5/2022"
+output: 
+  pdf_document:
+    toc: yes
+    latex_engine: xelatex
+---
+
+```{r setup2, include=FALSE}
+ knitr::opts_chunk$set(echo = TRUE)
+source(here::here("src","00_setup.R"))
+```
+
+```{r}
+# import dictionaries file
+dict <-  read_excel("data/populism_dictionaries.xlsx")
+variable.names(dict)
+
+# create the dictionary
+Rooduijn_Pauwels_Italian <-
+  dictionary(list(populism =
+                    (dict$Rooduijn_Pauwels_Italian
+                     [!is.na(dict$Rooduijn_Pauwels_Italian)])))
+
+Grundl_Italian_adapted <-
+  dictionary(list(populism =
+                    dict$Grundl_Italian_adapted
+                  [!is.na(dict$Grundl_Italian_adapted)]))
+
+Decadri_Boussalis <-
+  dictionary(list(populism =
+                    dict$Decadri_Boussalis
+                  [!is.na(dict$Decadri_Boussalis)]))
+
+Decadri_Boussalis_Grundl <-
+  dictionary(list(people =
+                    dict$Decadri_Boussalis_Grundl_People
+                  [!is.na(dict$Decadri_Boussalis_Grundl_People)],
+                  common_will =
+                    dict$`Decadri_Boussalis_Grundl_Common Will`
+                  [!is.na(dict$`Decadri_Boussalis_Grundl_Common Will`)],
+                  elite =
+                    dict$Decadri_Boussalis_Grundl_Elite
+                  [!is.na(dict$Decadri_Boussalis_Grundl_Elite)]))
+```
+
+```{r}
+dictionaries <- c("Rooduijn_Pauwels_Italian", "Grundl_Italian_adapted",
+                  "Decadri_Boussalis","Decadri_Boussalis_Grundl")
+n.words <- c(length(Rooduijn_Pauwels_Italian$populism),
+           length(Grundl_Italian_adapted$populism),
+           length(Decadri_Boussalis$populism),
+           (length(Decadri_Boussalis_Grundl$people)+
+              length(Decadri_Boussalis_Grundl$common_will)+
+              length(Decadri_Boussalis_Grundl$elite))
+            )
+number_of_words <- data.frame(dictionaries,n.words)
+kable(number_of_words)
+```
+
+```{r, include=FALSE}
+load("data/dfm.Rda")
+```
+
+### Group and weight the dfm
+
+```{r}
+# By politician & month
+dfm_weigh_name_month <- dfm_group(DFM, groups = interaction(nome, month)) %>% dfm_weight(scheme = "prop")
+# By pol & quarter
+dfm_weigh_name_quart <- dfm_group(DFM, groups = interaction(nome, quarter)) %>% dfm_weight(scheme = "prop")
+# By pol & year
+dfm_weigh_name_year <- dfm_group(DFM, groups = interaction(nome, year)) %>% dfm_weight(scheme = "prop")
+# By pol & day
+dfm_weigh_name_day <- dfm_group(DFM, groups = interaction(nome, date)) %>% dfm_weight(scheme = "prop")
+```
+
+
+\newpage
+
+## Rooduijn_Pauwels_Italian
+
+```{r}
+# Dictionary analysis with Rooduijn_Pauwels_Italian
+# By quarter
+dfm_dict2_name  <- dfm_lookup(dfm_weigh_name_quart, dictionary = Rooduijn_Pauwels_Italian)
+# Group by date
+dfm_by_date2_name <- dfm_lookup(dfm_weigh_name_day, dictionary = Rooduijn_Pauwels_Italian)
+```
+
+
+### Most populist politician
+
+```{r}
+dict2_tstat_nome <- textstat_frequency(dfm_dict2_name, groups = nome)
+
+kable(dict2_tstat_nome %>% slice_max(frequency, n = 20))
+```
+### Distribution of politician populism
+
+```{r}
+summary(dict2_tstat_nome$frequency)
+#TBD
+```
+
+
+```{r}
+# above the median
+dict2_tstat_nome %>% filter(frequency > median(frequency)) %>% count()
+# above the mean
+dict2_tstat_nome %>% filter(frequency > mean(frequency)) %>% count()
+# below the first quantiles
+dict2_tstat_nome %>% filter(frequency < 0.18584 ) %>% count()
+# above the third quantiles
+dict2_tstat_nome %>% filter(frequency > 1.48826 ) %>% count()
+```
+
+\newpage
+
+
+
+
+
+## Grundl_Italian_adapted
+
+```{r, warning=FALSE}
+# Dictionary analysis with Grundl_Italian_adapted
+# By quarter
+dfm_dict3_name <- dfm_lookup(dfm_weigh_name_quart, dictionary = Grundl_Italian_adapted)
+# Group by date
+dfm_by_date3_name <- dfm_lookup(dfm_weigh_name_day, dictionary = Grundl_Italian_adapted)
+#dfm_by_date2
+```
+
+
+
+
+### Most populist politician
+
+```{r}
+dict_3_tstat_nome <- textstat_frequency(dfm_dict3_name, groups = nome)
+
+kable(dict_3_tstat_nome %>% slice_max(frequency, n = 20))
+```
+
+
+### Distribution of politician populism
+
+```{r}
+# TBD
+summary(dict_3_tstat_nome$frequency)
+
+```
+
+
+
+
+```{r}
+# above the median
+dict_3_tstat_nome %>% filter(frequency > median(frequency)) %>% count()
+# above the mean
+dict_3_tstat_nome %>% filter(frequency > mean(frequency)) %>% count()
+# below the first quantiles
+dict_3_tstat_nome %>% filter(frequency < 0.23802) %>% count()
+# above the third quantiles
+dict_3_tstat_nome %>% filter(frequency > 1.56229 ) %>% count()
+```
+
+
+
+
+
+## Decadri_Boussalis
+
+
+```{r, warning=FALSE}
+# Dictionary analysis with Decadri_Boussalis
+# By quarter
+dfm_dict4_name  <- dfm_lookup(dfm_weigh_name_quart, dictionary = Decadri_Boussalis)
+# By date
+dfm_by_date4_name <- dfm_lookup(dfm_weigh_name_day, dictionary = Decadri_Boussalis)
+
+```
+
+
+
+
+### Most populist politician
+
+```{r}
+dict_4_tstat_nome <- textstat_frequency(dfm_dict4_name, groups = nome)
+
+kable(dict_4_tstat_nome %>% slice_max(frequency, n = 20))
+```
+
+### Distribution of politician populism
+
+```{r}
+#TBD
+summary(dict_4_tstat_nome$frequency)
+```
+
+```{r}
+# above the median
+dict_4_tstat_nome %>% filter(frequency > median(frequency)) %>% count()
+# above the mean
+dict_4_tstat_nome %>% filter(frequency > mean(frequency)) %>% count()
+# below the first quantiles
+dict_4_tstat_nome %>% filter(frequency < 0.51949) %>% count()
+# above the third quantiles
+dict_4_tstat_nome %>% filter(frequency > 4.29796 ) %>% count()
+```
+
+
+
+
+
+## Compare how the dictionaries score for the most populist politician
+**  DA AGGIUSTARE!!!**
+```{r, eval=FALSE, include=FALSE}
+# DA AGGIUSTARE!!!
+top_20_nome_2 <- dict2_tstat_nome %>% arrange(desc(frequency)) %>% head(20)
+top_20_nome_2$my_rank <- rank(top_20_nome_2$frequency)
+
+top_20_nome_3 <- dict_3_tstat_nome %>% arrange(desc(frequency)) %>% head(20)
+top_20_nome_3$my_rank <- rank(top_20_nome_3$frequency)
+
+top_20_nome_4 <- dict_4_tstat_nome %>% arrange(desc(frequency)) %>% head(20)
+top_20_nome_4$my_rank <- rank(top_20_nome_4$frequency)
+
+
+
+
+
+
+
+# define the politicians list
+pol <- unique(c(top_20_nome_4$group,top_20_nome_3$group,top_20_nome_2$group))
+
+# create an empty df
+pol_rank <- data.frame(first = vector(), second = vector(),
+                         third = vector(), fourth = vector() )
+
+# loop the rank for each pol
+for (i in pol)
+{
+  rank_dict_pol_2 <- (top_20_nome_2 %>% if_else(group == i,
+                                                .$my_rank,"na"))
+  rank_dict_pol_3 <- (top_20_nome_3 %>% if_else(group == i,
+                                                .$my_rank, "na"))
+  rank_dict_pol_4 <- (top_20_nome_4 %>% if_else(group == i,
+                                                .$my_rank, "na"))
+  
+  pol <- (i)
+  pol_rank <- rbind(pol_rank, cbind(pol, rank_dict_pol_2,
+                                        rank_dict_pol_3, rank_dict_pol_4))
+}
+
+# change the format of the columns in numeric
+pol_rank$rank_dict_pol_2 <- as.numeric(pol_rank$rank_dict_pol_2)
+pol_rank$rank_dict_pol_3 <- as.numeric(pol_rank$rank_dict_pol_3)
+pol_rank$rank_dict_pol_4 <- as.numeric(pol_rank$rank_dict_pol_4)
+
+# Create the column with the sum of the single score
+pol_rank$total_score <- rowSums(pol_rank[,-1])
+kable(pol_rank)
+```
+
+
+
+
+
+
+
+
+
+
+
+

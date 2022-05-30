@@ -72,6 +72,32 @@ max(tw$month)
 length(seq(from = min(tw$date), to = max(tw$date), by = 'month'))
 ```
 
+## Create the trimester variable
+
+```{r}
+tw <- tw %>% mutate(quarter = cut.Date(date, breaks = "1 quarter", labels = FALSE))
+```
+
+### Check the number of trimesters
+
+```{r}
+max(tw$quarter)
+length(seq.Date(from = min(tw$date), to = max(tw$date), by = 'quarter'))
+```
+
+## Create the year variables
+
+```{r}
+tw <- tw %>% mutate(year = cut.Date(date, breaks = "year", labels = FALSE))
+```
+
+### Check the number of years
+
+```{r}
+max(tw$year)
+length(seq.Date(from = min(tw$date), to = max(tw$date), by = 'year'))
+```
+
 ## Count the number of missing values
 
 ```{r}
@@ -95,7 +121,9 @@ sum(is.na(tw$chamber)),
 sum(is.na(tw$status)),
 sum(is.na(tw$date)),
 sum(is.na(tw$week)),
-sum(is.na(tw$month)) )
+sum(is.na(tw$month)),
+sum(is.na(tw$quarter)),
+sum(is.na(tw$year)))
 
 missing_df <- data.frame(colnames(tw), missings)
 kable(missing_df)
@@ -144,7 +172,7 @@ unique(tw$genere)
 ```{r}
 # Select variables for the analysis
 dataset <- tw %>% select(nome, tweet_testo, genere, party_id,
-                         chamber,status, date, week, month )
+                         chamber,status, date, week, month, quarter, year )
 colnames(dataset)
 ```
 
@@ -189,61 +217,37 @@ doc.tokens <- tokens_select(doc.tokens, my_list, selection='remove')
 DFM <- dfm(doc.tokens, tolower = TRUE)
 ```
 
-## Trim the data
-
-Only words that occur in the top 20% of the distribution and in less than 30% of documents. Very frequent but document specific words.
-
-```{r}
-DFM_trimmed <- dfm_trim(DFM, min_termfreq = 0.80, termfreq_type = "quantile",
-                        max_docfreq = 0.3, docfreq_type = "prop")
-
-# Check the topfeatures
-topfeatures(DFM_trimmed,15)
-```
-
 ## Remove the emoji
 
 ```{r, results="hide"}
 # Create a copy of the dfm
-test <- DFM_trimmed
+test <- DFM
 # Remove from the copy all the non ASCII carachters
 test@Dimnames$features <- gsub("[^\x01-\x7F]", "", test@Dimnames$features)
 
 # Check the difference from the list of features before and after apply gsub
 a <- unique(test@Dimnames$features)
-b <- unique(DFM_trimmed@Dimnames$features)
-setdiff(b,a) #I have selected also words that cannot be removed
+b <- unique(DFM@Dimnames$features)
+setdiff(b,a) #I have selected also words that must not be removed
 
 # Create an object with the features after remove non ASCII characters
 c <- test@Dimnames$features
 # Create an object with the original features
-d <- DFM_trimmed@Dimnames$features
+d <- DFM@Dimnames$features
 
 # Create the list of the removed features
 diff <- setdiff(d,c)
 emoji <- diff[diff %>% nchar() < 4] 
 emoji <- list(emoji)
 # Now i can remove this list from the dfm
-DFM_trimmed <- dfm_remove(DFM_trimmed, emoji)
+DFM <- dfm_remove(DFM, emoji)
 
-#save(DFM_trimmed,file="data/dfm_trimmed.Rda")
+#save(DFM,file="data/dfm.Rda")
 ```
 
 ![Emoji removed](output/emoji.png)
 
-## Take the proportion of the frequencies
-
-```{r}
-# Weight the frequency
-dfm_weight <- DFM_trimmed %>%
-  dfm_weight(scheme = "prop")
-```
-
 ### Now the data are ready for the next analysis
-
-```{r, include=FALSE, eval=FALSE}
-#save(dfm_weight,file="data/dfm_weight.Rda")
-```
 
 \newpage
 
@@ -255,11 +259,11 @@ dfm_weight <- DFM_trimmed %>%
 # Number of parliamentarians
 n_parl <- length(unique(dataset$nome))
 n_parl
-# How many parliamentarians for each party?
+# How many tweets for each parliamentarians?
 n_parl_party <- dataset %>% group_by(party_id) %>% count()
 kable(n_parl_party)
 
-# Gneder composition
+# Gender composition
 n_gender <- dataset %>% group_by(genere) %>% count()
 kable(n_gender)
 
@@ -273,13 +277,13 @@ min(tw$date)
 ```{r, warning=FALSE}
 # Textplotwordcloud
 set.seed(123)
-textplot_wordcloud(dfm_weight,min_count = 20,max_words = 300,
+textplot_wordcloud(DFM, min_count = 20,max_words = 300,
      color = c('red', 'pink', 'green', 'purple', 'blue'))
 ```
 
 ```{r}
 # Plot frequency of the topfeatures in the DFM
-features_dfm <- textstat_frequency(dfm_weight, n = 50)
+features_dfm <- textstat_frequency(DFM, n = 50)
 # Sort by reverse frequency order
 features_dfm$feature <- with(features_dfm, reorder(feature, -frequency))
 ggplot(features_dfm, aes(x = feature, y = frequency)) +
@@ -292,9 +296,13 @@ ggplot(features_dfm, aes(x = feature, y = frequency)) +
 ### Relative frequency of the topfeatures by Party ID
 
 ```{r}
+# group and weight the DFM
+dfm_party_weight <- dfm_group(DFM, groups = party_id) %>%
+  dfm_weight(scheme = "prop")
+
 # Plot relative frequency by party_id
-freq_weight <- textstat_frequency(dfm_weight, n = 7, 
-                                  groups = dfm_weight$party_id)
+freq_weight <- textstat_frequency(dfm_party_weight, n = 7, groups = party_id)
+
 
 ggplot(data = freq_weight, aes(x = nrow(freq_weight):1, y = frequency)) +
      geom_point() +
@@ -302,13 +310,14 @@ ggplot(data = freq_weight, aes(x = nrow(freq_weight):1, y = frequency)) +
      coord_flip() +
      scale_x_continuous(breaks = nrow(freq_weight):1,
                         labels = freq_weight$feature) +
-     labs(x = NULL, y = "Relative frequency")
+  ggtitle("Relative frequency") +
+  labs(x = NULL, y = NULL)
 ```
 
 ## Most common hashtag
 
 ```{r}
-tag_dfm <- dfm_select(dfm_weight, pattern = "#*")
+tag_dfm <- dfm_select(DFM, pattern = "#*")
 toptag <- names(topfeatures(tag_dfm, 20))
 toptag
 ```
@@ -319,15 +328,19 @@ tag_dfm %>%
   ggplot(aes(x = reorder(feature, frequency), y = frequency)) +
   geom_point() +
   coord_flip() +
-  labs(x = NULL, y = "Frequency") +
+  labs(x = NULL, y = "Absolute frequency") +
   theme_minimal()
 ```
 
 ### Most common hashtag by Gender
 
 ```{r}
-tstat_freq <- textstat_frequency(tag_dfm, n = 20,
-                                 groups = dfm_weight$genere)
+# group and weight the DFM
+dfm_gender_weight <- dfm_group(tag_dfm, groups = genere) %>%
+  dfm_weight(scheme = "prop")
+
+tstat_freq <- textstat_frequency(dfm_gender_weight, n = 20,
+                                 groups = dfm_gender_weight$genere)
 ```
 
 ```{r, echo=FALSE}
@@ -343,8 +356,6 @@ ggplot(data = tstat_freq, aes(x = nrow(tstat_freq):1, y = frequency)) +
 
 ### Co-occurrence Plot of hashtags
 
-**Not weighted**
-
 ```{r}
 # NOT WEIGHTED
 tag_dfm_NOT_W <- dfm_select(DFM, pattern = "#*")
@@ -356,27 +367,10 @@ topgat_fcm_NOT <- fcm_select(tag_fcm_NOT, pattern = toptag_NOT)
 textplot_network(topgat_fcm_NOT, min_freq = 0.1, edge_alpha = 0.8, edge_size = 5)
 ```
 
-**Weighted**
-
-```{r}
-# WEIGHTED
-tag_fcm <- fcm(tag_dfm)
-set.seed(123)
-topgat_fcm <- fcm_select(tag_fcm, pattern = toptag)
-textplot_network(topgat_fcm)#, min_freq = 0.1, edge_alpha = 0.8, edge_size = 5)
-```
-
-```{r, eval=FALSE, include=FALSE}
-# Check most frequent hashtag extracted with regular expressions
-ht <- str_extract_all(dataset$tweet_testo, '#[A-Za-z0-9_]+')
-ht <- unlist(ht)
-head(sort(table(ht), decreasing = TRUE))
-```
-
 ## Most frequently mentioned usernames
 
 ```{r}
-user_dfm <- dfm_select(dfm_weight, pattern = "@*")
+user_dfm <- dfm_select(DFM, pattern = "@*")
 topuser <- names(topfeatures(user_dfm, 20, scheme = "docfreq"))
 kable(topuser, col.names = "Most mentioned username")
 ```
@@ -384,8 +378,12 @@ kable(topuser, col.names = "Most mentioned username")
 ### Most frequently mentioned usernames by gender
 
 ```{r}
-user_tstat_freq <- textstat_frequency(user_dfm, n = 20,
-                                 groups = dfm_weight$genere)
+# group and weight the DFM
+user_dfm_gender_weight <- dfm_group(user_dfm, groups = genere) %>%
+  dfm_weight(scheme = "prop")
+
+user_tstat_freq <- textstat_frequency(user_dfm_gender_weight, n = 20,
+                                 groups = user_dfm_gender_weight$genere)
 ```
 
 ```{r, echo=FALSE}
@@ -400,18 +398,6 @@ ggplot(data = user_tstat_freq, aes(x = nrow(user_tstat_freq):1, y = frequency)) 
 ```
 
 ### Co-occurrence plot of usernames
-
-**Weighted**
-
-```{r, echo=FALSE}
-# WEIGHTED
-user_fcm <- fcm(user_dfm)
-set.seed(123)
-user_fcm <- fcm_select(user_fcm, pattern = topuser)
-textplot_network(user_fcm, min_freq = 0.1, edge_color = "orange", edge_alpha = 0.8, edge_size = 5)
-```
-
-**Not weighted**
 
 ```{r, echo=FALSE}
 # NOT WEIGHTED
@@ -503,6 +489,57 @@ kable(party_citations_page %>% filter(party != "NA") %>%
         arrange(desc(perc)),
       col.names = c("Party","Number of citations",
                     "number of tweets", "% of citations"))
+```
+
+## How many times the party leader is cited by his/her party
+
+### Create the variable with the official leader's account for every party
+
+```{r}
+tw <- tw %>% mutate(party_leader =
+if_else(party_id == "PD" & date < "2021-03-14", "@nzingaretti",
+if_else(party_id == "PD" & date > "2021-03-14", "@EnricoLetta",
+if_else( party_id == "FDI", "@GiorgiaMeloni",
+if_else(party_id == "M5S" &date < "2020-01-22" , "@luigidimaio",
+if_else(party_id == "M5S" &date > "2020-01-22" &date < "2021-08-06", "@vitocrimi",
+if_else(party_id == "M5S" & date > "2021-08-061", "@GiuseppeConteIT",
+if_else(party_id == "FI", "@berlusconi",
+if_else(party_id == "LEGA", "@matteosalvinimi",                                   if_else(party_id == "IV", "@matteorenzi",
+if_else(party_id == "CI", "@LuigiBrugnaro",
+if_else(party_id == "LEU", "@robersperanza",
+"NA"))))))))))))
+```
+
+### Count for each party how many times a politician cite his/ her party leader
+
+```{r, eval = FALSE}
+leader_citations <- data.frame(first = vector(), second = vector(),
+                                  third = vector(), fourth = vector())
+system.time(
+  for (i in unique(tw$party_leader))
+  {
+    b <- tw %>% filter(grepl(i,tweet_testo)&party_leader== i) %>% count()
+    c <- tw %>% filter(party_leader == i) %>% count()
+    d <- (b/c) * 100
+    leader_citations <- rbind(leader_citations, cbind(i,b,c,d))
+    
+  }
+)
+ #save(leader_citations, file = "data/leader_citations.Rda")
+```
+
+```{r, include = FALSE}
+load("data/leader_citations.Rda")
+```
+
+```{r}
+colnames(leader_citations) <- c("leader","n_citations",
+                                    "Number of tweets", "perc")
+
+kable(leader_citations %>% filter(leader != "NA") %>%
+        arrange(desc(perc)),
+      col.names = c("Leader","Number of citations",
+                    "Number of tweets", "% of citations"))
 ```
 
 ## How many times a politician cite itself in the tweet

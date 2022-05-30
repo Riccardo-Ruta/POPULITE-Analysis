@@ -107,5 +107,66 @@ kable(t22.3)%>%
 kable(t22.4)%>%
   kable_styling(latex_options = c("HOLD_position","scale_down"))
 ```
+
+
+
+## Trim the data
+
+Only words that occur in the top 20% of the distribution and in less than 30% of documents. Very frequent but document specific words.
+
+```{r}
+DFM_trimmed <- dfm_trim(DFM, min_termfreq = 0.80, termfreq_type = "quantile",
+                        max_docfreq = 0.3, docfreq_type = "prop")
+
+# Check the topfeatures
+topfeatures(DFM_trimmed,15)
 ```
+
+Take the proportion of the frequencies
+
+```{r}
+# Weight the frequency
+dfm_weight <- DFM %>%
+  dfm_weight(scheme = "prop")
+#save(dfm_weight,file="data/dfm_weight.Rda
+```
+
+** weighted **
+```{r}
+# WEIGHTED
+tag_fcm <- fcm(tag_dfm)
+set.seed(123)
+topgat_fcm <- fcm_select(tag_fcm, pattern = toptag)
+textplot_network(topgat_fcm)#, min_freq = 0.1, edge_alpha = 0.8, edge_size = 5)
+```
+
+```{r}
+{r, eval=FALSE, include=FALSE}
+# Check most frequent hashtag extracted with regular expressions
+ht <- str_extract_all(dataset$tweet_testo, '#[A-Za-z0-9_]+')
+ht <- unlist(ht)
+head(sort(table(ht), decreasing = TRUE))
+```
+
+Weighted
+```{r}
+{r, echo=FALSE}
+# WEIGHTED
+user_fcm <- fcm(user_dfm)
+set.seed(123)
+user_fcm <- fcm_select(user_fcm, pattern = topuser)
+textplot_network(user_fcm, min_freq = 0.1, edge_color = "orange", edge_alpha = 0.8, edge_size = 5)
+```
+
+
+
+```{r, echo=FALSE}
+# FOCUS ON THE DICTIONARIES THAT SCORE SIMILARLY
+comparison_time <- plot(dat_smooth3$x, dat_smooth3$y, type = "l", ylab = "Populism level", xlab = "Time", col = "blue",ylim = c(0.5,2))+
+  lines(dat_smooth2$x, dat_smooth2$y, type = "l", ylab = "Populism level", xlab = "Time", col = "red") +
+  lines(dat_smooth1$x, dat_smooth1$y, type = "l", ylab = "Populism level", xlab = "Time", col = "black")
+legend("topleft", legend = c("Roodujin_pauwels","Grundl_italian", "Decadri_Boussalis_Grundl"), fill = c("red", "blue", "Black"))
+title(main = "Compare how the different dictionaries score")
+```
+
 

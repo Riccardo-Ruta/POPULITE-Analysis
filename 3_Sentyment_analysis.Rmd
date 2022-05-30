@@ -112,7 +112,7 @@ load("data/nrc_speranza.Rda")
 ## Giorgia Meloni
 ### Proportion of the emotion
 
-```{r}
+```{r,echo=TRUE}
 barplot(
   sort(colSums(prop.table(nrc_meloni[, 1:8]))), 
   horiz = TRUE, 
@@ -124,7 +124,7 @@ barplot(
 
 ### Wordcloud of emotions
 
-```{r, warning=FALSE,  echo=FALSE}
+```{r, warning=FALSE, echo=TRUE}
 all <- c(
   paste(MELONI$tweet_testo[nrc_meloni$anger > 0], collapse=" "),
   paste(MELONI$tweet_testo[nrc_meloni$anticipation > 0], collapse=" "),

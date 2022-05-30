@@ -42,7 +42,8 @@ knitr::include_graphics("figs/logo.jpg")
 \Large
 
 \doublespacing
-{\bf Political communication and populist rhetoric, an analysis of Italian politicians in the digital arena.}
+{\bf Political communication and populist rhetoric.               }
+{\bf An analysis of Italian politicians in the digital arena.}
 
 \vspace{1 cm}
 
