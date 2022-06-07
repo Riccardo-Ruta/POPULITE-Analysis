@@ -169,4 +169,16 @@ legend("topleft", legend = c("Roodujin_pauwels","Grundl_italian", "Decadri_Bouss
 title(main = "Compare how the different dictionaries score")
 ```
 
+```{r}
+a <- lm(populism ~ factor_party, data_dict1)
+
+b <- lm(people ~ factor_party + factor_quarter, data_dict1)
+c <- lm(common_will ~ factor_party + factor_quarter, data_dict1)
+d <- lm(elite ~ factor_party + factor_quarter, data_dict1)
+summary(a)
+summary(b)
+summary(c)
+summary(d)
+```
+
 

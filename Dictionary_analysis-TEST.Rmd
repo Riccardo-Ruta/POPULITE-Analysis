@@ -1,0 +1,160 @@
+---
+title: "Dictionary Analysis-TEST"
+subtitle: ""
+author: "Riccardo Ruta"
+date: "5/2022"
+output: 
+  pdf_document:
+    toc: yes
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+ knitr::opts_chunk$set(echo = TRUE)
+source(here::here("src","00_setup.R"))
+```
+```{r}
+# import dictionaries file
+dict <-  read_excel("data/populism_dictionaries.xlsx")
+variable.names(dict)
+
+# create the dictionary
+Rooduijn_Pauwels_Italian <-
+  dictionary(list(populism =
+                    (dict$Rooduijn_Pauwels_Italian
+                     [!is.na(dict$Rooduijn_Pauwels_Italian)])))
+
+Grundl_Italian_adapted <-
+  dictionary(list(populism =
+                    dict$Grundl_Italian_adapted
+                  [!is.na(dict$Grundl_Italian_adapted)]))
+
+Decadri_Boussalis <-
+  dictionary(list(populism =
+                    dict$Decadri_Boussalis
+                  [!is.na(dict$Decadri_Boussalis)]))
+
+Decadri_Boussalis_Grundl <-
+  dictionary(list(people =
+                    dict$Decadri_Boussalis_Grundl_People
+                  [!is.na(dict$Decadri_Boussalis_Grundl_People)],
+                  common_will =
+                    dict$`Decadri_Boussalis_Grundl_Common Will`
+                  [!is.na(dict$`Decadri_Boussalis_Grundl_Common Will`)],
+                  elite =
+                    dict$Decadri_Boussalis_Grundl_Elite
+                  [!is.na(dict$Decadri_Boussalis_Grundl_Elite)]))
+# Create an extra dictionary combining 3 components into one
+d_b_g_Populism <-
+  dictionary(list(populism =
+                    c(Decadri_Boussalis_Grundl$people,
+                      Decadri_Boussalis_Grundl$common_will,
+                      Decadri_Boussalis_Grundl$elite)))
+
+```
+
+```{r}
+dictionaries <- c("Rooduijn_Pauwels_Italian", "Grundl_Italian_adapted",
+                  "Decadri_Boussalis","Decadri_Boussalis_Grundl","d_b_g_Populism")
+n.words <- c(length(Rooduijn_Pauwels_Italian$populism),
+           length(Grundl_Italian_adapted$populism),
+           length(Decadri_Boussalis$populism),
+           (length(Decadri_Boussalis_Grundl$people)+
+              length(Decadri_Boussalis_Grundl$common_will)+
+              length(Decadri_Boussalis_Grundl$elite)),
+           length(d_b_g_Populism$populism)
+            )
+number_of_words <- data.frame(dictionaries,n.words)
+kable(number_of_words)
+```
+
+```{r, include=FALSE}
+load("data/dfm.Rda")
+```
+
+### Group and weight the dfm
+
+
+```{r}
+# Create dfm grouped by date to check how dictionary score in time
+dfm_weigh_month <- dfm_group(DFM, groups = date)%>%
+  dfm_weight(scheme = "prop")
+# Create dfm grouoped By parl.group to check how the different parliamentary group score
+dfm_weigh_party <- dfm_group(DFM, groups = party_id)%>%
+  dfm_weight(scheme = "prop")
+# Create dfm grouped by trimester and filtered by parlamentary group to compare the different levels of populism
+dfm_weigh_p_quarter <- dfm_group(DFM,groups = interaction(quarter,party_id))%>%
+  dfm_weight(scheme = "prop")
+```
+
+## Decadri_Boussalis_Grundl
+
+
+```{r, warning=FALSE}
+# Dictionary analysis with Decadri_Boussalis_Grundl
+# By quarter
+dfm_dict1_month  <- dfm_lookup(dfm_weigh_month, dictionary = d_b_g_Populism)
+
+```
+
+```{r, echo=FALSE}
+testa <- quanteda::convert(dfm_dict1_month, to = "data.frame")
+#testa <- cbind(testa,dfm_dict1_month@docvars$date)
+#colnames(testa) <- c("doc_id","populism", "date")
+
+#create time series plot
+testa %>%
+  ggplot( aes(x=doc_id, y=populism * 100)) +
+    geom_line()
+```
+
+
+
+
+
+
+
+############################
+
+```{r}
+###################################################################
+
+#testa <- textstat_frequency(dfm_by_month2, groups = )
+
+
+testa <- quanteda::convert(dfm_by_date2, to = "data.frame")
+testa <- cbind(testa,dfm_by_date2@docvars$date)
+colnames(testa) <- c("doc_id","populism", "date")
+
+
+#create time series plot
+testa %>%
+  ggplot( aes(x=date, y=populism * 100)) +
+    geom_line() +
+    geom_point()
+
+```
+
+
+
+
+
+
+```{r, eval=FALSE}
+#TBD
+hist(dfm_dict2_tstat_party$perc, prob=T)
+points(density(dfm_dict2_tstat_party$perc),type="l",col="blue")
+rug(dfm_dict2_tstat_party$perc,col="red")
+
+m <- mean(dfm_dict2_tstat_party$perc)
+std<-sqrt(var(dfm_dict2_tstat_party$perc))
+
+hist(dfm_dict2_tstat_party$perc,prob=T,main="Frequency")
+
+curve(dnorm(x, mean=m, sd=std), col="darkblue", lwd=2, add=TRUE)
+
+```
+
+
+
+

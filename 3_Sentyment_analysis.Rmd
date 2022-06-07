@@ -22,10 +22,13 @@ load("data/dataset.Rda")
 # Sentiment analysis
 <http://saifmohammad.com/WebPages/lexicons.html>
 
+### get_nrc_sentiment
+The get_nrc_sentiment implements Saif Mohammad’s NRC Emotion lexicon. According to Mohammad, “the NRC emotion lexicon is a list of words and their associations with eight emotions (anger, fear, anticipation, trust, surprise, sadness, joy, and disgust) and two sentiments (negative and positive)” (See http://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm). The get_nrc_sentiment function returns a data frame in which each row represents a sentence from the original file. The columns include one for each emotion type was well as the positive or negative sentiment valence
+
 ## Inspect the dictionary
 
 ```{r, echo=TRUE}
-head(get_sentiment_dictionary(dictionary = "nrc", language = "italian"),15)
+# kable(head(get_sentiment_dictionary(dictionary = "nrc", language = "italian"),15))
 ```
 
 ### Clean text from dataframe 
@@ -57,68 +60,141 @@ clean.text = function(x)
 }
 ```
 
+## Clean the dataset
+
+```{r, eval=FALSE}
+# Call the function previously defined and remove stopwords
+system.time(
+  dataset_cleaned <- clean.text(dataset))
+system.time(  
+  dataset_cleaned <-  removeWords(dataset_cleaned,  c(stopwords("italian"))))
+save(dataset_cleaned,file="data/dataset_cleaned.Rda")
+     ```
+
 
 ## Create the filtered dataframes
 
 ```{r, echo=TRUE}
 # Create filtered dataframes
-MELONI <- dataset %>% filter(nome  == "MELONI Giorgia")
-CONTE <- dataset %>% filter(nome  == "CONTE Giuseppe")
-RENZI <- dataset %>% filter(nome  == "RENZI Matteo")
-SALVINI <- dataset %>% filter(nome  == "SALVINI Matteo")
-LETTA <- dataset %>% filter(nome  == "LETTA Enrico")
-BERLUSCONI <- dataset %>% filter(nome  == "BERLUSCONI Silvio")
-SPERANZA <- dataset %>% filter(nome  == "SPERANZA Roberto")
+#MELONI <- dataset %>% filter(nome  == "MELONI Giorgia")
+#CONTE <- dataset %>% filter(nome  == "CONTE Giuseppe")
+#RENZI <- dataset %>% filter(nome  == "RENZI Matteo")
+#SALVINI <- dataset %>% filter(nome  == "SALVINI Matteo")
+#LETTA <- dataset %>% filter(nome  == "LETTA Enrico")
+#BERLUSCONI <- dataset %>% filter(nome  == "BERLUSCONI Silvio")
+#SPERANZA <- dataset %>% filter(nome  == "SPERANZA Roberto")
+
+PD <- dataset_cleaned %>% filter(party_id == "PD")
+FDI <- dataset_cleaned %>% filter(party_id == "FDI")
+M5S <- dataset_cleaned %>% filter(party_id == "M5S")
+FI <- dataset_cleaned %>% filter(party_id == "FI")
+REG_LEAGUES <- dataset_cleaned %>% filter(party_id == "REG_LEAGUES")
+MISTO <- dataset_cleaned %>% filter(party_id == "MISTO")
+LEGA <- dataset_cleaned %>% filter(party_id == "LEGA")
+IV <- dataset_cleaned %>% filter(party_id == "IV")
+INDIPENDENTE <- dataset_cleaned %>% filter(party_id == "INDIPENDENTE")
+CI <- dataset_cleaned %>% filter(party_id == "CI")
+LEU <- dataset_cleaned %>% filter(party_id == "LEU")
+
 ```
 
 ## Create nrc objects
 ```{r, eval=F, echo=TRUE}
 # Create the nrc object
-nrc_meloni <- get_nrc_sentiment(MELONI$tweet_testo, language="italian")
-save(nrc_meloni,file="data/nrc_meloni.Rda")
+#nrc_meloni <- get_nrc_sentiment(MELONI$tweet_testo, language="italian")
+#save(nrc_meloni,file="data/nrc_meloni.Rda")
 
-nrc_conte <- get_nrc_sentiment(CONTE$tweet_testo, language="italian")
-save(nrc_conte,file="data/nrc_conte.Rda")
+#nrc_conte <- get_nrc_sentiment(CONTE$tweet_testo, language="italian")
+#save(nrc_conte,file="data/nrc_conte.Rda")
 
-nrc_renzi <- get_nrc_sentiment(RENZI$tweet_testo, language="italian")
-save(nrc_renzi,file="data/nrc_renzi.Rda")
+#nrc_renzi <- get_nrc_sentiment(RENZI$tweet_testo, language="italian")
+#save(nrc_renzi,file="data/nrc_renzi.Rda")
 
-nrc_salvini <- get_nrc_sentiment(SALVINI$tweet_testo, language="italian")
-save(nrc_salvini,file="data/nrc_salvini.Rda")
+#nrc_salvini <- get_nrc_sentiment(SALVINI$tweet_testo, language="italian")
+#save(nrc_salvini,file="data/nrc_salvini.Rda")
 
-nrc_letta <- get_nrc_sentiment(LETTA$tweet_testo, language="italian")
-save(nrc_letta,file="data/nrc_letta.Rda")
+#nrc_letta <- get_nrc_sentiment(LETTA$tweet_testo, language="italian")
+#save(nrc_letta,file="data/nrc_letta.Rda")
 
-nrc_berlusconi <- get_nrc_sentiment(BERLUSCONI$tweet_testo, language="italian")
-save(nrc_berlusconi, file="data/nrc_berlusconi.Rda")
+#nrc_berlusconi <- get_nrc_sentiment(BERLUSCONI$tweet_testo, language="italian")
+#save(nrc_berlusconi, file="data/nrc_berlusconi.Rda")
 
-nrc_speranza <- get_nrc_sentiment(SPERANZA$tweet_testo, language="italian")
-save(nrc_speranza,file="data/nrc_speranza.Rda")
+#nrc_speranza <- get_nrc_sentiment(SPERANZA$tweet_testo, language="italian")
+#save(nrc_speranza,file="data/nrc_speranza.Rda")
+
+################
+ system.time(
+nrc_PD <- get_nrc_sentiment(PD$tweet_testo, language="italian")
+save(nrc_PD,file="data/nrc_PD.Rda")
+
+nrc_FDI <- get_nrc_sentiment(FDI$tweet_testo, language="italian")
+save(nrc_FDI,file="data/nrc_FDI.Rda")
+
+nrc_M5S <- get_nrc_sentiment(M5S$tweet_testo, language="italian")
+save(nrc_M5S,file="data/nrc_M5S.Rda")
+
+nrc_FI <- get_nrc_sentiment(FI$tweet_testo, language="italian")
+save(nrc_FI,file="data/nrc_FI.Rda")
+
+nrc_REG_LEAGUES <- get_nrc_sentiment(REG_LEAGUES$tweet_testo, language="italian")
+save(nrc_REG_LEAGUES,file="data/nrc_REG_LEAGUES.Rda")
+
+nrc_MISTO <- get_nrc_sentiment(MISTO$tweet_testo, language="italian")
+save(nrc_MISTO,file="data/nrc_MISTO.Rda")
+
+nrc_LEGA <- get_nrc_sentiment(LEGA$tweet_testo, language="italian")
+save(nrc_LEGA,file="data/nrc_LEGA.Rda")
+
+nrc_IV <- get_nrc_sentiment(IV$tweet_testo, language="italian")
+save(nrc_IV,file="data/nrc_IV.Rda")
+
+nrc_INDIPENDENTE <- get_nrc_sentiment(INDIPENDENTE$tweet_testo, language="italian")
+save(nrc_INDIPENDENTE,file="data/nrc_INDIPENDENTE.Rda")
+
+nrc_CI <- get_nrc_sentiment(CI$tweet_testo, language="italian")
+save(nrc_CI,file="data/nrc_CI.Rda")
+
+nrc_LEU <- get_nrc_sentiment(LEU$tweet_testo, language="italian")
+save(nrc_LEU,file="data/nrc_LEU.Rda")
+)
+
 ```
 
 ```{r, include=FALSE}
 # load nrc object
-load("data/nrc_meloni.Rda")
-load("data/nrc_conte.Rda")
-load("data/nrc_renzi.Rda")
-load("data/nrc_salvini.Rda")
-load("data/nrc_letta.Rda")
-load("data/nrc_berlusconi.Rda")
-load("data/nrc_speranza.Rda")
+#load("data/nrc_meloni.Rda")
+#load("data/nrc_conte.Rda")
+#load("data/nrc_renzi.Rda")
+#load("data/nrc_salvini.Rda")
+#load("data/nrc_letta.Rda")
+#load("data/nrc_berlusconi.Rda")
+#load("data/nrc_speranza.Rda")
+
+load("data/nrc_PD.Rda")
+load("data/nrc_FDI.Rda")
+load("data/nrc_M5S.Rda")
+load("data/nrc_FI.Rda")
+load("data/nrc_REG_LEAGUES.Rda")
+load("data/nrc_MISTO.Rda")
+load("data/nrc_LEGA.Rda")
+load("data/nrc_IV.Rda")
+load("data/nrc_INDIPENDETE.Rda")
+load("data/nrc_CI.Rda")
+load("data/nrc_LEU.Rda")
 ```
 
 \newpage
 
-## Giorgia Meloni
+## Partito Democratico
 ### Proportion of the emotion
 
 ```{r,echo=TRUE}
 barplot(
-  sort(colSums(prop.table(nrc_meloni[, 1:8]))), 
+  sort(colSums(prop.table(nrc_PD[, 1:8]))), 
   horiz = TRUE, 
   cex.names = 0.7, 
   las = 1, 
-  main = "Emotions in tweets by Giorgia Meloni", xlab="Percentage"
+  main = "Emotions in tweets by Partito Democratico ", xlab="Percentage"
 )
 ```
 
@@ -126,14 +202,14 @@ barplot(
 
 ```{r, warning=FALSE, echo=TRUE}
 all <- c(
-  paste(MELONI$tweet_testo[nrc_meloni$anger > 0], collapse=" "),
-  paste(MELONI$tweet_testo[nrc_meloni$anticipation > 0], collapse=" "),
-  paste(MELONI$tweet_testo[nrc_meloni$disgust > 0], collapse=" "),
-  paste(MELONI$tweet_testo[nrc_meloni$fear > 0], collapse=" "),
-  paste(MELONI$tweet_testo[nrc_meloni$joy > 0], collapse=" "),
-  paste(MELONI$tweet_testo[nrc_meloni$sadness > 0], collapse=" "),
-  paste(MELONI$tweet_testo[nrc_meloni$surprise > 0], collapse=" "),
-  paste(MELONI$tweet_testo[nrc_meloni$trust > 0], collapse=" ")
+  paste(PD$tweet_testo[nrc_PD$anger > 0], collapse=" "),
+  paste(PD$tweet_testo[nrc_PD$anticipation > 0], collapse=" "),
+  paste(PD$tweet_testo[nrc_PD$disgust > 0], collapse=" "),
+  paste(PD$tweet_testo[nrc_PD$fear > 0], collapse=" "),
+  paste(PD$tweet_testo[nrc_PD$joy > 0], collapse=" "),
+  paste(PD$tweet_testo[nrc_PD$sadness > 0], collapse=" "),
+  paste(PD$tweet_testo[nrc_PD$surprise > 0], collapse=" "),
+  paste(PD$tweet_testo[nrc_PD$trust > 0], collapse=" ")
 )
 # Call the function previously defined
 all <- clean.text(all)
@@ -152,7 +228,7 @@ colnames(tdm) <- c('anger', 'anticipation', 'disgust', 'fear',
 layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
 par(mar=rep(0, 4))
 plot.new()
-text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Giorgia Meloni')
+text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Partito Democratico')
 comparison.cloud(tdm, random.order=FALSE,
                  colors = c("#00B2FF", "red", "#FF0099",
                             "#6600CC", "green", "orange", "blue", "brown"),
@@ -162,15 +238,15 @@ comparison.cloud(tdm, random.order=FALSE,
 \newpage
 
 
-## Giuseppe Conte
+## Fratelli d'Italia
 ### Proportion of the emotion
 ```{r}
 barplot(
-  sort(colSums(prop.table(nrc_conte[, 1:8]))), 
+  sort(colSums(prop.table(nrc_FDI[, 1:8]))), 
   horiz = TRUE, 
   cex.names = 0.7, 
   las = 1, 
-  main = "Emotions in tweets by Giuseppe Conte", xlab="Percentage"
+  main = "Emotions in tweets by Fratelli d'Italia", xlab="Percentage"
 )
 ```
 
@@ -178,14 +254,14 @@ barplot(
 
 ```{r, warning=FALSE, echo=FALSE}
 all <- c(
-  paste(CONTE$tweet_testo[nrc_conte$anger > 0], collapse=" "),
-  paste(CONTE$tweet_testo[nrc_conte$anticipation > 0], collapse=" "),
-  paste(CONTE$tweet_testo[nrc_conte$disgust > 0], collapse=" "),
-  paste(CONTE$tweet_testo[nrc_conte$fear > 0], collapse=" "),
-  paste(CONTE$tweet_testo[nrc_conte$joy > 0], collapse=" "),
-  paste(CONTE$tweet_testo[nrc_conte$sadness > 0], collapse=" "),
-  paste(CONTE$tweet_testo[nrc_conte$surprise > 0], collapse=" "),
-  paste(CONTE$tweet_testo[nrc_conte$trust > 0], collapse=" ")
+  paste(FDI$tweet_testo[nrc_FDI$anger > 0], collapse=" "),
+  paste(FDI$tweet_testo[nrc_FDI$anticipation > 0], collapse=" "),
+  paste(FDI$tweet_testo[nrc_FDI$disgust > 0], collapse=" "),
+  paste(FDI$tweet_testo[nrc_FDI$fear > 0], collapse=" "),
+  paste(FDI$tweet_testo[nrc_FDI$joy > 0], collapse=" "),
+  paste(FDI$tweet_testo[nrc_FDI$sadness > 0], collapse=" "),
+  paste(FDI$tweet_testo[nrc_FDI$surprise > 0], collapse=" "),
+  paste(FDI$tweet_testo[nrc_FDI$trust > 0], collapse=" ")
 )
 # Call the function previously defined
 all <- clean.text(all)
@@ -204,7 +280,7 @@ colnames(tdm) <- c('anger', 'anticipation', 'disgust', 'fear', 'joy',
 layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
 par(mar=rep(0, 4))
 plot.new()
-text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Giuseppe Conte')
+text(x=0.5, y=0.5, "Emotion Comparison Word Cloud for tweets by Fratelli d'Italia")
 comparison.cloud(tdm, random.order=FALSE,
                  colors = c("#00B2FF", "red", "#FF0099",
                             "#6600CC", "green", "orange", "blue", "brown"),
@@ -213,16 +289,16 @@ comparison.cloud(tdm, random.order=FALSE,
 
 \newpage
 
-## Matteo Renzi
+## Movimento 5 Stelle
 ### Proportion of the emotion
 
 ```{r}
 barplot(
-  sort(colSums(prop.table(nrc_renzi[, 1:8]))), 
+  sort(colSums(prop.table(nrc_M5S[, 1:8]))), 
   horiz = TRUE, 
   cex.names = 0.7, 
   las = 1, 
-  main = "Emotions in tweets by Matteo Renzi", xlab="Percentage"
+  main = "Emotions in tweets by Movimento 5 Stelle", xlab="Percentage"
 )
 ```
 
@@ -230,14 +306,14 @@ barplot(
 
 ```{r, warning=FALSE, echo=FALSE}
 all <- c(
-  paste(RENZI$tweet_testo[nrc_renzi$anger > 0], collapse=" "),
-  paste(RENZI$tweet_testo[nrc_renzi$anticipation > 0], collapse=" "),
-  paste(RENZI$tweet_testo[nrc_renzi$disgust > 0], collapse=" "),
-  paste(RENZI$tweet_testo[nrc_renzi$fear > 0], collapse=" "),
-  paste(RENZI$tweet_testo[nrc_renzi$joy > 0], collapse=" "),
-  paste(RENZI$tweet_testo[nrc_renzi$sadness > 0], collapse=" "),
-  paste(RENZI$tweet_testo[nrc_renzi$surprise > 0], collapse=" "),
-  paste(RENZI$tweet_testo[nrc_renzi$trust > 0], collapse=" ")
+  paste(M5S$tweet_testo[nrc_M5S$anger > 0], collapse=" "),
+  paste(M5S$tweet_testo[nrc_M5S$anticipation > 0], collapse=" "),
+  paste(M5S$tweet_testo[nrc_M5S$disgust > 0], collapse=" "),
+  paste(M5S$tweet_testo[nrc_M5S$fear > 0], collapse=" "),
+  paste(M5S$tweet_testo[nrc_M5S$joy > 0], collapse=" "),
+  paste(M5S$tweet_testo[nrc_M5S$sadness > 0], collapse=" "),
+  paste(M5S$tweet_testo[nrc_M5S$surprise > 0], collapse=" "),
+  paste(M5S$tweet_testo[nrc_M5S$trust > 0], collapse=" ")
 )
 # Call the function previously defined
 all <- clean.text(all)
@@ -256,7 +332,7 @@ colnames(tdm) <- c('anger', 'anticipation', 'disgust', 'fear',
 layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
 par(mar=rep(0, 4))
 plot.new()
-text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Matteo Renzi')
+text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Movimento 5 Stelle')
 comparison.cloud(tdm, random.order=FALSE,
                  colors = c("#00B2FF", "red", "#FF0099",
                             "#6600CC", "green", "orange", "blue", "brown"),
@@ -265,17 +341,17 @@ comparison.cloud(tdm, random.order=FALSE,
 
 \newpage
 
-## Matteo Salvini
+## Forza Italia
 
 ### Proportion of the emotion
 
 ```{r}
 barplot(
-  sort(colSums(prop.table(nrc_salvini[, 1:8]))), 
+  sort(colSums(prop.table(nrc_FI[, 1:8]))), 
   horiz = TRUE, 
   cex.names = 0.7, 
   las = 1, 
-  main = "Emotions in tweets by Matteo Salvini", xlab="Percentage"
+  main = "Emotions in tweets by Forza Italia", xlab="Percentage"
 )
 ```
 
@@ -283,14 +359,14 @@ barplot(
 
 ```{r, warning=FALSE}
 all <- c(
-  paste(SALVINI$tweet_testo[nrc_salvini$anger > 0], collapse=" "),
-  paste(SALVINI$tweet_testo[nrc_salvini$anticipation > 0], collapse=" "),
-  paste(SALVINI$tweet_testo[nrc_salvini$disgust > 0], collapse=" "),
-  paste(SALVINI$tweet_testo[nrc_salvini$fear > 0], collapse=" "),
-  paste(SALVINI$tweet_testo[nrc_salvini$joy > 0], collapse=" "),
-  paste(SALVINI$tweet_testo[nrc_salvini$sadness > 0], collapse=" "),
-  paste(SALVINI$tweet_testo[nrc_salvini$surprise > 0], collapse=" "),
-  paste(SALVINI$tweet_testo[nrc_salvini$trust > 0], collapse=" ")
+  paste(FI$tweet_testo[nrc_FI$anger > 0], collapse=" "),
+  paste(FI$tweet_testo[nrc_FI$anticipation > 0], collapse=" "),
+  paste(FI$tweet_testo[nrc_FI$disgust > 0], collapse=" "),
+  paste(FI$tweet_testo[nrc_FI$fear > 0], collapse=" "),
+  paste(FI$tweet_testo[nrc_FI$joy > 0], collapse=" "),
+  paste(FI$tweet_testo[nrc_FI$sadness > 0], collapse=" "),
+  paste(FI$tweet_testo[nrc_FI$surprise > 0], collapse=" "),
+  paste(FI$tweet_testo[nrc_FI$trust > 0], collapse=" ")
 )
 # Call the function previously defined
 all <- clean.text(all)
@@ -309,7 +385,7 @@ colnames(tdm) <- c('anger', 'anticipation', 'disgust', 'fear',
 layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
 par(mar=rep(0, 4))
 plot.new()
-text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Matteo Salvini')
+text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Forza Italia')
 comparison.cloud(tdm, random.order=FALSE,
                  colors = c("#00B2FF", "red", "#FF0099",
                             "#6600CC", "green", "orange", "blue", "brown"),
@@ -318,30 +394,30 @@ comparison.cloud(tdm, random.order=FALSE,
 
 \newpage
 
-## Enrico Letta
+## Regional Leagues
 
 ### Proportion of the emotion
 ```{r}
 barplot(
-  sort(colSums(prop.table(nrc_letta[, 1:8]))), 
+  sort(colSums(prop.table(nrc_REG_LEAGUES[, 1:8]))), 
   horiz = TRUE, 
   cex.names = 0.7, 
   las = 1, 
-  main = "Emotions in tweets by Enrico Letta", xlab="Percentage"
+  main = "Emotions in tweets by Regional Leagues", xlab="Percentage"
 )
 ```
 
 ### Wordcloud of emotions
 ```{r, warning=FALSE}
 all <- c(
-  paste(LETTA$tweet_testo[nrc_letta$anger > 0], collapse=" "),
-  paste(LETTA$tweet_testo[nrc_letta$anticipation > 0], collapse=" "),
-  paste(LETTA$tweet_testo[nrc_letta$disgust > 0], collapse=" "),
-  paste(LETTA$tweet_testo[nrc_letta$fear > 0], collapse=" "),
-  paste(LETTA$tweet_testo[nrc_letta$joy > 0], collapse=" "),
-  paste(LETTA$tweet_testo[nrc_letta$sadness > 0], collapse=" "),
-  paste(LETTA$tweet_testo[nrc_letta$surprise > 0], collapse=" "),
-  paste(LETTA$tweet_testo[nrc_letta$trust > 0], collapse=" ")
+  paste(REG_LEAGUES$tweet_testo[nrc_REG_LEAGUES$anger > 0], collapse=" "),
+  paste(REG_LEAGUES$tweet_testo[nrc_REG_LEAGUES$anticipation > 0], collapse=" "),
+  paste(REG_LEAGUES$tweet_testo[nrc_REG_LEAGUES$disgust > 0], collapse=" "),
+  paste(REG_LEAGUES$tweet_testo[nrc_REG_LEAGUES$fear > 0], collapse=" "),
+  paste(REG_LEAGUES$tweet_testo[nrc_REG_LEAGUES$joy > 0], collapse=" "),
+  paste(REG_LEAGUES$tweet_testo[nrc_REG_LEAGUES$sadness > 0], collapse=" "),
+  paste(REG_LEAGUES$tweet_testo[nrc_REG_LEAGUES$surprise > 0], collapse=" "),
+  paste(REG_LEAGUES$tweet_testo[nrc_REG_LEAGUES$trust > 0], collapse=" ")
 )
 # Call the function previously defined
 all <- clean.text(all)
@@ -359,7 +435,7 @@ colnames(tdm) <- c('anger', 'anticipation', 'disgust', 'fear', 'joy', 'sadness',
 layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
 par(mar=rep(0, 4))
 plot.new()
-text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Enrico Letta')
+text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Regional Leagues')
 comparison.cloud(tdm, random.order=FALSE,
                  colors = c("#00B2FF", "red", "#FF0099", "#6600CC", "green", "orange", "blue", "brown"),
                  title.size=1.5, max.words=80)
@@ -367,30 +443,30 @@ comparison.cloud(tdm, random.order=FALSE,
 
 \newpage
 
-## Silvio Berlusconi
+## Gruppo Misto
 
 ### Proportion of the emotion
 ```{r}
 barplot(
-  sort(colSums(prop.table(nrc_berlusconi[, 1:8]))), 
+  sort(colSums(prop.table(nrc_MISTO[, 1:8]))), 
   horiz = TRUE, 
   cex.names = 0.7, 
   las = 1, 
-  main = "Emotions in tweets by Silvio Berlusconi", xlab="Percentage"
+  main = "Emotions in tweets by Gruppo Misto", xlab="Percentage"
 )
 ```
 
 ### Wordcloud of emotions
 ```{r, warning=FALSE}
 all <- c(
-  paste(BERLUSCONI$tweet_testo[nrc_berlusconi$anger > 0], collapse=" "),
-  paste(BERLUSCONI$tweet_testo[nrc_berlusconi$anticipation > 0], collapse=" "),
-  paste(BERLUSCONI$tweet_testo[nrc_berlusconi$disgust > 0], collapse=" "),
-  paste(BERLUSCONI$tweet_testo[nrc_berlusconi$fear > 0], collapse=" "),
-  paste(BERLUSCONI$tweet_testo[nrc_berlusconi$joy > 0], collapse=" "),
-  paste(BERLUSCONI$tweet_testo[nrc_berlusconi$sadness > 0], collapse=" "),
-  paste(BERLUSCONI$tweet_testo[nrc_berlusconi$surprise > 0], collapse=" "),
-  paste(BERLUSCONI$tweet_testo[nrc_berlusconi$trust > 0], collapse=" ")
+  paste(MISTO$tweet_testo[nrc_MISTO$anger > 0], collapse=" "),
+  paste(MISTO$tweet_testo[nrc_MISTO$anticipation > 0], collapse=" "),
+  paste(MISTO$tweet_testo[nrc_MISTO$disgust > 0], collapse=" "),
+  paste(MISTO$tweet_testo[nrc_MISTO$fear > 0], collapse=" "),
+  paste(MISTO$tweet_testo[nrc_MISTO$joy > 0], collapse=" "),
+  paste(MISTO$tweet_testo[nrc_MISTO$sadness > 0], collapse=" "),
+  paste(MISTO$tweet_testo[nrc_MISTO$surprise > 0], collapse=" "),
+  paste(MISTO$tweet_testo[nrc_MISTO$trust > 0], collapse=" ")
 )
 # Call the function previously defined
 all <- clean.text(all)
@@ -409,7 +485,7 @@ colnames(tdm) <- c('anger', 'anticipation', 'disgust', 'fear',
 layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
 par(mar=rep(0, 4))
 plot.new()
-text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Silvio Berlusconi')
+text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Gruppo Misto')
 comparison.cloud(tdm, random.order=FALSE,
                  colors = c("#00B2FF", "red", "#FF0099",
                             "#6600CC", "green", "orange", "blue", "brown"),
@@ -418,30 +494,30 @@ comparison.cloud(tdm, random.order=FALSE,
 
 \newpage
 
-## Roberto Speranza
+## Lega Salvini
 
 ### Proportion of the emotion
 ```{r}
 barplot(
-  sort(colSums(prop.table(nrc_speranza[, 1:8]))), 
+  sort(colSums(prop.table(nrc_LEGA[, 1:8]))), 
   horiz = TRUE, 
   cex.names = 0.7, 
   las = 1, 
-  main = "Emotions in tweets by Roberto Speranza", xlab="Percentage"
+  main = "Emotions in tweets by Lega", xlab="Percentage"
 )
 ```
 
 ### Wordcloud of emotions
 ```{r, warning=FALSE}
 all <- c(
-  paste(SPERANZA$tweet_testo[nrc_speranza$anger > 0], collapse=" "),
-  paste(SPERANZA$tweet_testo[nrc_speranza$anticipation > 0], collapse=" "),
-  paste(SPERANZA$tweet_testo[nrc_speranza$disgust > 0], collapse=" "),
-  paste(SPERANZA$tweet_testo[nrc_speranza$fear > 0], collapse=" "),
-  paste(SPERANZA$tweet_testo[nrc_speranza$joy > 0], collapse=" "),
-  paste(SPERANZA$tweet_testo[nrc_speranza$sadness > 0], collapse=" "),
-  paste(SPERANZA$tweet_testo[nrc_speranza$surprise > 0], collapse=" "),
-  paste(SPERANZA$tweet_testo[nrc_speranza$trust > 0], collapse=" ")
+  paste(LEGA$tweet_testo[nrc_LEGA$anger > 0], collapse=" "),
+  paste(LEGA$tweet_testo[nrc_LEGA$anticipation > 0], collapse=" "),
+  paste(LEGA$tweet_testo[nrc_LEGA$disgust > 0], collapse=" "),
+  paste(LEGA$tweet_testo[nrc_LEGA$fear > 0], collapse=" "),
+  paste(LEGA$tweet_testo[nrc_LEGA$joy > 0], collapse=" "),
+  paste(LEGA$tweet_testo[nrc_LEGA$sadness > 0], collapse=" "),
+  paste(LEGA$tweet_testo[nrc_LEGA$surprise > 0], collapse=" "),
+  paste(LEGA$tweet_testo[nrc_LEGA$trust > 0], collapse=" ")
 )
 # Call the function previously defined
 all <- clean.text(all)
@@ -460,7 +536,207 @@ colnames(tdm) <- c('anger', 'anticipation', 'disgust', 'fear', 'joy', 'sadness',
 layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
 par(mar=rep(0, 4))
 plot.new()
-text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Roberto Speranza')
+text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Lega Salvini')
+comparison.cloud(tdm, random.order=FALSE,
+                 colors = c("#00B2FF", "red", "#FF0099", "#6600CC", "green", "orange", "blue", "brown"),
+                 title.size=1.5, max.words=80)
+```
+
+\newpage
+
+## Italia Viva
+
+### Proportion of the emotion
+```{r}
+barplot(
+  sort(colSums(prop.table(nrc_IV[, 1:8]))), 
+  horiz = TRUE, 
+  cex.names = 0.7, 
+  las = 1, 
+  main = "Emotions in tweets by Italia Viva", xlab="Percentage"
+)
+```
+
+### Wordcloud of emotions
+```{r, warning=FALSE}
+all <- c(
+  paste(IV$tweet_testo[nrc_IV$anger > 0], collapse=" "),
+  paste(IV$tweet_testo[nrc_IV$anticipation > 0], collapse=" "),
+  paste(IV$tweet_testo[nrc_IV$disgust > 0], collapse=" "),
+  paste(IV$tweet_testo[nrc_IV$fear > 0], collapse=" "),
+  paste(IV$tweet_testo[nrc_IV$joy > 0], collapse=" "),
+  paste(IV$tweet_testo[nrc_IV$sadness > 0], collapse=" "),
+  paste(IV$tweet_testo[nrc_IV$surprise > 0], collapse=" "),
+  paste(IV$tweet_testo[nrc_IV$trust > 0], collapse=" ")
+)
+# Call the function previously defined
+all <- clean.text(all)
+# remove stop-words
+all = removeWords(all,  c(stopwords("italian")))
+# create corpus
+corpus_viz <- Corpus(VectorSource(all))
+# create term-document matrix
+tdm <- TermDocumentMatrix(corpus_viz)
+# convert as matrix
+tdm <- as.matrix(tdm)
+# add column names
+colnames(tdm) <- c('anger', 'anticipation', 'disgust', 'fear', 'joy', 'sadness', 'surprise', 'trust')
+
+# Plot comparison wordcloud
+layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
+par(mar=rep(0, 4))
+plot.new()
+text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Italia Viva')
+comparison.cloud(tdm, random.order=FALSE,
+                 colors = c("#00B2FF", "red", "#FF0099", "#6600CC", "green", "orange", "blue", "brown"),
+                 title.size=1.5, max.words=80)
+```
+
+\newpage
+
+## Gruppo Indipendente
+
+### Proportion of the emotion
+```{r}
+barplot(
+  sort(colSums(prop.table(nrc_INDIPENDETE[, 1:8]))), 
+  horiz = TRUE, 
+  cex.names = 0.7, 
+  las = 1, 
+  main = "Emotions in tweets by Gruppo Indipendente", xlab="Percentage"
+)
+```
+
+### Wordcloud of emotions
+```{r, warning=FALSE}
+all <- c(
+  paste(INDIPENDENTE$tweet_testo[nrc_INDIPENDETE$anger > 0], collapse=" "),
+  paste(INDIPENDENTE$tweet_testo[nrc_INDIPENDETE$anticipation > 0], collapse=" "),
+  paste(INDIPENDENTE$tweet_testo[nrc_INDIPENDETE$disgust > 0], collapse=" "),
+  paste(INDIPENDENTE$tweet_testo[nrc_INDIPENDETE$fear > 0], collapse=" "),
+  paste(INDIPENDENTE$tweet_testo[nrc_INDIPENDETE$joy > 0], collapse=" "),
+  paste(INDIPENDENTE$tweet_testo[nrc_INDIPENDETE$sadness > 0], collapse=" "),
+  paste(INDIPENDENTE$tweet_testo[nrc_INDIPENDETE$surprise > 0], collapse=" "),
+  paste(INDIPENDENTE$tweet_testo[nrc_INDIPENDETE$trust > 0], collapse=" ")
+)
+# Call the function previously defined
+all <- clean.text(all)
+# remove stop-words
+all = removeWords(all,  c(stopwords("italian")))
+# create corpus
+corpus_viz <- Corpus(VectorSource(all))
+# create term-document matrix
+tdm <- TermDocumentMatrix(corpus_viz)
+# convert as matrix
+tdm <- as.matrix(tdm)
+# add column names
+colnames(tdm) <- c('anger', 'anticipation', 'disgust', 'fear', 'joy', 'sadness', 'surprise', 'trust')
+
+# Plot comparison wordcloud
+layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
+par(mar=rep(0, 4))
+plot.new()
+text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Gruppo Indipendente')
+comparison.cloud(tdm, random.order=FALSE,
+                 colors = c("#00B2FF", "red", "#FF0099", "#6600CC", "green", "orange", "blue", "brown"),
+                 title.size=1.5, max.words=80)
+```
+
+\newpage
+
+## Coraggio Italia
+
+### Proportion of the emotion
+```{r}
+barplot(
+  sort(colSums(prop.table(nrc_CI[, 1:8]))), 
+  horiz = TRUE, 
+  cex.names = 0.7, 
+  las = 1, 
+  main = "Emotions in tweets by Coraggio Italia", xlab="Percentage"
+)
+```
+
+### Wordcloud of emotions
+```{r, warning=FALSE}
+all <- c(
+  paste(CI$tweet_testo[nrc_CI$anger > 0], collapse=" "),
+  paste(CI$tweet_testo[nrc_CI$anticipation > 0], collapse=" "),
+  paste(CI$tweet_testo[nrc_CI$disgust > 0], collapse=" "),
+  paste(CI$tweet_testo[nrc_CI$fear > 0], collapse=" "),
+  paste(CI$tweet_testo[nrc_CI$joy > 0], collapse=" "),
+  paste(CI$tweet_testo[nrc_CI$sadness > 0], collapse=" "),
+  paste(CI$tweet_testo[nrc_CI$surprise > 0], collapse=" "),
+  paste(CI$tweet_testo[nrc_CI$trust > 0], collapse=" ")
+)
+# Call the function previously defined
+all <- clean.text(all)
+# remove stop-words
+all = removeWords(all,  c(stopwords("italian")))
+# create corpus
+corpus_viz <- Corpus(VectorSource(all))
+# create term-document matrix
+tdm <- TermDocumentMatrix(corpus_viz)
+# convert as matrix
+tdm <- as.matrix(tdm)
+# add column names
+colnames(tdm) <- c('anger', 'anticipation', 'disgust', 'fear', 'joy', 'sadness', 'surprise', 'trust')
+
+# Plot comparison wordcloud
+layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
+par(mar=rep(0, 4))
+plot.new()
+text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Coraggio Italia')
+comparison.cloud(tdm, random.order=FALSE,
+                 colors = c("#00B2FF", "red", "#FF0099", "#6600CC", "green", "orange", "blue", "brown"),
+                 title.size=1.5, max.words=80)
+```
+
+\newpage
+
+## Liberi e Uguali
+
+### Proportion of the emotion
+```{r}
+barplot(
+  sort(colSums(prop.table(nrc_LEU[, 1:8]))), 
+  horiz = TRUE, 
+  cex.names = 0.7, 
+  las = 1, 
+  main = "Emotions in tweets by Liberi e Uguali", xlab="Percentage"
+)
+```
+
+### Wordcloud of emotions
+```{r, warning=FALSE}
+all <- c(
+  paste(LEU$tweet_testo[nrc_LEU$anger > 0], collapse=" "),
+  paste(LEU$tweet_testo[nrc_LEU$anticipation > 0], collapse=" "),
+  paste(LEU$tweet_testo[nrc_LEU$disgust > 0], collapse=" "),
+  paste(LEU$tweet_testo[nrc_LEU$fear > 0], collapse=" "),
+  paste(LEU$tweet_testo[nrc_LEU$joy > 0], collapse=" "),
+  paste(LEU$tweet_testo[nrc_LEU$sadness > 0], collapse=" "),
+  paste(LEU$tweet_testo[nrc_LEU$surprise > 0], collapse=" "),
+  paste(LEU$tweet_testo[nrc_LEU$trust > 0], collapse=" ")
+)
+# Call the function previously defined
+all <- clean.text(all)
+# remove stop-words
+all = removeWords(all,  c(stopwords("italian")))
+# create corpus
+corpus_viz <- Corpus(VectorSource(all))
+# create term-document matrix
+tdm <- TermDocumentMatrix(corpus_viz)
+# convert as matrix
+tdm <- as.matrix(tdm)
+# add column names
+colnames(tdm) <- c('anger', 'anticipation', 'disgust', 'fear', 'joy', 'sadness', 'surprise', 'trust')
+
+# Plot comparison wordcloud
+layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
+par(mar=rep(0, 4))
+plot.new()
+text(x=0.5, y=0.5, 'Emotion Comparison Word Cloud for tweets by Liberi e Uguali')
 comparison.cloud(tdm, random.order=FALSE,
                  colors = c("#00B2FF", "red", "#FF0099", "#6600CC", "green", "orange", "blue", "brown"),
                  title.size=1.5, max.words=80)

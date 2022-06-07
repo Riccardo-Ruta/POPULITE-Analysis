@@ -259,12 +259,13 @@ DFM <- dfm_remove(DFM, emoji)
 # Number of parliamentarians
 n_parl <- length(unique(dataset$nome))
 n_parl
-# How many tweets for each parliamentarians?
-n_parl_party <- dataset %>% group_by(party_id) %>% count()
+
+# How many parliamentarians for each party_id?
+n_parl_party <- dataset %>% select(party_id, nome) %>% group_by(party_id) %>% unique() %>% count()
 kable(n_parl_party)
 
 # Gender composition
-n_gender <- dataset %>% group_by(genere) %>% count()
+n_gender <- dataset %>% select(genere, nome) %>% group_by(genere) %>% unique() %>% count()
 kable(n_gender)
 
 # Wich is the period of analysis?
