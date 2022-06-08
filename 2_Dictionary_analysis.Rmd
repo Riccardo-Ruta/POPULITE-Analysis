@@ -17,17 +17,19 @@ source(here::here("src","00_setup.R"))
 
 At the level of political parties, which ones make most use of populist rhetoric?
 
-At the level of individual politicians, which ones make most use of populist rhetoric?
-
-I use 3 dictionary to perform the analysis
+I use 3 dictionaries to perform the analysis
 
 -   Rooduijn & Pauwels: Rooduijn, M., and T. Pauwels. 2011. "Measuring Populism: Comparing Two Methods of Content Analysis." West European Politics 34 (6): 1272--1283.
 
--   Decadri & Boussalis: Decadri, S., & Boussalis, C. (2020). Populism, party membership, and language complexity in the Italian chamber of deputies. Journal of Elections, Public Opinion and Parties, 30(4), 484-503.
-
 -   Grundl: Gründl J. Populist ideas on social media: A dictionary-based measurement of populist communication. New Media & Society. December 2020.
 
--   Decadri & Boussalis + Grundl: this is simply a more extended version of the D&B dictionary, which also contains some terms taken from Grundl.
+-   Decadri & Boussalis: Decadri, S., & Boussalis, C. (2020). Populism, party membership, and language complexity in the Italian chamber of deputies. Journal of Elections, Public Opinion and Parties, 30(4), 484-503.
+
+-   This previous dictionary is used in the version colled "Decadri & Boussalis + Grundl": that is simply a more extended version of the D&B dictionary, which also contains some terms taken from Grundl.
+
+
+
+
 
 ## Create the dictionary
 
@@ -134,6 +136,7 @@ data_quarter_people$perc <- data_quarter_people$x * 100
 plot_people <- ggplot(data = data_quarter_people, aes(x = Group.1, y = perc))+
   geom_line(color = "#00AFBB", size = 2)+
   scale_x_continuous("Quarters", labels = as.character(data_quarter_people$Group.1), breaks = data_quarter_people$Group.1)+
+  ylab("Percentage of populist words - people")+
   labs(title = "Populism level over quarters of the 'people' component")
 plot_people
 
@@ -148,7 +151,8 @@ data_quarter_common$perc <- data_quarter_common$x * 100
 plot_common <- ggplot(data = data_quarter_common, aes(x = Group.1, y = perc))+
   geom_line(color = "#00AFBB", size = 2)+
   scale_x_continuous("Quarters", labels = as.character(data_quarter_common$Group.1), breaks = data_quarter_common$Group.1)+
-  labs(title = "Populism level over quarters of the 'common_will' component")
+  ylab("Percentage of populist words - common will")+
+  labs(title = "Populism level over quarters of the 'common will' component")
 plot_common
 ############
 #Over time ELITE (quarters)
@@ -161,6 +165,7 @@ data_quarter_elite$perc <- data_quarter_elite$x * 100
 plot_elite <- ggplot(data = data_quarter_elite, aes(x = Group.1, y = perc))+
   geom_line(color = "#00AFBB", size = 2)+
   scale_x_continuous("Quarters", labels = as.character(data_quarter_elite$Group.1), breaks = data_quarter_elite$Group.1)+
+  ylab("Percentage of populist words - elite")+
   labs(title = "Populism level over quarters of the 'elite' component")
 plot_elite
 
@@ -178,7 +183,7 @@ p <- ggplot() +
                      values=c('people'='red', 'elite'='blue', 'common will'='green'))+ 
   
   scale_x_continuous("Quarters", labels = as.character(data_quarter_people$Group.1), breaks = data_quarter_people$Group.1)+
-  
+  ylab("Percentage of populist words")+
   labs(title = " Compare the 3 components of the populism level")
 
 p
@@ -194,12 +199,13 @@ data_quarter_general$perc <- data_quarter_general$x
 plot_general <- ggplot(data = data_quarter_general, aes(x = Group.1, y = perc))+
   geom_line(color = "#00AFBB", size = 2)+
   scale_x_continuous("Quarters", labels = as.character(data_quarter_general$Group.1), breaks = data_quarter_general$Group.1)+
+  ylab("Percentage of populist words")+
   labs(title = "General level of populism over quarters")
 plot_general
 
 ```
 
-### Main component for each parliamentary group
+### Frequencies of the 3 components of populism for each parliamentary group
 ```{r, echo=FALSE}
 
 tstat1 <- textstat_frequency(dfm_dict1, groups = party_id)
@@ -215,7 +221,7 @@ ggplot(data = tstat1, aes(x = factor(nrow(tstat1):1), y = frequency *100)) +
 
 
 
-### Most populist parliamentary group
+### Ranking of parliamentary groups according to their level of populism
 
 ```{r}
 #By party no time (quarters)
@@ -233,6 +239,8 @@ ggplot(data=data_party, aes(x=Group.1, y=perc)) +
   theme_minimal()+
   geom_jitter(width=0.15)+
   theme(axis.text.x = element_text(angle = 45, hjust=1))+
+  ylab("Percentage of populist words") +
+  xlab("Parliamentary groups")+
   labs(title = "LEVEL OF POPULISM")
 
 # PEOPLE
@@ -248,6 +256,8 @@ ggplot(data=data_party_people, aes(x=Group.1, y=perc)) +
   theme_minimal()+
   geom_jitter(width=0.15)+
   theme(axis.text.x = element_text(angle = 45, hjust=1))+
+  ylab("Percentage of populist words - people")+
+  xlab("Parliamentary groups")+
   labs(title = "LEVEL OF POPULISM: PEOPLE COMPONENT")
 
 # COMMON WILL
@@ -263,6 +273,8 @@ ggplot(data=data_party_common, aes(x=Group.1, y=perc)) +
   theme_minimal()+
   geom_jitter(width=0.15)+
   theme(axis.text.x = element_text(angle = 45, hjust=1))+
+  ylab("Percentage of populist words - common will")+
+  xlab("Parliamentary groups")+
   labs(title = "LEVEL OF POPULISM: COMMON WILL COMPONENT")
 
 # ELITE
@@ -278,6 +290,8 @@ ggplot(data=data_party_elite, aes(x=Group.1, y=perc)) +
   theme_minimal()+
   geom_jitter(width=0.15)+
   theme(axis.text.x = element_text(angle = 45, hjust=1))+
+  ylab("Percentage of populist words - elite")+
+  xlab("Parliamentary groups")+
   labs(title = "LEVEL OF POPULISM: ELITE COMPONENT")
 ```
 Are the average values of populism for each party statistically different from each other?
@@ -312,13 +326,15 @@ left_party <- data_dict1 %>% select(populism, party_id, quarter) %>%
 ggplot(left_party, aes(x=quarter, y=populism, color=party_id)) +
   geom_line(size=1.5)+
   scale_x_continuous("Quarters", labels = as.character(left_party$quarter), breaks = left_party$quarter)+
-  ggtitle("Level of populism in the quarters for left-wing parties")
+  ylab("Percentage of populist words")+
+  ggtitle("Level of populism over time for left-wing parties")
 
 # Right parties in time
 ggplot(right_party, aes(x=quarter, y=populism, color=party_id)) +
   geom_line(size=1.5)+
   scale_x_continuous("Quarters", labels = as.character(right_party$quarter), breaks = right_party$quarter)+
-  ggtitle("Level of populism in the quarters for right-wing parties")
+  ylab("Percentage of populist words")+
+  ggtitle("Level of populism over time for right-wing parties")
 ```
 
 
@@ -346,7 +362,7 @@ data_dict2 <- dfm_dict2 %>%
 ```
 
 
-### Level of populism in time
+### Level of populism over time
 
 ```{r}
 #Over time general level populism (quarters)
@@ -359,11 +375,12 @@ data_quarter_general2$perc <- data_quarter_general2$x * 100
 plot_general2 <- ggplot(data = data_quarter_general2, aes(x = Group.1, y = perc))+
   geom_line(color = "#00AFBB", size = 2)+
   scale_x_continuous("Quarters", labels = as.character(data_quarter_general2$Group.1), breaks = data_quarter_general2$Group.1)+
+  ylab("Percentage of populist words")+
   labs(title = "General level of populism over quarters")
 plot_general2
 ```
 
-### Most populist parliamentary group
+### Ranking of parliamentary groups according their populism level
 
 ```{r}
 
@@ -378,6 +395,8 @@ ggplot(data=data_party2, aes(x=Group.1, y=perc)) +
   geom_bar(stat="identity", fill="steelblue")+
   geom_text(aes(label=perc), vjust=1.6, color="white", size=3.5)+
   theme_minimal()+
+  ylab("Percentage of populist words")+
+  xlab("Parliamentary groups")+
   labs(title = "LEVEL OF POPULISM")
 ```
 
@@ -419,6 +438,7 @@ data_quarter_general3$perc <- data_quarter_general3$x * 100
 plot_general3 <- ggplot(data = data_quarter_general3, aes(x = Group.1, y = perc))+
   geom_line(color = "#00AFBB", size = 2)+
   scale_x_continuous("Quarters", labels = as.character(data_quarter_general3$Group.1), breaks = data_quarter_general3$Group.1)+
+  ylab("Percentage of populist words")+
   labs(title = "General level of populism over quarters")
 plot_general3
 ```
@@ -438,6 +458,8 @@ ggplot(data=data_party3, aes(x=Group.1, y=perc)) +
   geom_bar(stat="identity", fill="steelblue")+
   geom_text(aes(label=perc), vjust=1.6, color="white", size=3.5)+
   theme_minimal()+
+  ylab("Percentage of populist words")+
+  xlab("Parliamentary groups")+
   labs(title = "LEVEL OF POPULISM")
 ```
 
@@ -446,11 +468,11 @@ ggplot(data=data_party3, aes(x=Group.1, y=perc)) +
 
 
 
-## Compare the general level of populism in time for the dictionaries
+## Compare the general level of populism over time for the dictionaries
 
 ```{r, echo=FALSE, warning=FALSE}
 comparison_time <- plot(data_quarter_general3$Group.1, data_quarter_general3$perc,
-                        type = "l", ylab = "Populism level", xlab = "Time", col = "green", ylim = c(0.1,1))+
+                        type = "l", ylab = "Populism level", xlab = "Quarters", col = "green", ylim = c(0.1,1))+
   lines(data_quarter_general2$Group.1, data_quarter_general2$perc,
         type = "l", ylab = "Populism level", xlab = "Time", col = "blue")+
   lines(data_quarter_general$Group.1, data_quarter_general$perc,
