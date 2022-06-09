@@ -337,6 +337,12 @@ ggplot(right_party, aes(x=quarter, y=populism, color=party_id)) +
   ggtitle("Level of populism over time for right-wing parties")
 ```
 
+```{r, eval=FALSE, include=FALSE}
+# save data_dict1 for next uses
+#save(data_dict1, file = "data/data_dict1.Rda")
+```
+
+
 
 \newpage
 
