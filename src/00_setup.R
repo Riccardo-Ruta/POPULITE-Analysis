@@ -2,7 +2,7 @@ want <- c("here","quanteda","readr","quanteda.textplots","plyr",
           "dplyr", "tidyverse", "rio", "readtext", "quanteda.textstats",
           "sure", "syuzhet", "tm","wordcloud","readxl","na.tools", "ggplotify",
           "kableExtra", "knitr","ggplot2", "topicmodels","topicdoc", "cowplot",
-          "quanteda.textmodels", "tidytext","textdata", "nnet")  # list of required packages
+          "quanteda.textmodels", "tidytext","textdata", "nnet","stm","sjPlot")  # list of required packages
 have <- want %in% rownames(installed.packages())
 if ( any(!have) ) { install.packages( want[!have] ) }
 rm(have, want)
@@ -37,5 +37,8 @@ library(quanteda.textmodels)
 library(tidytext)
 library(textdata)
 library(nnet)
+library(stm)
+library(sjPlot)
+
 
 Sys.setlocale("LC_TIME", "C")

@@ -1,0 +1,305 @@
+---
+title: 'STM Topicmodel  '
+author: "Riccardo Ruta"
+date: "05/2022"
+output:
+  pdf_document: 
+    toc: yes
+    latex_engine: xelatex
+  html_document: default
+  word_document:
+    toc: yes
+---
+
+```{r setup4, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+here::here("")
+source(here::here("src","00_setup.R"))
+```
+
+# STM Topic model analysis
+
+## Prelimnary steps
+
+### Load the data
+
+```{r, include=FALSE}
+load("data/dfm.Rda")
+```
+
+### Import the dictionaries
+
+```{r}
+# Import dictionaries file
+dict <-  read_excel("data/populism_dictionaries.xlsx")
+
+Decadri_Boussalis_Grundl <-
+  dictionary(list(people =
+                    dict$Decadri_Boussalis_Grundl_People
+                  [!is.na(dict$Decadri_Boussalis_Grundl_People)],
+                  common_will =
+                    dict$`Decadri_Boussalis_Grundl_Common Will`
+                  [!is.na(dict$`Decadri_Boussalis_Grundl_Common Will`)],
+                  elite =
+                    dict$Decadri_Boussalis_Grundl_Elite
+                  [!is.na(dict$Decadri_Boussalis_Grundl_Elite)]))
+```
+
+### Remove all the account's mentions
+
+```{r}
+DFM@Dimnames$features <- gsub("^@", "", DFM@Dimnames$features)
+```
+
+### Trim the data
+
+```{r}
+# Remove text with less than 1 word
+DFM <- dfm_subset(DFM, ntoken(DFM) > 1)
+
+# Remove very short words
+DFM <- dfm_remove(DFM, min_nchar=2)
+
+# Dfm trimming:only words that occur in the top 20% of the distribution and in less than 10% of documents
+DFM <- dfm_trim(DFM,min_termfreq = 0.8,
+                termfreq_type = "quantile",
+                max_docfreq = 0.1, docfreq_type = "prop")
+
+```
+
+### Group and weight the data
+
+```{r}
+DFMG<-dfm_group(DFM,groups = interaction(nome, quarter,party_id))
+
+DFMGW<-  dfm_weight(DFMG,
+                    scheme ="prop")
+```
+
+### Apply dictionary
+
+```{r}
+# Apply Dictionary
+DFMdict <- dfm_lookup(DFMGW, dictionary = Decadri_Boussalis_Grundl)
+
+# Convert to a dataframe
+DATAdictDFM <- DFMdict %>%
+  quanteda::convert(to = "data.frame")
+
+```
+
+### Create percentage for each components
+
+```{r}
+# RUN ONLY ONCE!
+# Add variable with general level of populism & multiply all components by 100
+DATAdictDFM <- DATAdictDFM %>% mutate(populism = (people + common_will + elite) * 100)
+                                      
+DATAdictDFM <- DATAdictDFM %>% mutate(people = people*100,
+                                      common_will = common_will*100,
+                                      elite = elite*100)
+```
+
+### Add the percentage of populism to the original dfm (not weighted)
+
+```{r}
+docvars(DFMG) <- cbind(docvars(DFMG),DATAdictDFM)
+```
+
+### Convert DFM to STM format
+
+```{r}
+#EXtract a sample
+#myDFM <- dfm_sample(DFMG,
+#                    size = 5000)
+
+myDFM = DFMG
+set.seed(123)
+DfmStm <- quanteda::convert(myDFM, to = "stm", docvars = docvars(myDFM))
+
+```
+
+## FIND THE BEST NUMBER OF TOPICS K
+
+### Search the best number of Topics comparing coherence and exclusivity values
+
+K = 2:50
+
+```{r, eval=FALSE}
+k <-c(5:20)
+system.time(storage <- searchK(DfmStm$documents, 
+                               DfmStm$vocab, 
+                               K = k, 
+                               #max.em.its = 75, # REMOVED
+                               prevalence = ~ party_id + populism + s(quarter),
+                               data = DfmStm$meta, init.type = "Spectral"))
+#save(storage,file="data/storage.Rda")
+```
+
+```{r, include=FALSE, eval=TRUE}
+load("data/storage.Rda")
+```
+
+### plot results
+
+```{r}
+plot.searchK(storage)
+
+plot(storage$results$semcoh, storage$results$exclus,
+     xlab= "Semantic coherence",
+     ylab= "Exclusivity",
+     col= "blue", pch = 19, cex = 1, lty = "solid", lwd = 2)
+text(storage$results$semcoh, storage$results$exclus, labels=storage$results$K, cex= 1, pos=4)
+
+plot(storage$results$K, storage$results$heldout,
+     xlab= "Number of Topics",
+     ylab= "held-out likelihood",
+     col= "blue", pch = 19, cex = 1, lty = "solid", lwd = 2, xaxt="n")
+text(storage$results$K, storage$results$heldout, labels=storage$results$K, cex= 1, pos=4)
+xtick<-seq(2, 50, by=1)
+axis(side=1, at=xtick, labels = FALSE)
+text(x=xtick,  par("usr")[3], 
+     labels = xtick, pos = 1, xpd = TRUE)
+
+```
+
+K= 11 has the best values of coherence, exclusivity and held-Out likelihood.
+
+### Run the analysis selecting k = 11
+
+```{r, eval=FALSE}
+k = 11
+
+mySTM <- stm(DfmStm$documents, vocab = DfmStm$vocab, 
+             K = k, 
+             prevalence = ~ party_id + populism + s(quarter),
+             data = DfmStm$meta,
+             init.type = "Spectral", 
+             verbose = TRUE)
+
+# save(mySTM,file="data/mySTM.Rda")
+```
+
+```{r, include=FALSE, eval=TRUE}
+load("data/mySTM.Rda")
+```
+
+### Label topics
+
+The frequency/exclusivity (FREX) scoring summarizes words according to their probability of appearance under a topic and the exclusivity to that topic. These words provide more semantically intuitive representations of each topic
+
+```{r}
+labelTopics(mySTM, n=10)
+
+```
+
+### Most frequent topic
+
+```{r}
+     
+R <- plot(mySTM, 
+          type = "summary", 
+          xlim = c(0, .3))
+
+# plot just frex words for each topic
+plot(mySTM, type = "summary", labeltype = c("frex"), n=5)  # topic 9 is the most frequent
+```
+
+### Find document most associated Text with the most frequent topic (9)
+
+```{r, eval =FALSE}
+# Load original corpus
+load("data/corpus.Rda")
+
+# list the documents in the dfm
+docs <- myDFM@Dimnames$docs
+
+# Remove text with less than 1 word
+corpus <- corpus_subset(corpus, ntoken(corpus) > 1)
+
+# group the corpus like the dfm
+corpus_g <- corpus_group(corpus,groups = interaction(nome, quarter,party_id))
+
+
+# subset the same text of the dfm
+subs_corpus <- corpus_subset(corpus_g, docnames(corpus_g) %in% docs)
+
+documents <- as.character(subs_corpus)
+
+documents <- as.vector(documents)
+
+# Let's focus on topic 9
+thought9 <- findThoughts(mySTM, texts=documents, topics=9, n=3)$docs[[1]]
+
+#   qui non run esce errore seguente !!
+
+# Error in findThoughts(mySTM, texts = texts(subs_corpus), topics = 9, n = 3) : 
+# Number of provided texts and number of documents modeled do not match
+```
+
+### Correlation between topics
+
+```{r}
+mod.out.corr <- topicCorr(mySTM)
+plot(mod.out.corr)
+    
+```
+
+### Which are the the most likely topics across our documents?
+
+```{r}
+#apply(mySTM$theta,1,which.max) 
+
+tab <- table(apply(mySTM$theta,1,which.max)) 
+kable(tab[order(desc(tab))])
+```
+
+### save them back in the original dataframe
+
+```{r, eval=FALSE}
+# STESSO PROBLEMA LIKE SOPRA:
+# ORIGINAL CORPUS E STM NON SONO LO STESSO NUMERO
+# 5710 vs 5713
+subs_corpus$topic <- apply(mySTM$theta,1,which.max)
+
+str(subs_corpus) 
+
+# Topic 5 - 5 random documents associated to it
+
+set.seed(123)
+
+sample(subs_corpus$text[subs_corpus$topic==5], 5)
+
+
+```
+
+## Coefficients
+
+```{r}
+#out$meta$rating <- as.factor(out$meta$rating)
+prep <- estimateEffect(1:11 ~ party_id + populism + s(quarter),
+                       mySTM,metadata = DfmStm$meta,
+                       uncertainty = "Global")
+summary(prep)
+```
+
+## Interpretation and validation
+
+**Da sistemare**
+
+```{r, eval=FALSE}
+#Topic Prevalence Over-time
+#qui potresti far vedere che la prevalence di alcuni topics ha dei picchi
+#in periodo in cui ha senso che abbia dei picchi...
+#Anche questo vale come validation, va runnato però dopo che hai runnato estimateEffect
+#perché ti servono i coefficienti dei quarters della regression...
+#Anche qui, esempio con Topic 1 poi devi guardare tutti i topics...
+#Va un po' sistemato (vedi x axis), magari da provare con GGPLOT...
+plot(prep, "quarter", method = "continuous", topics = 1,
+       model = z, printlegend = FALSE, xaxt = "n", xlab = "Time")
+quartseq <- seq(from = as.Date("2020-01-01"),
+                  to = as.Date("2022-04-18"), by = "quarter")
+quartnames <- quarters(quartseq)
+axis(1,at = as.numeric(quartseq) - min(as.numeric(quartseq)),
+     labels = quartnames)
+```

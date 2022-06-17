@@ -431,5 +431,10 @@ sadness_model <- lm(sadness ~ factor_party + factor_quarter + populism, data_dic
 summary(sadness_model)
 ```
 
+### Tab the results
+
+```{r}
+tab_model(negative_model,negative_prevalence_model)
+```
 
 

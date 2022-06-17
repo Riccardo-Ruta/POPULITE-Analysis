@@ -26,13 +26,13 @@ source(here::here("src","00_setup.R"))
 As an additional analysis, we have developed an application that implements an emotion recognition system in videos. The aim is to investigate which were the main emotions conveyed by Italian party leaders through interviews and live broadcasts published on their respective facebook profiles, during the first two months after the invasion of Ukraine by the Russian army. 
 
 The corpus for this analysis was constructed by manually searching for videos showing the politician engaged in a live broadcast or interview on the pages of the following party leaders:
-Forza Italia: Silvio Berlusconi 
-Fratelli d'Italia: Giorgia Meloni
-Italia Viva: Matteo Renzi
-Lega: Matteo Salvini
-Liberi e Uguali: Roberto Speranza
-Movimento 5 stelle: Giuseppe Conte
-Partyito Democratico: Enrico Letta
+Forza Italia: Silvio Berlusconi;
+Fratelli d'Italia: Giorgia Meloni;
+Italia Viva: Matteo Renzi;
+Lega: Matteo Salvini;
+Liberi e Uguali: Roberto Speranza;
+Movimento 5 stelle: Giuseppe Conte;
+Partito Democratico: Enrico Letta;
 
 Subsequently, only videos that were suitable for analysis were downloaded, i.e. videos with a frontal shot of the politician and not exceeding 35 MB in size; for some party leaders, no video suitable for analysis was found. A total of 21 videos were collected, distributed in this way:
 Silvio Berlusconi: 0
@@ -664,7 +664,7 @@ barplot(t(matrix),
         legend.text = TRUE, 
         args.legend = list(x = "topright"),
          xlim=c(0,7.5),
-        main = ""
+        main = "Emotion classification for each party leader"
         )
 
 
@@ -674,7 +674,7 @@ barplot(matrix,
         args.legend = list(x = "topright",
                            inset = c(- 0.065, -0.1)),
         beside = T,
-        main = "")
+        main = "Level of emotions captured in party leaders' videos \n (from 21st Feb to 21st Apr 2022)")
 
 ```
 Looking at these results, it is possible to observe which emotions were used by party leaders during the first two months of the Ukrainian invasion, it should be noted that the videos were downloaded regardless of whether the topic at hand was the war in Ukraine.
