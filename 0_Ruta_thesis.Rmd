@@ -123,12 +123,12 @@ no more than 250 words for the abstract
 
 \newpage
 
-```{r 3_Sentiment_analysis, child = '3_Sentyment_analysis.Rmd', eval=FALSE}
+```{r 3_Sentiment_analysis, child = '3_Sentiment_analysis.Rmd'}
 ```
 
 \newpage
 
-```{r 4_LDA_Topic_analysis, child = '4_LDA_Topic_analysis(NEW).Rmd', eval=FALSE}
+```{r 4_STM_Topic_analysis, child = '4_STM_Topic_analysis.Rmd'}
 ```
 
 \newpage

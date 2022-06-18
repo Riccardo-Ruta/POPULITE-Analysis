@@ -21,7 +21,7 @@ source(here::here("src","00_setup.R"))
 # import the data
 tw <-  read_csv("data/large_files/politicians_final_corrected.csv",
                 show_col_types = FALSE )
-
+#save(tw,file="data/tw.Rda")
 kable(colnames(tw), col.names = "variables")
 ```
 

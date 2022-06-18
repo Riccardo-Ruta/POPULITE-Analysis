@@ -25,6 +25,8 @@ source(here::here("src","00_setup.R"))
 
 ```{r, include=FALSE}
 load("data/dfm.Rda")
+load("data/dataset.Rda")
+load("data/tw.Rda")
 ```
 
 ### Import the dictionaries
@@ -51,6 +53,79 @@ Decadri_Boussalis_Grundl <-
 DFM@Dimnames$features <- gsub("^@", "", DFM@Dimnames$features)
 ```
 
+### Remove from the DFM extra words uselss for an STM topic model
+
+```{r}
+###### LIST OF WORDS LINKED TO THE PARTIES (party_all)######
+# words linked to the parties
+party_pd <- c("pd","senatoripd","partitodemocratico","p_democratico","partito_democratico",
+              "letta","partitodemocratico","p_democratico","partito_democratico","pdnetwork",
+              "deputatipd","pdabruzzo","deputatipd")
+
+party_fdi <- c("fdi","fratelliditalia","fratelliitalia","fratelliditaiia",
+               "fdi_parlamento","fratelli_italia","gfratelli_d'italia",
+               "fratellid'italia","meloni","fdimantova")
+
+party_m5s <- c("m5s","movimento5stelle","movimentocinquestelle","5stelle",
+               "cinquestelle","mov5stelle","conte","#conte","m5s_senato",
+               "m5s_camera","m5scampania","puglia_m5s","movimento5stelle",
+               "giuseppeconteit","dimaio","modena5stelle","giuseppeconte")
+
+party_fi <- c("fi","forzaitalia","forza_italia","gruppoficamera","gruppofisenato",
+              "fi_toscana","fipuglia2020","fi_parlamento","fi_ultimissime",
+              "berlusconi_pe","fi_giovani","fi_veneto")
+
+party_lega <- c("lega","legasalvini","legacamera","legasenato","votalega","lega_senato",
+                "lega_camera","legasicilia","salvini","salvinipremier",
+                "oggivotolega","noiconsalvini","lega_gruppoid","legasardegna",
+                "iostoconsalvini","26gennaiovotolega","domenicavotolega")
+
+party_minori <- c("leu","italiaviva","italia_viva","renzi","#renzi",
+                  "coraggio_italia","coraggioitalia",
+                  "liberieuguali","liberi_e_uguali","liberiuguali",
+                  "piu_europa","azione_it","governomusumeci","italiaviva_eu")
+
+party <- c(party_lega,party_fi,party_m5s,party_fdi,party_pd,party_minori)
+party_mentions <- paste("@",party,sep = "")
+party_hashtag <- paste("#",party,sep = "")
+
+party_all <- c(party,party_mentions,party_hashtag)
+##########
+
+# list of party_id
+partyid <- unique(dataset$party_id)
+
+#list of surnames
+nome <- unique(dataset$nome)
+df1 <- data.frame(nome)
+df2 <- extract(df1, nome, c("FirstName", "LastName"), "([^ ]+) (.*)")
+surnames <- df2$FirstName
+
+# list of twitter names
+utenti <- unique(tw$tw_screen_name)
+
+# mentions to the account
+mentions <- paste("@",utenti, sep = "")
+
+# hashtag mentions
+hashatag <- paste("#",utenti, sep = "")
+
+######################
+
+# create my new list of word to be removed
+extra_words <- c(partyid, surnames, party_all,
+                 stopwords('spanish'), stopwords("french"),
+                 stopwords("english"),
+                 utenti, mentions, hashatag)
+
+# Save extra_words
+#save(extra_words,file="data/extra_words.Rda")
+
+# Remove from the dfm
+DFM <- dfm_select(DFM, extra_words, selection='remove')
+```
+
+
 ### Trim the data
 
 ```{r}
@@ -67,12 +142,17 @@ DFM <- dfm_trim(DFM,min_termfreq = 0.8,
 
 ```
 
+
 ### Group and weight the data
 
 ```{r}
-DFMG<-dfm_group(DFM,groups = interaction(nome, quarter,party_id))
+# Group by nome, quarter and parliamentary group
+DFMG <- dfm_group(DFM,groups = interaction(nome, quarter,party_id))
 
-DFMGW<-  dfm_weight(DFMG,
+# Remove text with less than 1 word
+DFMG <- dfm_subset(DFMG, ntoken(DFMG) > 1)
+
+DFMGW <-  dfm_weight(DFMG,
                     scheme ="prop")
 ```
 
@@ -109,21 +189,19 @@ docvars(DFMG) <- cbind(docvars(DFMG),DATAdictDFM)
 ### Convert DFM to STM format
 
 ```{r}
-#EXtract a sample
-#myDFM <- dfm_sample(DFMG,
-#                    size = 5000)
-
 myDFM = DFMG
 set.seed(123)
 DfmStm <- quanteda::convert(myDFM, to = "stm", docvars = docvars(myDFM))
 
 ```
 
-## FIND THE BEST NUMBER OF TOPICS K
+## FIRST TRY
+
+## Find best number of topics k
 
 ### Search the best number of Topics comparing coherence and exclusivity values
 
-K = 2:50
+K = 5:20
 
 ```{r, eval=FALSE}
 k <-c(5:20)
@@ -165,23 +243,23 @@ text(x=xtick,  par("usr")[3],
 
 K= 11 has the best values of coherence, exclusivity and held-Out likelihood.
 
-### Run the analysis selecting k = 11
+## Run the analysis selecting k = 11
 
-```{r, eval=FALSE}
+```{r, eval=F}
 k = 11
 
-mySTM <- stm(DfmStm$documents, vocab = DfmStm$vocab, 
+mySTM11 <- stm(DfmStm$documents, vocab = DfmStm$vocab, 
              K = k, 
              prevalence = ~ party_id + populism + s(quarter),
              data = DfmStm$meta,
              init.type = "Spectral", 
              verbose = TRUE)
 
-# save(mySTM,file="data/mySTM.Rda")
+# save(mySTM11,file="data/mySTM11.Rda")
 ```
 
 ```{r, include=FALSE, eval=TRUE}
-load("data/mySTM.Rda")
+load("data/mySTM11.Rda")
 ```
 
 ### Label topics
@@ -189,23 +267,21 @@ load("data/mySTM.Rda")
 The frequency/exclusivity (FREX) scoring summarizes words according to their probability of appearance under a topic and the exclusivity to that topic. These words provide more semantically intuitive representations of each topic
 
 ```{r}
-labelTopics(mySTM, n=10)
-
+labelTopics(mySTM11, n=10)
 ```
 
 ### Most frequent topic
 
 ```{r}
-     
-R <- plot(mySTM, 
+R <- plot(mySTM11, 
           type = "summary", 
           xlim = c(0, .3))
 
 # plot just frex words for each topic
-plot(mySTM, type = "summary", labeltype = c("frex"), n=5)  # topic 9 is the most frequent
+plot(mySTM11, type = "summary", labeltype = c("frex"), n=5)  # topic 9 is the most frequent
 ```
 
-### Find document most associated Text with the most frequent topic (9)
+### Find most associated Text with the most frequent topic (9)
 
 ```{r, eval =FALSE}
 # Load original corpus
@@ -214,12 +290,11 @@ load("data/corpus.Rda")
 # list the documents in the dfm
 docs <- myDFM@Dimnames$docs
 
-# Remove text with less than 1 word
-corpus <- corpus_subset(corpus, ntoken(corpus) > 1)
-
 # group the corpus like the dfm
 corpus_g <- corpus_group(corpus,groups = interaction(nome, quarter,party_id))
 
+# Remove text with less than 1 word
+#corpus_g <- corpus_subset(corpus_g, ntoken(corpus_g) > 1)
 
 # subset the same text of the dfm
 subs_corpus <- corpus_subset(corpus_g, docnames(corpus_g) %in% docs)
@@ -229,12 +304,11 @@ documents <- as.character(subs_corpus)
 documents <- as.vector(documents)
 
 # Let's focus on topic 9
-thought9 <- findThoughts(mySTM, texts=documents, topics=9, n=3)$docs[[1]]
+thought11_9 <- findThoughts(mySTM11, texts=documents, topics=9, n=3)$docs[[1]]
 
-#   qui non run esce errore seguente !!
-
-# Error in findThoughts(mySTM, texts = texts(subs_corpus), topics = 9, n = 3) : 
-# Number of provided texts and number of documents modeled do not match
+#plot them
+par(mfrow = c(1, 2),mar = c(.5, .5, 1, .5))
+plotQuote(thought11_9, width = 30, main = "Topic 1")
 ```
 
 ### Correlation between topics
@@ -242,14 +316,11 @@ thought9 <- findThoughts(mySTM, texts=documents, topics=9, n=3)$docs[[1]]
 ```{r}
 mod.out.corr <- topicCorr(mySTM)
 plot(mod.out.corr)
-    
 ```
 
 ### Which are the the most likely topics across our documents?
 
 ```{r}
-#apply(mySTM$theta,1,which.max) 
-
 tab <- table(apply(mySTM$theta,1,which.max)) 
 kable(tab[order(desc(tab))])
 ```
@@ -269,13 +340,299 @@ str(subs_corpus)
 set.seed(123)
 
 sample(subs_corpus$text[subs_corpus$topic==5], 5)
+```
+
+
+
+\newpage
+
+
+## Run the analysis selecting k = 20
+
+```{r, eval=FALSE}
+k = 20
+
+mySTM20 <- stm(DfmStm$documents, vocab = DfmStm$vocab, 
+             K = k, 
+             prevalence = ~ party_id + populism + s(quarter),
+             data = DfmStm$meta,
+             init.type = "Spectral", 
+             verbose = TRUE)
+
+# save(mySTM,file="data/mySTM20.Rda")
+```
+
+```{r, include=FALSE, eval=TRUE}
+load("data/mySTM20.Rda")
+```
+
+### Label topics
+
+The frequency/exclusivity (FREX) scoring summarizes words according to their probability of appearance under a topic and the exclusivity to that topic. These words provide more semantically intuitive representations of each topic
+
+```{r}
+labelTopics(mySTM20, n=10)
+```
+
+### Most frequent topic
+
+```{r}
+R <- plot(mySTM20, 
+          type = "summary", 
+          xlim = c(0, .3))
+
+# plot just frex words for each topic
+plot(mySTM20, type = "summary", labeltype = c("frex"), n=5)  # topic 9 is the most frequent
+```
+
+### Find most associated Text with the most frequent topic (15)
+
+```{r, eval =FALSE}
+# Let's focus on topic 15
+thought20_15 <- findThoughts(mySTM20, texts=subs_corpus, topics=15, n=3)$docs[[1]]
+
+#   qui non run esce errore seguente !!
+
+# Error in findThoughts(mySTM, texts = texts(subs_corpus), topics = 9, n = 3) : 
+# Number of provided texts and number of documents modeled do not match
+```
+
+### Correlation between topics
+
+```{r}
+mod.out.corr20 <- topicCorr(mySTM20)
+plot(mod.out.corr20)
+```
+
+### Which are the the most likely topics across our documents?
+
+```{r}
+tab20 <- table(apply(mySTM20$theta,1,which.max)) 
+kable(tab20[order(desc(tab20))])
+```
+
+### save them back in the original dataframe
+
+```{r, eval=FALSE}
+# STESSO PROBLEMA LIKE SOPRA:
+# ORIGINAL CORPUS E STM NON SONO LO STESSO NUMERO
+# 5710 vs 5713
+subs_corpus$topic20 <- apply(mySTM20$theta,1,which.max)
+
+str(subs_corpus) 
+
+# Topic 5 - 5 random documents associated to it
+
+set.seed(123)
+
+sample(subs_corpus$text[subs_corpus$topic20==5], 5)
+```
+
+\newpage
+
+## Run the analysis selecting k = 10
+
+```{r, eval=FALSE}
+k = 10
+
+mySTM10 <- stm(DfmStm$documents, vocab = DfmStm$vocab, 
+             K = k, 
+             prevalence = ~ party_id + populism + s(quarter),
+             data = DfmStm$meta,
+             init.type = "Spectral", 
+             verbose = TRUE)
+
+ #save(mySTM10,file="data/mySTM10.Rda")
+```
+
+```{r, include=FALSE, eval=TRUE}
+load("data/mySTM10.Rda")
+```
+
+### Label topics
+
+The frequency/exclusivity (FREX) scoring summarizes words according to their probability of appearance under a topic and the exclusivity to that topic. These words provide more semantically intuitive representations of each topic
+
+```{r}
+labelTopics(mySTM10, n=10)
 
 
 ```
 
-## Coefficients
+### Most frequent topic
 
 ```{r}
+R <- plot(mySTM10, 
+          type = "summary", 
+          xlim = c(0, .3))
+
+# plot just frex words for each topic
+plot(mySTM10, type = "summary", labeltype = c("frex"), n=5)  # topic 9 is the most frequent
+```
+
+### Find most associated Text with the most frequent topic (9)
+
+```{r, eval =FALSE}
+# Let's focus on topic 15
+thought10_9 <- findThoughts(mySTM10, texts=documents, topics=9, n=3)$docs[[1]]
+#plot them
+par(mfrow = c(1, 2),mar = c(.5, .5, 1, .5))
+plotQuote(thought10_9, width = 30, main = "Topic 1")
+```
+
+### Correlation between topics
+
+```{r}
+mod.out.corr10 <- topicCorr(mySTM10)
+plot(mod.out.corr10)
+```
+
+### Which are the the most likely topics across our documents?
+
+```{r}
+tab10 <- table(apply(mySTM10$theta,1,which.max)) 
+kable(tab10[order(desc(tab10))])
+```
+
+### save them back in the original dataframe
+
+```{r, eval=FALSE}
+# STESSO PROBLEMA LIKE SOPRA:
+# ORIGINAL CORPUS E STM NON SONO LO STESSO NUMERO
+# 5710 vs 5713
+subs_corpus$mySTM10 <- apply(mySTM10$theta,1,which.max)
+
+str(subs_corpus) 
+
+# Topic 5 - 5 random documents associated to it
+
+set.seed(123)
+
+sample(subs_corpus$text[subs_corpus$topic20==5], 5)
+```
+
+\newpage
+
+## SECOND TRY
+
+### Search the best number of Topics comparing coherence and exclusivity values
+
+K = 7:25
+
+```{r, eval= FALSE}
+k <-c(7:25)
+system.time(storage2 <- searchK(DfmStm$documents, 
+                               DfmStm$vocab, 
+                               K = k,
+                               prevalence = ~ party_id + populism + s(quarter),
+                               data = DfmStm$meta, init.type = "Spectral"))
+#save(storage2,file="data/storage2.Rda")
+```
+
+```{r, include=FALSE, eval=TRUE}
+load("data/storage2.Rda")
+```
+
+### plot results
+
+```{r}
+plot.searchK(storage2)
+
+plot(storage2$results$semcoh, storage2$results$exclus,
+     xlab= "Semantic coherence",
+     ylab= "Exclusivity",
+     col= "blue", pch = 19, cex = 1, lty = "solid", lwd = 2)
+text(storage2$results$semcoh, storage2$results$exclus,
+     labels=storage2$results$K, cex= 1, pos=4)
+
+plot(storage2$results$K, storage2$results$heldout,
+     xlab= "Number of Topics",
+     ylab= "held-out likelihood",
+     col= "blue", pch = 19, cex = 1, lty = "solid", lwd = 2, xaxt="n")
+text(storage2$results$K, storage2$results$heldout, labels=storage2$results$K, cex= 1, pos=4)
+xtick<-seq(2, 50, by=1)
+axis(side=1, at=xtick, labels = FALSE)
+text(x=xtick,  par("usr")[3], 
+     labels = xtick, pos = 1, xpd = TRUE)
+
+```
+
+\newpage
+
+## Run the analysis selecting k = 15
+
+```{r, eval=FALSE}
+k = 15
+
+newSTM15_2 <- stm(DfmStm$documents, vocab = DfmStm$vocab, 
+             K = k, 
+             prevalence = ~ party_id + populism + s(quarter),
+             data = DfmStm$meta,
+             init.type = "Spectral", 
+             verbose = TRUE)
+
+#save(newSTM15_2,file="data/newSTM15_2.Rda")
+```
+
+```{r, include=FALSE, eval=TRUE}
+load("data/newSTM15_2.Rda")
+```
+
+### Label topics
+
+The frequency/exclusivity (FREX) scoring summarizes words according to their probability of appearance under a topic and the exclusivity to that topic. These words provide more semantically intuitive representations of each topic
+
+```{r}
+labelTopics(newSTM15_2, n=20)
+```
+
+\newpage
+
+## Run the analysis selecting k = 14
+
+```{r, eval=FALSE}
+k = 14
+
+newSTM14_2 <- stm(DfmStm$documents, vocab = DfmStm$vocab, 
+             K = k, 
+             prevalence = ~ party_id + populism + s(quarter),
+             data = DfmStm$meta,
+             init.type = "Spectral", 
+             verbose = TRUE)
+
+#save(newSTM14_2,file="data/newSTM14_2.Rda")
+```
+
+```{r, include=FALSE, eval=TRUE}
+load("data/newSTM14_2.Rda")
+```
+
+### Label topics
+
+The frequency/exclusivity (FREX) scoring summarizes words according to their probability of appearance under a topic and the exclusivity to that topic. These words provide more semantically intuitive representations of each topic
+
+```{r}
+labeledtpic <- labelTopics(newSTM14_2, n=20)
+
+#FREX
+FREXnewSTM14_2 <- t(as.matrix(labeledtpic[["frex"]]))
+FREXnewSTM14_2
+
+
+# PROB
+PROBnewSTM14_2 <- t(as.matrix(labeledtpic[["prob"]]))
+PROBnewSTM14_2
+
+
+
+```
+
+\newpage
+
+
+## Coefficients
+**RUNNARE SUL MODELLO STM CORRETTO**
+```{r, eval=FALSE}
 #out$meta$rating <- as.factor(out$meta$rating)
 prep <- estimateEffect(1:11 ~ party_id + populism + s(quarter),
                        mySTM,metadata = DfmStm$meta,
