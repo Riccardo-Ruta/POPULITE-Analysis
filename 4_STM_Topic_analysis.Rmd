@@ -125,7 +125,6 @@ extra_words <- c(partyid, surnames, party_all,
 DFM <- dfm_select(DFM, extra_words, selection='remove')
 ```
 
-
 ### Trim the data
 
 ```{r}
@@ -141,7 +140,6 @@ DFM <- dfm_trim(DFM,min_termfreq = 0.8,
                 max_docfreq = 0.1, docfreq_type = "prop")
 
 ```
-
 
 ### Group and weight the data
 
@@ -193,6 +191,28 @@ myDFM = DFMG
 set.seed(123)
 DfmStm <- quanteda::convert(myDFM, to = "stm", docvars = docvars(myDFM))
 
+```
+
+### Import the original corpus and repeat the same cleanings
+
+This is for search the documents after find a label for the topics
+
+```{r}
+# Load original corpus
+load("data/corpus.Rda")
+
+# list the documents in the dfm
+docs <- myDFM@Dimnames$docs
+
+# group the corpus like the dfm
+corpus_g <- corpus_group(corpus,groups = interaction(nome, quarter,party_id))
+
+# subset the same text of the dfm
+subs_corpus <- corpus_subset(corpus_g, docnames(corpus_g) %in% docs)
+
+documents <- as.character(subs_corpus)
+
+documents <- as.vector(documents)
 ```
 
 ## FIRST TRY
@@ -284,25 +304,6 @@ plot(mySTM11, type = "summary", labeltype = c("frex"), n=5)  # topic 9 is the mo
 ### Find most associated Text with the most frequent topic (9)
 
 ```{r, eval =FALSE}
-# Load original corpus
-load("data/corpus.Rda")
-
-# list the documents in the dfm
-docs <- myDFM@Dimnames$docs
-
-# group the corpus like the dfm
-corpus_g <- corpus_group(corpus,groups = interaction(nome, quarter,party_id))
-
-# Remove text with less than 1 word
-#corpus_g <- corpus_subset(corpus_g, ntoken(corpus_g) > 1)
-
-# subset the same text of the dfm
-subs_corpus <- corpus_subset(corpus_g, docnames(corpus_g) %in% docs)
-
-documents <- as.character(subs_corpus)
-
-documents <- as.vector(documents)
-
 # Let's focus on topic 9
 thought11_9 <- findThoughts(mySTM11, texts=documents, topics=9, n=3)$docs[[1]]
 
@@ -314,14 +315,14 @@ plotQuote(thought11_9, width = 30, main = "Topic 1")
 ### Correlation between topics
 
 ```{r}
-mod.out.corr <- topicCorr(mySTM)
+mod.out.corr <- topicCorr(mySTM11)
 plot(mod.out.corr)
 ```
 
 ### Which are the the most likely topics across our documents?
 
 ```{r}
-tab <- table(apply(mySTM$theta,1,which.max)) 
+tab <- table(apply(mySTM11$theta,1,which.max)) 
 kable(tab[order(desc(tab))])
 ```
 
@@ -331,7 +332,7 @@ kable(tab[order(desc(tab))])
 # STESSO PROBLEMA LIKE SOPRA:
 # ORIGINAL CORPUS E STM NON SONO LO STESSO NUMERO
 # 5710 vs 5713
-subs_corpus$topic <- apply(mySTM$theta,1,which.max)
+subs_corpus$topic <- apply(mySTM11$theta,1,which.max)
 
 str(subs_corpus) 
 
@@ -342,10 +343,7 @@ set.seed(123)
 sample(subs_corpus$text[subs_corpus$topic==5], 5)
 ```
 
-
-
 \newpage
-
 
 ## Run the analysis selecting k = 20
 
@@ -455,8 +453,6 @@ The frequency/exclusivity (FREX) scoring summarizes words according to their pro
 
 ```{r}
 labelTopics(mySTM10, n=10)
-
-
 ```
 
 ### Most frequent topic
@@ -583,7 +579,46 @@ load("data/newSTM15_2.Rda")
 The frequency/exclusivity (FREX) scoring summarizes words according to their probability of appearance under a topic and the exclusivity to that topic. These words provide more semantically intuitive representations of each topic
 
 ```{r}
-labelTopics(newSTM15_2, n=20)
+labeled_topics <- labelTopics(newSTM15_2, n=20)
+frex_newSTM15_2 <-  t(as.matrix(labeled_topics[["frex"]]))
+frex_newSTM15_2
+```
+
+### Most frequent topic
+
+```{r}
+table(apply(newSTM15_2$theta,1,which.max))
+plot(newSTM15_2, type = "summary", labeltype = c("frex"), n=8)
+```
+
+### Find the most associated document for each topics
+
+This list of 15 items represent the respective document with highest theta for each topic ordered from 1 to 15.
+
+```{r}
+apply(newSTM15_2$theta,2,which.max)
+```
+
+### Let's read the documents with the highest theta for each topic
+
+```{r}
+kable(as.character(subs_corpus)[2029], col.names = "1") # topic 1
+kable(as.character(subs_corpus)[3047], col.names = "2") # topic 2
+kable(as.character(subs_corpus)[5074], col.names = "3") # topic 3
+kable(as.character(subs_corpus)[3548], col.names = "4") # topic 4
+kable(as.character(subs_corpus)[2080], col.names = "5") # topic 5
+
+kable(as.character(subs_corpus)[4030], col.names = "6") # topic 6
+kable(as.character(subs_corpus)[5435], col.names = "7") # topic 7
+kable(as.character(subs_corpus)[3629], col.names = "8") # topic 8
+kable(as.character(subs_corpus)[3547], col.names = "9") # topic 9
+kable(as.character(subs_corpus)[311], col.names = "10") # topic 10
+
+kable(as.character(subs_corpus)[2285], col.names = "11") # topic 11
+kable(as.character(subs_corpus)[33], col.names = "12") # topic 12
+kable(as.character(subs_corpus)[2744], col.names = "13") # topic 13
+kable(as.character(subs_corpus)[1423], col.names = "14") # topic 14
+kable(as.character(subs_corpus)[2898], col.names = "15") # topic 15
 ```
 
 \newpage
@@ -612,32 +647,95 @@ load("data/newSTM14_2.Rda")
 The frequency/exclusivity (FREX) scoring summarizes words according to their probability of appearance under a topic and the exclusivity to that topic. These words provide more semantically intuitive representations of each topic
 
 ```{r}
-labeledtpic <- labelTopics(newSTM14_2, n=20)
+labeledtpic <- labelTopics(newSTM14_2, n=40)
 
 #FREX
 FREXnewSTM14_2 <- t(as.matrix(labeledtpic[["frex"]]))
 FREXnewSTM14_2
 
-
 # PROB
 PROBnewSTM14_2 <- t(as.matrix(labeledtpic[["prob"]]))
 PROBnewSTM14_2
+```
 
+### Most frequent topic
 
+```{r}
+tab <- table(apply(newSTM14_2$theta,1,which.max))
+kable(tab[order(desc(tab))], col.names = c("Topic", "Freq"))
+plot(newSTM14_2, type = "summary", labeltype = c("frex"), n=8)
 
+```
+
+### Find the most associated text with the most frequent topic (9)
+
+```{r, eval =FALSE}
+# Let's focus on topic 9
+thought14_2_9 <- findThoughts(newSTM14_2, texts=documents, topics=9, n=1)$docs[[1]]
+kable(thought14_2_9)
+#plot them
+par(mfrow = c(1, 2),mar = c(.5, .5, 1, .5))
+plotQuote(thought14_2_9, width = 80, main = "Text for Topic 9")
+```
+
+### Find the most associated document for each topics
+
+This list of 15 items represent the respective document with highest theta for each topic ordered from 1 to 15.
+
+```{r}
+doc_number <- apply(newSTM14_2$theta,2,which.max)
+
+topics_number <- 1:14
+topics_label <- c("1","Electoral consultations", "Regions","Right-party",
+                  "no_vax/no obbligo vaccinale", "Left-wing party",
+                  "International","eco-transition/state support",
+                  "Public rights/War","Armed Forces","Public information service",
+                  "Right-wing populism","Coronavirus","Olympics game")
+kable(cbind(topics_number,topics_label,doc_number))
+  
+```
+
+### Let's read the documents with the highest theta for each topic
+
+```{r}
+kable(as.character(subs_corpus)[2614], col.names = "Topic1") # topic 1
+kable(as.character(subs_corpus)[651], col.names = "Electoral consultations") # topic 2
+kable(as.character(subs_corpus)[2081], col.names = "Regions") # topic 3
+kable(as.character(subs_corpus)[1695], col.names = "Right-party") # topic 4
+kable(as.character(subs_corpus)[4204], col.names = "no_vax/no obbligo vaccinale") # topic 5
+
+kable(as.character(subs_corpus)[4928], col.names = "Left-wing party") # topic 6
+kable(as.character(subs_corpus)[4908], col.names = "International") # topic 7
+kable(as.character(subs_corpus)[3566], col.names = "eco-transition/state support") # topic 8
+kable(as.character(subs_corpus)[5641], col.names = "Public rights/War") # topic 9
+kable(as.character(subs_corpus)[3583], col.names = "Armed Forces") # topic 10
+
+kable(as.character(subs_corpus)[3548], col.names = "Public information service") # topic 11 
+kable(as.character(subs_corpus)[1837], col.names = "Right-wing populism") # topic 12
+kable(as.character(subs_corpus)[2488], col.names = "Coronavirus") # topic 13
+kable(as.character(subs_corpus)[2001], col.names = "Olympics game") # topic 14
+```
+
+### Correlation between topics
+
+```{r}
+mod.out.corr <- topicCorr(newSTM14_2)
+plot(mod.out.corr)
 ```
 
 \newpage
 
-
 ## Coefficients
+
 **RUNNARE SUL MODELLO STM CORRETTO**
-```{r, eval=FALSE}
+
+```{r,}
 #out$meta$rating <- as.factor(out$meta$rating)
-prep <- estimateEffect(1:11 ~ party_id + populism + s(quarter),
-                       mySTM,metadata = DfmStm$meta,
+prep_newSTM14_2 <- estimateEffect(1:14 ~ party_id + populism + s(quarter),
+                       newSTM14_2,metadata = DfmStm$meta,
                        uncertainty = "Global")
-summary(prep)
+summary(prep_newSTM14_2)
+
 ```
 
 ## Interpretation and validation
@@ -645,14 +743,10 @@ summary(prep)
 **Da sistemare**
 
 ```{r, eval=FALSE}
-#Topic Prevalence Over-time
-#qui potresti far vedere che la prevalence di alcuni topics ha dei picchi
-#in periodo in cui ha senso che abbia dei picchi...
-#Anche questo vale come validation, va runnato però dopo che hai runnato estimateEffect
-#perché ti servono i coefficienti dei quarters della regression...
-#Anche qui, esempio con Topic 1 poi devi guardare tutti i topics...
-#Va un po' sistemato (vedi x axis), magari da provare con GGPLOT...
-plot(prep, "quarter", method = "continuous", topics = 1,
+help("plot.estimateEffect")
+
+# TOPIC 1
+plot(prep_newSTM14_2, "quarter", method = "continuous", topics = 1,
        model = z, printlegend = FALSE, xaxt = "n", xlab = "Time")
 quartseq <- seq(from = as.Date("2020-01-01"),
                   to = as.Date("2022-04-18"), by = "quarter")
@@ -660,3 +754,11 @@ quartnames <- quarters(quartseq)
 axis(1,at = as.numeric(quartseq) - min(as.numeric(quartseq)),
      labels = quartnames)
 ```
+```{r}
+plot.estimateEffect(prep_newSTM14_2)
+plot.STM(newSTM14_2,"summary")
+plot.STM(newSTM14_2,"perspectives",topics = c(14,3))
+plot.STM(newSTM14_2,"hist")
+
+```
+
