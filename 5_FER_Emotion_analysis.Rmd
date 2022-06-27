@@ -5,24 +5,657 @@ date: "05/2022"
 output:
   pdf_document: 
     toc: yes
-    latex_engine: xelatex
   html_document: default
   word_document:
     toc: yes
 ---
+
+```{r setup_5, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source(here::here("src","00_setup.R"))
+```
+
+\newpage
+
 # FER: Facial Emotion Recognition Analysis
 
-## Report on the analysis made with FER Python package
+**Report on the analysis made with FER Python package**
 
-The package use the FER-2013 dataset created by Pierre Luc Carrier and Aaron Courville.
 
-The dataset was created using the Google image search API to search for images of faces that match a set of 184 emotion-related keywords like “blissful”, “enraged,” etc.
-These keywords were combined with words related to gender, age or ethnicity, to obtain nearly 600 strings which were used as facial image search queries.
-The first 1000 images returned for each query were kept for the next stage of processing.
-OpenCV face recognition was used to obtain bounding boxes around each face in the collected images. Human labelers than rejected incorrectly labeled images, corrected the cropping if necessary, and filtered out some duplicate images.
-Approved, cropped images were then resized to 48x48 pixels and converted to grayscale.
-Mehdi Mirza and Ian Goodfellow prepared a subset of the images for this contest,and mapped the fine-grained emotion keywords into the same seven broad categories used in the Toronto Face Database [Joshua Susskind, Adam Anderson, and Geoffrey E. Hinton. The Toronto face dataset. Technical Report UTML TR 2010-001, U. Toronto, 2010.].
-The resulting dataset contains 35887 images, with 4953 “Anger” images, 547 “Disgust” images, 5121 “Fear” images, 8989 “Happiness” images, 6077 “Sadness” images, 4002 “Surprise” images, and 6198 “Neutral” images.
-FER-2013 could theoretical suffer from label errors due to the way it was collected, but Ian Goodfellow found that human accuracy on FER-2013 was 65±5%.
+## Import the datasets
+```{r, results="hide"}
+# CONTE
+Conte_07_03_22_00 <- read_csv("data/video_emotions/Conte_07-03-22_00.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
 
-66% ACCURACY REPORTED BY OCTAVIO ARRIAGA, Matias Valdenegro-Toro, Paul Plöger (Real-time Convolutional Neural Networks for Emotion and Gender Classification)
+Conte_09_03_22_00 <- read_csv("data/video_emotions/Conte_09-03-22_00.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+Conte_22_02_22_00 <- read_csv("data/video_emotions/Conte_22-02-22_00.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+Conte_23_02_22_00 <- read_csv("data/video_emotions/Conte_23-02-22_00.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+Conte_23_02_22_01 <- read_csv("data/video_emotions/Conte_23-02-22_01.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+Conte_24_02_22_01 <- read_csv("data/video_emotions/Conte_24-02-22_01.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+Conte_28_02_22_00 <- read_csv("data/video_emotions/Conte_28-02-22_00.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+# LETTA
+Letta_03_03_22_00 <- read_csv("data/video_emotions/Letta_03-03-22_00.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+Letta_06_04_22_00 <- read_csv("data/video_emotions/Letta_06-04-22_00.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+# MELONI
+Meloni_1_03_2022 <- read_csv("data/video_emotions/Meloni_1-03-2022.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+Meloni_11_03_2022_02 <- read_csv("data/video_emotions/Meloni_11-03-2022_02.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+Meloni_11_03_2022 <- read_csv("data/video_emotions/Meloni_11-03-2022.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+Meloni_15_03_2022 <- read_csv("data/video_emotions/Meloni_15-03-2022.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+Meloni_22_03_2022 <- read_csv("data/video_emotions/Meloni_22-03-2022.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+Meloni_29_03_2022 <- read_csv("data/video_emotions/Meloni_29-03-2022.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+Meloni_31_03_2022<- read_csv("data/video_emotions/Meloni_31-03-2022.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+# RENZI
+Renzi_19_04_2022 <- read_csv("data/video_emotions/Renzi_19-04-2022.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+Renzi_30_03_2022 <- read_csv("data/video_emotions/Renzi_30-03-2022.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+# SALVINI
+Salvini_08_03_2022 <- read_csv("data/video_emotions/Salvini_08-03-2022.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+Salvini_08_04_2022_02 <- read_csv("data/video_emotions/Salvini_08-04-2022_02.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+
+Salvini_16_03_2022 <- read_csv("data/video_emotions/Salvini_16-03-2022.csv", 
+    col_types = cols(angry = col_number(), 
+        disgust = col_number(), fear = col_number(), 
+        happy = col_number(), sad = col_number(), 
+        surprise = col_number(), neutral = col_number()))
+```
+
+
+
+## Conte datasets
+
+```{r}
+#1
+# Conte_07_03_22_00
+Conte_07_03_22_00_prop <- c(
+  angry <-  sum(Conte_07_03_22_00$angry),
+  disgust <- sum(Conte_07_03_22_00$disgust),
+  fear <- sum(Conte_07_03_22_00$fear),
+  happy <- sum(Conte_07_03_22_00$happy),
+  sad <- sum(Conte_07_03_22_00$sad),
+  surprise <- sum(Conte_07_03_22_00$surprise),
+  meutral <- sum(Conte_07_03_22_00$neutral)
+)
+```
+
+```{r}
+#2
+# Conte_09_03_22_00
+Conte_09_03_22_00_prop <- c(
+  angry <-  sum(Conte_09_03_22_00$angry),
+  disgust <- sum(Conte_09_03_22_00$disgust),
+  fear <- sum(Conte_09_03_22_00$fear),
+  happy <- sum(Conte_09_03_22_00$happy),
+  sad <- sum(Conte_09_03_22_00$sad),
+  surprise <- sum(Conte_09_03_22_00$surprise),
+  meutral <- sum(Conte_09_03_22_00$neutral)
+)
+```
+
+```{r}
+#3
+# Conte_22_02_22_00
+i = Conte_22_02_22_00
+Conte_22_02_22_00_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+```{r}
+#4
+# Conte_23_02_22_00
+i = Conte_23_02_22_00
+Conte_23_02_22_00_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+```{r}
+#5
+# Conte_23_02_22_01
+i = Conte_23_02_22_01
+Conte_23_02_22_01_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+```{r}
+#6
+# Conte_24_02_22_01
+i = Conte_24_02_22_01
+Conte_24_02_22_01_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+```{r}
+#7
+# Conte_28_02_22_00
+i = Conte_28_02_22_00
+Conte_28_02_22_00_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+```{r}
+conte <- rbind(Conte_07_03_22_00_prop,
+               Conte_09_03_22_00_prop,
+               Conte_22_02_22_00_prop,
+               Conte_23_02_22_00_prop,
+               Conte_23_02_22_01_prop,
+               Conte_24_02_22_01_prop,
+               Conte_28_02_22_00_prop
+               )
+emo_label <- colnames(Conte_07_03_22_00)[3:9]
+
+colnames(conte) <- emo_label
+
+conte <- as.data.frame(conte)
+
+tot_conte <- max(Conte_07_03_22_00$...1) +
+              max(Conte_09_03_22_00$...1) +
+              max(Conte_22_02_22_00$...1) +
+              max(Conte_23_02_22_00$...1) +
+              max(Conte_23_02_22_01$...1) +
+              max(Conte_24_02_22_01$...1) +
+              max(Conte_28_02_22_00$...1)
+
+conte[8,] <- c(sum(conte$angry)/tot_conte * 100,
+               sum(conte$disgust)/tot_conte *100,
+               sum(conte$fear)/tot_conte *100,
+               sum(conte$happy)/tot_conte *100,
+               sum(conte$sad)/tot_conte *100,
+               sum(conte$surprise)/tot_conte * 100,
+               sum(conte$neutral)/tot_conte *100)
+
+```
+
+## Letta datasets
+
+```{r}
+#1
+# Letta_03_03_22_00
+i = Letta_03_03_22_00
+Letta_03_03_22_00_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+```{r}
+#2
+# Letta_06_04_22_00
+i = Letta_06_04_22_00
+Letta_06_04_22_00_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+
+```{r}
+letta <- rbind(Letta_03_03_22_00_prop,
+               Letta_06_04_22_00_prop
+               )
+colnames(letta) <- emo_label
+
+letta <- as.data.frame(letta)
+
+tot_letta <- max(Letta_03_03_22_00$...1) +
+              max(Letta_06_04_22_00$...1)
+
+letta[3,] <- c(sum(letta$angry)/tot_letta * 100,
+               sum(letta$disgust)/tot_letta *100,
+               sum(letta$fear)/tot_letta *100,
+               sum(letta$happy)/tot_letta *100,
+               sum(letta$sad)/tot_letta *100,
+               sum(letta$surprise)/tot_letta * 100,
+               sum(letta$neutral)/tot_letta *100)
+```
+
+## Meloni datasets
+
+```{r}
+#1
+# Meloni_1_03_2022
+i = Meloni_1_03_2022
+Meloni_1_03_2022_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+```{r}
+#2
+# Meloni_11_03_2022_02
+i = Meloni_11_03_2022_02
+Meloni_11_03_2022_02_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+```{r}
+#3
+# Meloni_11_03_2022
+i = Meloni_11_03_2022
+Meloni_11_03_2022_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+```{r}
+#4
+# Meloni_15_03_2022
+i = Meloni_15_03_2022
+Meloni_15_03_2022_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+```{r}
+#5
+# Meloni_22_03_2022
+i = Meloni_22_03_2022
+Meloni_22_03_2022_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+```{r}
+#6
+# Meloni_29_03_2022
+i = Meloni_29_03_2022
+Meloni_29_03_2022_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+```{r}
+#7
+# Meloni_31_03_2022
+i = Meloni_31_03_2022
+Meloni_31_03_2022_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+```{r}
+meloni <- rbind(Meloni_1_03_2022_prop,
+               Meloni_11_03_2022_02_prop,
+               Meloni_11_03_2022_prop,
+               Meloni_15_03_2022_prop,
+               Meloni_22_03_2022_prop,
+               Meloni_29_03_2022_prop,
+               Meloni_31_03_2022_prop
+               )
+colnames(meloni) <- emo_label
+
+meloni <- as.data.frame(meloni)
+
+
+tot_meloni <- max(Meloni_1_03_2022$...1) +
+              max(Meloni_11_03_2022_02$...1)+
+              max(Meloni_11_03_2022$...1)+
+              max(Meloni_15_03_2022$...1)+
+              max(Meloni_22_03_2022$...1)+
+              max(Meloni_29_03_2022$...1)+
+              max(Meloni_31_03_2022$...1)
+
+meloni[8,] <- c(sum(meloni$angry)/tot_meloni * 100,
+                sum(meloni$disgust)/tot_meloni *100,
+                sum(meloni$fear)/tot_meloni *100,
+                sum(meloni$happy)/tot_meloni *100,
+                sum(meloni$sad)/tot_meloni *100 ,
+                sum(meloni$surprise)/tot_meloni * 100,
+                sum(meloni$neutral)/tot_meloni *100)
+```
+
+
+
+
+## Renzi datasets
+
+
+```{r}
+#1
+# Renzi_19_04_2022
+i = Renzi_19_04_2022
+Renzi_19_04_2022_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+```{r}
+#2
+# Renzi_30_03_2022
+i = Renzi_30_03_2022
+Renzi_30_03_2022_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+
+```{r}
+renzi <- rbind(Renzi_19_04_2022_prop,
+               Renzi_30_03_2022_prop
+               )
+colnames(renzi) <- emo_label
+
+renzi <- as.data.frame(renzi)
+
+tot_renzi <- max(Renzi_19_04_2022$...1) +
+              max(Renzi_30_03_2022$...1)
+
+renzi[3,] <- c(sum(renzi$angry)/tot_renzi * 100,
+               sum(renzi$disgust)/tot_renzi * 100,
+               sum(renzi$fear)/tot_renzi * 100,
+               sum(renzi$happy)/tot_renzi * 100,
+               sum(renzi$sad)/tot_renzi * 100,
+               sum(renzi$surprise)/tot_renzi * 100,
+               sum(renzi$neutral)/tot_renzi * 100)
+```
+
+
+
+
+## Salvini datasets
+
+
+```{r}
+#1
+# Salvini_08_03_2022
+i = Salvini_08_03_2022
+Salvini_08_03_2022_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+```{r}
+#2
+# Salvini_08_04_2022_02
+i = Salvini_08_04_2022_02
+Salvini_08_04_2022_02_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+```{r}
+#3
+# Salvini_16_03_2022
+i = Salvini_16_03_2022
+Salvini_16_03_2022_prop <- c(
+  angry <-  sum(i$angry),
+  disgust <- sum(i$disgust),
+  fear <- sum(i$fear),
+  happy <- sum(i$happy),
+  sad <- sum(i$sad),
+  surprise <- sum(i$surprise),
+  meutral <- sum(i$neutral)
+)
+```
+
+
+```{r}
+salvini <- rbind(Salvini_08_03_2022_prop,
+               Salvini_08_04_2022_02_prop,
+               Salvini_16_03_2022_prop
+               )
+colnames(salvini) <- emo_label
+
+salvini <- as.data.frame(salvini)
+
+tot_salvini <- max(Salvini_08_03_2022$...1) +
+                max(Salvini_08_04_2022_02$...1)+
+                max(Salvini_16_03_2022$...1)
+
+salvini[4,] <- c(sum(salvini$angry)/tot_salvini * 100,
+                 sum(salvini$disgust)/tot_salvini * 100,
+               sum(salvini$fear)/tot_salvini * 100,
+               sum(salvini$happy)/tot_salvini * 100,
+               sum(salvini$sad)/tot_salvini * 100,
+               sum(salvini$surprise)/tot_salvini * 100,
+               sum(salvini$neutral)/tot_salvini * 100)
+```
+
+
+
+## Create dataset with the proportion of the emotions registered for each leader
+
+```{r}
+emotions <- rbind(conte[8,], letta[3,], meloni[8,],
+                  renzi [3,], salvini[4,])
+
+emotions <- as.data.frame(emotions)
+
+rownames(emotions) <- c("Conte", "Letta","Meloni", "Renzi", "Salvini")
+
+kable(emotions)
+```
+
+## Results
+```{r}
+matrix <- as.matrix(emotions)
+
+
+barplot(t(matrix),
+        col = 1:ncol(matrix),
+        legend.text = TRUE, 
+        args.legend = list(x = "topright"),
+         xlim=c(0,7.5),
+        main = "Emotion classification for each party leader"
+        )
+
+
+barplot(matrix,
+        col = 1:nrow(matrix),
+        legend.text = TRUE, 
+        args.legend = list(x = "topright",
+                           inset = c(- 0.065, -0.1)),
+        beside = T,
+        main = "Level of emotions captured in party leaders' videos \n (from 21st Feb to 21st Apr 2022)")
+
+```
+.
+
+

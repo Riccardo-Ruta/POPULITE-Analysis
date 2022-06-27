@@ -1,0 +1,73 @@
+---
+title: "R code commentary and appendix"
+output:
+  pdf_document: 
+    number_sections: yes
+    latex_engine: xelatex
+geometry: "left = 3cm, right = 2.5cm, top = 2.5cm, bottom = 2.5cm"
+fontsize: 12pt
+header-includes:
+  - \usepackage{float}
+  - \usepackage{sectsty}
+  - \usepackage{paralist}
+  - \usepackage{setspace}\spacing{1.5}
+  - \usepackage{fancyhdr}
+  - \usepackage{lastpage}
+  - \usepackage{dcolumn}
+  - \usepackage[nottoc, numbib]{tocbibind}
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center", dev = "cairo_pdf", fig.pos = "H")
+```
+
+\allsectionsfont{\centering}
+\subsectionfont{\raggedright}
+\subsubsectionfont{\raggedright}
+
+\pagenumbering{Roman}
+
+\newpage
+\centering
+\raggedright
+
+\newpage
+\tableofcontents
+
+\newpage
+\pagenumbering{arabic}
+
+\newpage
+
+```{r 1_Preliminar_analysis, child = '1_Preliminar_analysis.Rmd'}
+knitr::opts_chunk$set(fig.align = "center", dev = "cairo_pdf", fig.pos = "H")
+```
+
+\newpage
+
+```{r 2_Dictionary_analysis, child = '2_Dictionary_analysis.Rmd'}
+knitr::opts_chunk$set(fig.align = "center", dev = "cairo_pdf", fig.pos = "H")
+```
+
+\newpage
+
+```{r 3_Sentiment_analysis, child = '3_Sentiment_analysis.Rmd'}
+knitr::opts_chunk$set(fig.align = "center", dev = "cairo_pdf", fig.pos = "H")
+```
+
+\newpage
+
+```{r 4_STM_Topic_analysis, child = '4_STM_Topic_analysis.Rmd'}
+knitr::opts_chunk$set(fig.align = "center", dev = "cairo_pdf", fig.pos = "H")
+```
+
+\newpage
+
+```{r 5_Fer_Emotion_analysis, child = '5_Fer_Emotion_analysis.Rmd'}
+knitr::opts_chunk$set(fig.align = "center", dev = "cairo_pdf", fig.pos = "H")
+```
+
+\newpage
+
+Un ringraziamento speciale va a tutto il team del progetto POPULITE e in particolare alle Professoresse Silvia Decadri e Fedra Negri che con i puntuali consigli e continuo incoraggiamento hanno reso questo lavoro possibile e a Vanessa Ferrara il cui sostegno è stato fondamentale nel raggiungimento del traguardo. Per ultimo ma di certo non meno importante a Gaia Rebecchi che mi ha aiutato a superare i momenti di sconforto e non ha mai smesso di motivarmi.

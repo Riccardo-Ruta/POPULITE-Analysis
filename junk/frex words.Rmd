@@ -1,0 +1,37 @@
+---
+title: 'frex word'
+author: "Riccardo Ruta"
+date: "05/2022"
+output:
+  html_document: default
+  pdf_document: 
+    toc: yes
+    latex_engine: xelatex
+  word_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+here::here("")
+source(here::here("src","00_setup.R"))
+```
+
+```{r}
+load("data/mySTM.Rda")
+load("data/mySTM10.Rda")
+load("data/mySTM20.Rda")
+```
+
+
+```{r}
+frex10 <- t(as.matrix(labelTopics(mySTM10, n=30)$frex))
+kable(frex10)
+
+frex20 <- t(as.matrix(labelTopics(mySTM20, n=30)$frex))
+kable(frex20)
+
+frex7 <- t(as.matrix(labelTopics(mySTM, n=30)$frex))
+kable(frex7)
+```
+

@@ -1,5 +1,5 @@
 ---
-title: "Sentiment Analysis"
+title: "Emotion Analysis"
 subtitle: "Analysis performed using Italian_LIWC2007 Dictionary"
 author: "Riccardo Ruta"
 date: "5/2022"
@@ -14,7 +14,9 @@ output:
 source(here::here("src","00_setup.R"))
 ```
 
+# Emotion analysis
 
+## Import the LIWC2007_Dictionary
 
 ```{r, results="hide"}
 # Data
@@ -23,9 +25,9 @@ load("data/dfm.Rda")
 # Dictionary LWIC Complete
 LWIC_ITA <- dictionary(file = "data/large_files/Italian_LIWC2007_Dictionary.dic", 
                        format = "LIWC")
-emotions <- c("Emo_Pos", "Emo_Neg", "Ansia", "Rabbia", "Tristez", "Ottimis" )
+emotions <- c("Emo_Pos", "Emo_Neg", "Ansia", "Rabbia", "Tristezza", "Ottimismo" )
 
-# Inspect the words
+# Count the number of words
 n.words <- c(
 length(LWIC_ITA[["Emo_Pos"]]),
 length(LWIC_ITA[["Emo_Neg"]]),
@@ -43,7 +45,8 @@ myLWIC_ITA <- dictionary(list(positive = LWIC_ITA[["Emo_Pos"]],
                               anxiety = LWIC_ITA[["Ansia"]],
                               anger = LWIC_ITA[["Rabbia"]],
                               sadness = LWIC_ITA[["Tristez"]],
-                              optimism = LWIC_ITA[["Ottimis"]]))
+                              optimism = LWIC_ITA[["Ottimis"]]
+                              ))
 
 myLWIC_ITA_sent <- dictionary(list(positive = LWIC_ITA[["Emo_Pos"]],
                               negative = LWIC_ITA[["Emo_Neg"]]))
@@ -53,7 +56,7 @@ myLWIC_ITA_sent <- dictionary(list(positive = LWIC_ITA[["Emo_Pos"]],
 kable(num_words)
 ```
 
-### Group and weight the dfm
+## Group and weight the dfm
 
 ```{r}
 # By party & quarter
@@ -78,16 +81,29 @@ data_dict_emo <- DFM_emotions %>%
   quanteda::convert(to = "data.frame") %>% 
   cbind(docvars(DFM_emotions))
 
+# Create a new variable with the difference of negative - positive emotions
+data_dict_emo$negative_prevalence <-
+  (data_dict_emo$negative - data_dict_emo$positive)
+
 # Transform the proportion into percentage
-data_dict_emo <- data_dict_emo %>% mutate(positive =  positive * 100,
-                                          negative = negative * 100,
-                                          anxiety = anxiety * 100,
-                                          anger = anger *100,
-                                          sadness = sadness * 100,
-                                          optimism = optimism *100)
+data_dict_emo <- data_dict_emo %>%
+  mutate(positive =  positive * 100,
+                    negative = negative * 100,
+                    anxiety = anxiety * 100,
+                    anger = anger *100,
+                    sadness = sadness * 100,
+                    optimism = optimism *100,
+                    negative_prevalence = negative_prevalence *100)
 ```
 
+\newpage
+
 ## Percentage of the emotions in time
+
+These are the start and end dates of the quarters covered by the analysis
+
+![](figs/Trimester%20dates.png){width="434"}
+
 The code is only shown for 'positive' but is identical for all emotions
 
 ```{r}
@@ -97,16 +113,21 @@ data_quarter_positive <- aggregate(x = data_dict_emo$positive,  # Specify data c
           FUN = mean) # Specify function (i.e. mean)
 data_quarter_positive$perc <- data_quarter_positive$x
 
+mean_positive <- mean(data_quarter_positive$perc)
+
 # plot 
 plot_positive <- ggplot(data = data_quarter_positive, aes(x = Group.1, y = perc))+
   geom_line(color = "#00AFBB", size = 2)+
   scale_x_continuous("Quarters", labels = as.character(data_quarter_positive$Group.1), breaks = data_quarter_positive$Group.1)+
-  labs(title = "Positive Sentiment")
+  geom_line(aes(x = Group.1, y = mean(perc)),linetype = "dashed")+
+  ylab("Percentage of positive words")+
+  labs(title = "Positive Emotion")
 plot_positive
 
 ```
-```{r, echo=FALSE}
-#Over time NEGATIVE (quarters)
+
+```{r, echo=FALSE, warning=FALSE}
+# NEGATIVE
 data_quarter_negative <- aggregate(x = data_dict_emo$negative,  # Specify data column
           by = list(data_dict_emo$quarter),  # Specify group indicator
           FUN = mean) # Specify function (i.e. mean)
@@ -116,39 +137,45 @@ data_quarter_negative$perc <- data_quarter_negative$x
 plot_negative <- ggplot(data = data_quarter_negative, aes(x = Group.1, y = perc))+
   geom_line(color = "#00AFBB", size = 2)+
   scale_x_continuous("Quarters", labels = as.character(data_quarter_negative$Group.1), breaks = data_quarter_negative$Group.1)+
-  labs(title = "Negative Sentiment")
+  geom_line(aes(x = Group.1, y = mean(perc)), linetype = "dashed")+
+  ylab("Percentage of negative words")+
+  labs(title = "Negative Emotion")
 plot_negative
 
 ############
-#Over time ANXIETY (quarters)
+# ANXIETY
 data_quarter_anxiety <- aggregate(x = data_dict_emo$anxiety,  # Specify data column
           by = list(data_dict_emo$quarter),  # Specify group indicator
           FUN = mean) # Specify function (i.e. mean)
 data_quarter_anxiety$perc <- data_quarter_anxiety$x
 
-# plot the level of the "ELITE" component in time
+# plot
 plot_anxiety <- ggplot(data = data_quarter_anxiety, aes(x = Group.1, y = perc))+
   geom_line(color = "#00AFBB", size = 2)+
   scale_x_continuous("Quarters", labels = as.character(data_quarter_anxiety$Group.1), breaks = data_quarter_anxiety$Group.1)+
+  geom_line(aes(x = Group.1, y = mean(perc)), linetype = "dashed")+
+  ylab("Percentage of anxious words")+
   labs(title = "Anxiety emo")
 plot_anxiety
 
 ############
-#Over time ANGER (quarters)
+#ANGER
 data_quarter_anger <- aggregate(x = data_dict_emo$anger,  # Specify data column
           by = list(data_dict_emo$quarter),  # Specify group indicator
           FUN = mean) # Specify function (i.e. mean)
 data_quarter_anger$perc <- data_quarter_anger$x
 
-# plot the level of the "ELITE" component in time
+# plot
 plot_anger <- ggplot(data = data_quarter_anger, aes(x = Group.1, y = perc))+
   geom_line(color = "#00AFBB", size = 2)+
   scale_x_continuous("Quarters", labels = as.character(data_quarter_anger$Group.1), breaks = data_quarter_anger$Group.1)+
+  geom_line(aes(x = Group.1, y = mean(perc)), linetype = "dashed")+
+  ylab("Percentage of anger words")+
   labs(title = "Anger emo")
 plot_anger
 
 ############
-#Over time SADNESS (quarters)
+# SADNESS
 data_quarter_sadness <- aggregate(x = data_dict_emo$sadness,  # Specify data column
           by = list(data_dict_emo$quarter),  # Specify group indicator
           FUN = mean) # Specify function (i.e. mean)
@@ -158,22 +185,26 @@ data_quarter_sadness$perc <- data_quarter_sadness$x
 plot_sadness <- ggplot(data = data_quarter_sadness, aes(x = Group.1, y = perc))+
   geom_line(color = "#00AFBB", size = 2)+
   scale_x_continuous("Quarters", labels = as.character(data_quarter_sadness$Group.1), breaks = data_quarter_sadness$Group.1)+
+  geom_line(aes(x = Group.1, y = mean(perc)), linetype = "dashed")+
+  ylab("Percentage of sad words")+
   labs(title = "Sadness Emo")
 plot_sadness
 
 ############
-#Over time OPTIMISM (quarters)
-data_quarter_optimism <- aggregate(x = data_dict_emo$optimism,  # Specify data column
-          by = list(data_dict_emo$quarter),  # Specify group indicator
-          FUN = mean) # Specify function (i.e. mean)
-data_quarter_optimism$perc <- data_quarter_optimism$x
+# OPTIMISM
+#data_quarter_optimism <- aggregate(x = data_dict_emo$optimism,  # Specify data column
+#          by = list(data_dict_emo$quarter),  # Specify group indicator
+#          FUN = mean) # Specify function (i.e. mean)
+#data_quarter_optimism$perc <- data_quarter_optimism$x
 
 # plot
-plot_optimism<- ggplot(data = data_quarter_optimism, aes(x = Group.1, y = perc))+
-  geom_line(color = "#00AFBB", size = 2)+
-  scale_x_continuous("Quarters", labels = as.character(data_quarter_optimism$Group.1), breaks = data_quarter_optimism$Group.1)+
-  labs(title = "Optimism Emo")
-plot_optimism
+#plot_optimism<- ggplot(data = data_quarter_optimism, aes(x = Group.1, y = perc))+
+#  geom_line(color = "#00AFBB", size = 2)+
+#  scale_x_continuous("Quarters", labels = as.character(data_quarter_optimism$Group.1), breaks = #data_quarter_optimism$Group.1)+
+# geom_line(aes(x = Group.1, y = mean(perc)), linetype = "dashed")+
+#  ylab("Percentage of optimistic words")+
+#  labs(title = "Optimism Emo")
+#plot_optimism
 
 #########
 # compare the levels
@@ -182,29 +213,45 @@ p1 <- ggplot() +
   geom_line(data = data_quarter_positive, aes(x = Group.1, y = perc, color = "positive"), size = 2) +
   # plot negative
   geom_line(data = data_quarter_negative, aes(x = Group.1, y = perc, color = "negative"), size = 2) +
+  # mean positive
+  geom_line(data = data_quarter_positive, aes(x = Group.1, y = mean(perc)), linetype = "dashed") +
+  # mean negative
+  geom_line(data = data_quarter_negative, aes(x = Group.1, y = mean(perc)), linetype = "dashed") +
   scale_color_manual(name='Legend',
                      breaks=c('positive', 'negative'),
                      values=c('positive'='red', 'negative'='blue'))+
   scale_x_continuous("Quarters",
                      labels = as.character(data_quarter_positive$Group.1),
                      breaks = data_quarter_positive$Group.1)+
-  labs(title = "Sentiment")
+  ylab("Percentage of words")+
+  labs(title = "Emotion")
 
 p2 <- ggplot() +
   # plot anxiety
   geom_line(data = data_quarter_anxiety, aes(x = Group.1, y = perc, color = "anxiety"), size = 2) +
+  # mean anxiety
+  geom_line(data = data_quarter_anxiety, aes(x = Group.1, y = mean(perc)), linetype = "dashed") +
   # plot anger
   geom_line(data = data_quarter_anger, aes(x = Group.1, y = perc, color = "anger"), size = 2) +
+  # mean anger
+  geom_line(data = data_quarter_anger, aes(x = Group.1, y = mean(perc)), linetype = "dashed") +
   # plot sadness
   geom_line(data = data_quarter_sadness, aes(x = Group.1, y = perc, color = "sadness"), size = 2) +
+  # mean sadness 
+  geom_line(data = data_quarter_sadness, aes(x = Group.1, y = mean(perc)), linetype = "dashed") +
   # plot optimism
-  geom_line(data = data_quarter_optimism, aes(x = Group.1, y = perc, color = "optimism"), size = 2) +
+  #geom_line(data = data_quarter_optimism, aes(x = Group.1, y = perc, color = "optimism"), size = 2) +
+  # mean optimism 
+  #geom_line(data = data_quarter_optimism, aes(x = Group.1, y = mean(perc)), linetype = "dashed") +
+  
   scale_color_manual(name='Legend',
-                     breaks=c('anxiety', 'anger', 'sadness',"optimism"),
+                     breaks=c('anxiety', 'anger', 'sadness', 'optimism'),
                      values=c('anxiety'='red', 'anger'='blue',
-                              'sadness'='green', "optimism" = "black"))+ 
+                              'sadness'='green')#, 'optimism'= 'black')
+                     )+ 
   
   scale_x_continuous("Quarters", labels = as.character(data_quarter_positive$Group.1), breaks = data_quarter_positive$Group.1)+
+  ylab("Percentage of words")+
   labs(title = "Emotions")
 
 p1
@@ -212,12 +259,13 @@ p2
 
 ```
 
-
 ## Main emotion for each parliamentary group
 
 ```{r, echo=FALSE}
 
 tstat_emo <- textstat_frequency(DFM_emotions, groups = party_id)
+
+tstat_emo <- tstat_emo %>% filter(feature != "optimism")
 
 ggplot(data = tstat_emo, aes(x = factor(nrow(tstat_emo):1), y = frequency *100)) +
     geom_point() +
@@ -225,27 +273,36 @@ ggplot(data = tstat_emo, aes(x = factor(nrow(tstat_emo):1), y = frequency *100))
     coord_flip() +
     scale_x_discrete(breaks = nrow(tstat_emo):1,
                        labels = tstat_emo$feature) +
-    labs(x = NULL, y = "Relative frequency")
+    labs(x = NULL, y = "Relative frequency")+
+  ggtitle("Main emotions for each parliamentary group")
 ```
 
 The code is only shown for 'positive' but is identical for all emotions
-```{r}
 
+```{r}
 # POSITIVE
 data_party_positive <- aggregate(x = data_dict_emo$positive,  # Specify data column
           by = list(data_dict_emo$party_id),  # Specify group indicator
           FUN = mean) # Specify function (i.e. mean)
 data_party_positive$perc <- round(data_party_positive$x,3)
-kable(data_party_positive %>% select(Group.1, perc) %>%  arrange(desc(perc)), caption = "POSITIVE")
+
+kable(data_party_positive %>%
+        select(Group.1, perc) %>% 
+        arrange(desc(perc)), caption = "POSITIVE")
 
 ggplot(data=data_party_positive, aes(x=Group.1, y=perc)) +
   geom_bar(stat="identity", fill="steelblue")+
   geom_text(aes(label=perc), vjust=0, color="black", size=3.5)+
+  geom_abline(slope=0, intercept= mean(data_party_positive$perc),lty=2) +
   theme_minimal()+
-  labs(title = "Positive Sentiment")+
+  xlab("Parliamentary group")+
+  labs(title = "Positive Emotion")+
   coord_flip()
 
 ```
+
+\newpage
+
 ```{r, echo=FALSE}
 #By party no time (quarters)
 # NEGATIVE
@@ -258,9 +315,11 @@ kable(data_party_negative %>% select(Group.1, perc) %>%  arrange(desc(perc)), ca
 ggplot(data=data_party_negative, aes(x=Group.1, y=perc)) +
   geom_bar(stat="identity", fill="steelblue")+
   geom_text(aes(label=perc), vjust=0, color="black", size=3.5)+
+  geom_abline(slope=0, intercept= mean(data_party_negative$perc),lty=2) +
   theme_minimal()+
   coord_flip()+
-  labs(title = "Negative Sentiment")
+  xlab("Parliamentary group")+
+  labs(title = "Negative Emotion")
 ############################
 
 # ANXIETY
@@ -273,8 +332,10 @@ kable(data_party_anxiety %>% select(Group.1, perc) %>%  arrange(desc(perc)), cap
 ggplot(data=data_party_anxiety, aes(x=Group.1, y=perc)) +
   geom_bar(stat="identity", fill="steelblue")+
   geom_text(aes(label=perc), vjust=0, color="black", size=3.5)+
+  geom_abline(slope=0, intercept= mean(data_party_anxiety$perc),lty=2) +
   theme_minimal()+
   coord_flip()+
+  xlab("Parliamentary group")+
   labs(title = "Anxiety emotion")
 ##################
 
@@ -288,8 +349,10 @@ kable(data_party_anger %>% select(Group.1, perc) %>%  arrange(desc(perc)), capti
 ggplot(data=data_party_anger, aes(x=Group.1, y=perc)) +
   geom_bar(stat="identity", fill="steelblue")+
   geom_text(aes(label=perc), vjust=0, color="black", size=3.5)+
+  geom_abline(slope=0, intercept= mean(data_party_anger$perc),lty=2) +
   theme_minimal()+
   coord_flip()+
+  xlab("Parliamentary group")+
   labs(title = "Anger emotion")
 ##################
 
@@ -303,10 +366,15 @@ kable(data_party_sadness %>% select(Group.1, perc) %>%  arrange(desc(perc)), cap
 ggplot(data=data_party_sadness, aes(x=Group.1, y=perc)) +
   geom_bar(stat="identity", fill="steelblue")+
   geom_text(aes(label=perc), vjust=0, color="black", size=3.5)+
+  geom_abline(slope=0, intercept= mean(data_party_sadness$perc),lty=2) +
   theme_minimal()+
   coord_flip()+
+  xlab("Parliamentary group")+
   labs(title = "Sadness emotion")
 ##################
+```
+
+```{r, echo=FALSE, eval=FALSE,include=FALSE}
 
 # OPTIMISM
 data_party_optimism <- aggregate(x = data_dict_emo$optimism,  # Specify data column
@@ -314,45 +382,87 @@ data_party_optimism <- aggregate(x = data_dict_emo$optimism,  # Specify data col
           FUN = mean) # Specify function (i.e. mean)
 data_party_optimism$perc <- round(data_party_optimism$x,3)
 kable(data_party_optimism %>% select(Group.1, perc) %>%  arrange(desc(perc)), caption = "OPTIMISM")
-
 ggplot(data=data_party_optimism, aes(x=Group.1, y=perc)) +
   geom_bar(stat="identity", fill="steelblue")+
   geom_text(aes(label=perc), vjust=0, color="black", size=3.5)+
+    geom_abline(slope=0, intercept= mean(data_party_optimism$perc),lty=2) +
   theme_minimal()+
   coord_flip()+
+  xlab("Parliamentary group")+
   labs(title = "Optimism emotion")
-##################
+#################
 ```
-### Are the average values of [...] for each party statistically different from each other?
+
+### Are the average values of positive/negative emotions for each party statistically different from each other?
+
 The reference category is PD
 
 ```{r}
-# POSITIVE
-summary(data_dict_emo$positive)
 # bivariate regression for check t-test 
-data_dict_emo$factor_party <- as.factor(data_dict_emo$party_id)
-data_dict_emo$factor_party <- relevel(data_dict_emo$factor_party, ref = "PD")
 
+# create the factor variables for party and quarter
+data_dict_emo$factor_party <- as.factor(data_dict_emo$party_id)
 data_dict_emo$factor_quarter <- as.factor(data_dict_emo$quarter)
+
+# Check the mean values
+summary(data_dict_emo$positive)
+summary(data_dict_emo$negative)
+
+# Set PD as reference category for party_id
+data_dict_emo$factor_party <- relevel(data_dict_emo$factor_party, ref = "PD")
+# Set 5 as reference category for quarter
 data_dict_emo$factor_quarter <- relevel(data_dict_emo$factor_quarter, ref = "5")
 
-positive_model <- lm(positive ~  factor_quarter + factor_party, data_dict_emo )
+# Run the regressions
 
+# POSITIVE
+positive_model <- lm(positive ~  factor_quarter + factor_party, data_dict_emo )
 summary(positive_model)
 
 #NEGATIVE
-summary(data_dict_emo$negative)
-# bivariate regression for check t-test 
-data_dict_emo$factor_party <- as.factor(data_dict_emo$party_id)
-data_dict_emo$factor_party <- relevel(data_dict_emo$factor_party, ref = "PD")
-
-data_dict_emo$factor_quarter <- as.factor(data_dict_emo$quarter)
-data_dict_emo$factor_quarter <- relevel(data_dict_emo$factor_quarter, ref = "5")
-
 negative_model <- lm(negative ~  factor_quarter + factor_party, data_dict_emo )
-
 summary(negative_model)
 ```
 
+## Regressions
 
+```{r}
+# import the populism dataset
+load("data/data_dict1.Rda")
 
+# add the level of populism in the dataframe with the emotions
+data_dict_emo$populism <- data_dict1$populism
+
+# Change the reference category for quarter as quarter 8
+data_dict_emo$factor_quarter <- relevel(data_dict_emo$factor_quarter, ref = "8")
+
+# Negative prevalence
+negative_prevalence_model <- lm(negative_prevalence ~ factor_party +
+                                  factor_quarter +
+                                  populism, data_dict_emo)
+summary(negative_prevalence_model)
+
+# Negative emotion
+negative_model <- lm(negative ~ factor_party +
+                       factor_quarter +
+                       populism, data_dict_emo)
+summary(negative_model)
+
+# Anxiety emotion
+anxiety_model <- lm(anxiety ~ factor_party +
+                      factor_quarter +
+                      populism, data_dict_emo)
+summary(anxiety_model)
+
+# Anger emotion
+anger_model <- lm(anger ~ factor_party +
+                    factor_quarter +
+                    populism, data_dict_emo)
+summary(anger_model)
+
+# sadness emotion
+sadness_model <- lm(sadness ~ factor_party +
+                      factor_quarter +
+                      populism, data_dict_emo)
+summary(sadness_model)
+```

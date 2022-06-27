@@ -1,0 +1,90 @@
+---
+title: "Untitled"
+author: "Riccardo Ruta"
+date: '2022-06-14'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r setup4, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+here::here("")
+source(here::here("src","00_setup.R"))
+```
+
+# STM Topic model analysis
+
+## Load the data
+```{r, include=FALSE}
+load("data/dfm.Rda")
+```
+
+## Import the dictionaries
+
+```{r}
+# Import dictionaries file
+dict <-  read_excel("data/populism_dictionaries.xlsx")
+
+Decadri_Boussalis_Grundl <-
+  dictionary(list(people =
+                    dict$Decadri_Boussalis_Grundl_People
+                  [!is.na(dict$Decadri_Boussalis_Grundl_People)],
+                  common_will =
+                    dict$`Decadri_Boussalis_Grundl_Common Will`
+                  [!is.na(dict$`Decadri_Boussalis_Grundl_Common Will`)],
+                  elite =
+                    dict$Decadri_Boussalis_Grundl_Elite
+                  [!is.na(dict$Decadri_Boussalis_Grundl_Elite)]))
+```
+
+
+## Remove all the account's mentions
+
+```{r}
+DFM@Dimnames$features <- gsub("^@", "", DFM@Dimnames$features)
+```
+
+## Trim the data
+
+```{r}
+# Remove text with less than 1 word
+DFM <- dfm_subset(DFM, ntoken(DFM) > 1)
+
+# Remove very short words
+DFM <- dfm_remove(DFM, min_nchar=2)
+```
+
+## Apply dictionary
+
+```{r}
+# Apply Dictionary
+DFMdict <- dfm_lookup(DFM, 
+                        dictionary = Decadri_Boussalis_Grundl)%>%
+  dfm_weight(scheme = "prop")
+
+DATAdictDFM <- DFMdict %>%
+  quanteda::convert(to = "data.frame")
+
+```
+
+## Create percentage for each components
+
+```{r}
+# RUN ONLY ONCE!
+# Add variable with general level of populism & multiply all components by 100
+DATAdictDFM <- DATAdictDFM %>% mutate(populism = (people + common_will + elite) * 100)
+                                      
+DATAdictDFM <- DATAdictDFM %>% mutate(people = people*100,
+                                      common_will = common_will*100,
+                                      elite = elite*100)
+```
+
+## Check the values
+```{r}
+kable(DATAdictDFM  %>% count(people))
+kable(DATAdictDFM  %>% count(common_will))
+kable(DATAdictDFM  %>% count(elite))
+kable(DATAdictDFM  %>% count(populism))
+```

@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2022.5.7)  7 JUN 2022 20:34
+This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2022.5.7)  7 JUN 2022 21:00
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -481,19 +481,16 @@ Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
 \etb@tempcnta=\count325
 ) (./3_Sentiment_analysis.aux
 
-LaTeX Warning: Label `tab:unnamed-chunk-7' multiply defined.
+LaTeX Warning: Label `tab:unnamed-chunk-10' multiply defined.
 
 
-LaTeX Warning: Label `tab:unnamed-chunk-7' multiply defined.
+LaTeX Warning: Label `tab:unnamed-chunk-10' multiply defined.
 
 
-LaTeX Warning: Label `tab:unnamed-chunk-7' multiply defined.
+LaTeX Warning: Label `tab:unnamed-chunk-10' multiply defined.
 
 
-LaTeX Warning: Label `tab:unnamed-chunk-7' multiply defined.
-
-
-LaTeX Warning: Label `tab:unnamed-chunk-7' multiply defined.
+LaTeX Warning: Label `tab:unnamed-chunk-10' multiply defined.
 
 )
 \openout1 = `3_Sentiment_analysis.aux'.
@@ -842,55 +839,84 @@ LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
 [1
 
 ] [2]
-File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-5-1.pdf Graphic file (type pdf)
-<use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-5-1.pdf>
-[3]
-LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 299.
-
-LaTeX Font Warning: Font shape `TU/lmtt/bx/it' in size <10> not available
-(Font)              Font shape `TU/lmtt/b/sl' tried instead on input line 299.
-
-File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-5-2.pdf Graphic file (type pdf)
-<use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-5-2.pdf>
-[4]
-File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-5-3.pdf Graphic file (type pdf)
-<use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-5-3.pdf>
-[5]
-File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-5-4.pdf Graphic file (type pdf)
-<use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-5-4.pdf>
-[6]
-File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-5-5.pdf Graphic file (type pdf)
-<use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-5-5.pdf>
-[7]
-File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-5-6.pdf Graphic file (type pdf)
-<use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-5-6.pdf>
-[8] [9]
-File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-5-7.pdf Graphic file (type pdf)
-<use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-5-7.pdf>
-File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-5-8.pdf Graphic file (type pdf)
-<use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-5-8.pdf>
-[10]
 File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-6-1.pdf Graphic file (type pdf)
 <use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-6-1.pdf>
-[11]
 File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-7-1.pdf Graphic file (type pdf)
 <use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-7-1.pdf>
-[12] [13]
 File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-7-2.pdf Graphic file (type pdf)
 <use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-7-2.pdf>
-[14]
 File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-7-3.pdf Graphic file (type pdf)
 <use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-7-3.pdf>
-[15] [16]
 File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-7-4.pdf Graphic file (type pdf)
 <use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-7-4.pdf>
 File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-7-5.pdf Graphic file (type pdf)
 <use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-7-5.pdf>
-[17] [18]
 File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-7-6.pdf Graphic file (type pdf)
 <use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-7-6.pdf>
-[19] [20] [21] [22] (./3_Sentiment_analysis.aux)
+File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-7-7.pdf Graphic file (type pdf)
+<use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-7-7.pdf>
+
+Underfull \hbox (badness 10000) in paragraph at lines 298--306
+[][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 298--306
+[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 298--306
+[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 298--306
+[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 298--306
+[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 298--306
+[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 298--306
+[]
+ []
+
+[3] [4] [5] [6] [7] [8] [9] [10]
+File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-8-1.pdf Graphic file (type pdf)
+<use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-8-1.pdf>
+[11]
+File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-9-1.pdf Graphic file (type pdf)
+<use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-9-1.pdf>
+[12]
+File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-10-1.pdf Graphic file (type pdf)
+<use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-10-1.pdf>
+[13]
+File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-10-2.pdf Graphic file (type pdf)
+<use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-10-2.pdf>
+[14]
+File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-10-3.pdf Graphic file (type pdf)
+<use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-10-3.pdf>
+[15]
+File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-10-4.pdf Graphic file (type pdf)
+<use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-10-4.pdf>
+[16]
+File: 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-10-5.pdf Graphic file (type pdf)
+<use 3_Sentiment_analysis_files/figure-latex/unnamed-chunk-10-5.pdf>
+
+Underfull \hbox (badness 10000) in paragraph at lines 545--548
+[][]
+ []
+
+[17] [18] [19] [20] (./3_Sentiment_analysis.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
@@ -898,12 +924,12 @@ Package rerunfilecheck Info: File `3_Sentiment_analysis.out' has not changed.
 (rerunfilecheck)             Checksum: 5B1BEC2A36D974EEAC3D8F479F525730;643.
  ) 
 Here is how much of TeX's memory you used:
- 18950 strings out of 478132
- 354022 string characters out of 5851318
- 808080 words of memory out of 5000000
- 39320 multiletter control sequences out of 15000+600000
- 475800 words of font info for 80 fonts, out of 8000000 for 9000
+ 18943 strings out of 478132
+ 353938 string characters out of 5851318
+ 808110 words of memory out of 5000000
+ 39317 multiletter control sequences out of 15000+600000
+ 475784 words of font info for 78 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 86i,9n,121p,417b,466s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 86i,9n,121p,417b,358s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on 3_Sentiment_analysis.pdf (22 pages).
+Output written on 3_Sentiment_analysis.pdf (20 pages).
