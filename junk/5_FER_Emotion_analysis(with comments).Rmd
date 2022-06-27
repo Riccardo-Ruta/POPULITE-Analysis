@@ -5,6 +5,7 @@ date: "05/2022"
 output:
   pdf_document: 
     toc: yes
+    latex_engine: xelatex
   html_document: default
   word_document:
     toc: yes
@@ -19,7 +20,42 @@ source(here::here("src","00_setup.R"))
 
 # FER: Facial Emotion Recognition Analysis
 
-**Report on the analysis made with FER Python package**
+## Report on the analysis made with FER Python package
+
+
+As an additional analysis, we have developed an application that implements an emotion recognition system in videos. The aim is to investigate which were the main emotions conveyed by Italian party leaders through interviews and live broadcasts published on their respective facebook profiles, during the first two months after the invasion of Ukraine by the Russian army. 
+
+The corpus for this analysis was constructed by manually searching for videos showing the politician engaged in a live broadcast or interview on the pages of the following party leaders:
+Forza Italia: Silvio Berlusconi;
+Fratelli d'Italia: Giorgia Meloni;
+Italia Viva: Matteo Renzi;
+Lega: Matteo Salvini;
+Liberi e Uguali: Roberto Speranza;
+Movimento 5 stelle: Giuseppe Conte;
+Partito Democratico: Enrico Letta;
+
+Subsequently, only videos that were suitable for analysis were downloaded, i.e. videos with a frontal shot of the politician and not exceeding 35 MB in size; for some party leaders, no video suitable for analysis was found. A total of 21 videos were collected, distributed in this way:
+Silvio Berlusconi: 0
+Giorgia Meloni: 7
+Matteo Renzi: 2
+Matteo Salvini: 3
+Roberto Speranza: 0
+Giuseppe Conte: 7
+Enrico Letta: 2
+
+To perform this analysis we used the Python FER (Face Emotion Recognition) package, developed by Justin Shenk using the FER2013 dataset curated by Pierre Luc Carrier and Aaron Courville. 
+
+The dataset was created using the Google image search API to search for images of faces that match a set of 184 emotion-related keywords like “blissful”, “enraged,” etc.
+These keywords were combined with words related to gender, age or ethnicity, to obtain nearly 600 strings which were used as facial image search queries.
+The first 1000 images returned for each query were kept for the next stage of processing.
+OpenCV face recognition was used to obtain bounding boxes around each face in the collected images. Human labelers than rejected incorrectly labeled images, corrected the cropping if necessary, and filtered out some duplicate images.
+Approved, cropped images were then resized to 48x48 pixels and converted to grayscale.
+Mehdi Mirza and Ian Goodfellow prepared a subset of the images for this contest,and mapped the fine-grained emotion keywords into the same seven broad categories used in the Toronto Face Database [Joshua Susskind, Adam Anderson, and Geoffrey E. Hinton. The Toronto face dataset. Technical Report UTML TR 2010-001, U. Toronto, 2010.].
+
+The package allows you to call a keras convolutional neural network model trained using the dataset FER2013, described in "Challenges in Representation Learning: A report on three machine learning contests". In order to simplify the use of the package and allow access to it everywhere (not exclusively on PCs with python installed), it was decided to develop a simple cloud-hosted application. For this solution, I used the freemwork streamlit, which offers free application hosting to the developer community. Thanks to this solution, I was able to speed up analysis times and expand the user base of the FER package to include users who do not use the Python language.
+Through the application it is possible to upload a video in mp4 format (max 35 MB) and call the model to perform the analysis. Once the analysis is performed, a summary graph of the emotions detected frame by frame and a table showing the proportion of each emotion detected with respect to the length of the video are displayed. Finally, a button is available with which to download the results in a .csv file in which the coordinates of the faces detected and the proportion detected frame by frame for each emotion are shown, the file can be saved on any device and re-analysed with any software that allows the processing of .csv files.
+The code is free and available on the project's github repository.
+
 
 
 ## Import the datasets
@@ -158,7 +194,7 @@ Salvini_16_03_2022 <- read_csv("data/video_emotions/Salvini_16-03-2022.csv",
 
 
 
-## Conte datasets
+## Analyse Conte datasets
 
 ```{r}
 #1
@@ -286,17 +322,14 @@ tot_conte <- max(Conte_07_03_22_00$...1) +
               max(Conte_24_02_22_01$...1) +
               max(Conte_28_02_22_00$...1)
 
-conte[8,] <- c(sum(conte$angry)/tot_conte * 100,
-               sum(conte$disgust)/tot_conte *100,
-               sum(conte$fear)/tot_conte *100,
-               sum(conte$happy)/tot_conte *100,
-               sum(conte$sad)/tot_conte *100,
-               sum(conte$surprise)/tot_conte * 100,
+conte[8,] <- c(sum(conte$angry)/tot_conte * 100, sum(conte$disgust)/tot_conte *100,
+               sum(conte$fear)/tot_conte *100, sum(conte$happy)/tot_conte *100,
+               sum(conte$sad)/tot_conte *100 ,sum(conte$surprise)/tot_conte * 100,
                sum(conte$neutral)/tot_conte *100)
 
 ```
 
-## Letta datasets
+## Analyse Letta datasets
 
 ```{r}
 #1
@@ -340,16 +373,13 @@ letta <- as.data.frame(letta)
 tot_letta <- max(Letta_03_03_22_00$...1) +
               max(Letta_06_04_22_00$...1)
 
-letta[3,] <- c(sum(letta$angry)/tot_letta * 100,
-               sum(letta$disgust)/tot_letta *100,
-               sum(letta$fear)/tot_letta *100,
-               sum(letta$happy)/tot_letta *100,
-               sum(letta$sad)/tot_letta *100,
-               sum(letta$surprise)/tot_letta * 100,
+letta[3,] <- c(sum(letta$angry)/tot_letta * 100, sum(letta$disgust)/tot_letta *100,
+               sum(letta$fear)/tot_letta *100, sum(letta$happy)/tot_letta *100,
+               sum(letta$sad)/tot_letta *100 ,sum(letta$surprise)/tot_letta * 100,
                sum(letta$neutral)/tot_letta *100)
 ```
 
-## Meloni datasets
+## Analyse Meloni datasets
 
 ```{r}
 #1
@@ -478,19 +508,16 @@ tot_meloni <- max(Meloni_1_03_2022$...1) +
               max(Meloni_29_03_2022$...1)+
               max(Meloni_31_03_2022$...1)
 
-meloni[8,] <- c(sum(meloni$angry)/tot_meloni * 100,
-                sum(meloni$disgust)/tot_meloni *100,
-                sum(meloni$fear)/tot_meloni *100,
-                sum(meloni$happy)/tot_meloni *100,
-                sum(meloni$sad)/tot_meloni *100 ,
-                sum(meloni$surprise)/tot_meloni * 100,
-                sum(meloni$neutral)/tot_meloni *100)
+meloni[8,] <- c(sum(meloni$angry)/tot_meloni * 100, sum(meloni$disgust)/tot_meloni *100,
+               sum(meloni$fear)/tot_meloni *100, sum(meloni$happy)/tot_meloni *100,
+               sum(meloni$sad)/tot_meloni *100 ,sum(meloni$surprise)/tot_meloni * 100,
+               sum(meloni$neutral)/tot_meloni *100)
 ```
 
 
 
 
-## Renzi datasets
+## Analyse Renzi datasets
 
 
 ```{r}
@@ -535,19 +562,16 @@ renzi <- as.data.frame(renzi)
 tot_renzi <- max(Renzi_19_04_2022$...1) +
               max(Renzi_30_03_2022$...1)
 
-renzi[3,] <- c(sum(renzi$angry)/tot_renzi * 100,
-               sum(renzi$disgust)/tot_renzi * 100,
-               sum(renzi$fear)/tot_renzi * 100,
-               sum(renzi$happy)/tot_renzi * 100,
-               sum(renzi$sad)/tot_renzi * 100,
-               sum(renzi$surprise)/tot_renzi * 100,
-               sum(renzi$neutral)/tot_renzi * 100)
+renzi[3,] <- c(sum(renzi$angry)/tot_renzi * 100, sum(renzi$disgust)/tot_renzi *100,
+               sum(renzi$fear)/tot_renzi *100, sum(renzi$happy)/tot_renzi *100,
+               sum(renzi$sad)/tot_renzi *100 ,sum(renzi$surprise)/tot_renzi * 100,
+               sum(renzi$neutral)/tot_renzi *100)
 ```
 
 
 
 
-## Salvini datasets
+## Analyse Salvini datasets
 
 
 ```{r}
@@ -609,13 +633,10 @@ tot_salvini <- max(Salvini_08_03_2022$...1) +
                 max(Salvini_08_04_2022_02$...1)+
                 max(Salvini_16_03_2022$...1)
 
-salvini[4,] <- c(sum(salvini$angry)/tot_salvini * 100,
-                 sum(salvini$disgust)/tot_salvini * 100,
-               sum(salvini$fear)/tot_salvini * 100,
-               sum(salvini$happy)/tot_salvini * 100,
-               sum(salvini$sad)/tot_salvini * 100,
-               sum(salvini$surprise)/tot_salvini * 100,
-               sum(salvini$neutral)/tot_salvini * 100)
+salvini[4,] <- c(sum(salvini$angry)/tot_salvini * 100, sum(salvini$disgust)/tot_salvini *100,
+               sum(salvini$fear)/tot_salvini *100, sum(salvini$happy)/tot_salvini *100,
+               sum(salvini$sad)/tot_salvini *100 ,sum(salvini$surprise)/tot_salvini * 100,
+               sum(salvini$neutral)/tot_salvini *100)
 ```
 
 
@@ -656,6 +677,8 @@ barplot(matrix,
         main = "Level of emotions captured in party leaders' videos \n (from 21st Feb to 21st Apr 2022)")
 
 ```
-.
+Looking at these results, it is possible to observe which emotions were used by party leaders during the first two months of the Ukrainian invasion, it should be noted that the videos were downloaded regardless of whether the topic at hand was the war in Ukraine.
+Looking at the data, it can be seen that the most recorded emotion is Sad for politicians Giuseppe Conte, Matteo Renzi and Matteo Salvini; while for Enrico Letta the highest percentage is Neutral and for Giorgia Meloni it is Fear.
+The major limitation of this analysis is the model's low reliability in extracting emotions correctly, the accuracy percentage was recorded at around 66% as indicated in the paper by Octavio Arriaga, Matias Valdenegro-Toro, Paul Plöger (Real-time Convolutional Neural Networks for Emotion and Gender Classification); and the second major limitation is the analysis time, each video takes about two and a half times the length of the video itself. To obtain more reliable results, as reported on other studies, it is possible to use Microsoft's Cognitive Services with which it is possible to replicate the same analysis by calling up an API, the disadvantage in this case being that it is a proprietary paid service based on a non-open source and non-accessible model. The advantage of using an open source model such as FER is given by the possibility, through future studies, of replicating the analysis using models trained on different datasets with a view to defining an increasingly accurate neural network model for a specific use such as this.
 
 

@@ -102,15 +102,12 @@ data_dict1 <- dfm_dict1 %>%
   cbind(docvars(dfm_dict1))
 
 # Add variable with general level of populism
-data_dict1 <- data_dict1 %>%
-  mutate(populism = (people + common_will + elite) * 100)
+data_dict1 <- data_dict1 %>% mutate(populism = (people + common_will + elite) * 100)
 ```
 
 
 
 ### Level of populism in time
-
-The code is only shown for the "PEOPLE" component but is identical for the others
 
 ```{r}
 #Over time PEOPLE (quarters)
@@ -122,15 +119,12 @@ data_quarter_people$perc <- data_quarter_people$x * 100
 # plot the level of the "people" component in time
 plot_people <- ggplot(data = data_quarter_people, aes(x = Group.1, y = perc))+
   geom_line(color = "#00AFBB", size = 2)+
-  scale_x_continuous("Quarters", labels = as.character(data_quarter_people$Group.1),
-                     breaks = data_quarter_people$Group.1)+
+  scale_x_continuous("Quarters", labels = as.character(data_quarter_people$Group.1), breaks = data_quarter_people$Group.1)+
   ylab("Percentage of populist words - people")+
   labs(title = "Populism level over quarters of the 'people' component")
 plot_people
-```
 
-
-```{r, echo=FALSE}
+############
 #Over time COMMON WILL (quarters)
 data_quarter_common <- aggregate(x = data_dict1$common_will,  # Specify data column
           by = list(data_dict1$quarter),  # Specify group indicator
@@ -144,7 +138,7 @@ plot_common <- ggplot(data = data_quarter_common, aes(x = Group.1, y = perc))+
   ylab("Percentage of populist words - common will")+
   labs(title = "Populism level over quarters of the 'common will' component")
 plot_common
-
+############
 #Over time ELITE (quarters)
 data_quarter_elite <- aggregate(x = data_dict1$elite,  # Specify data column
           by = list(data_dict1$quarter),  # Specify group indicator
@@ -158,31 +152,27 @@ plot_elite <- ggplot(data = data_quarter_elite, aes(x = Group.1, y = perc))+
   ylab("Percentage of populist words - elite")+
   labs(title = "Populism level over quarters of the 'elite' component")
 plot_elite
-```
-```{r}
+
+#########
 # compare the levels
 p <- ggplot() +
   # plot people
-  geom_line(data = data_quarter_people,
-            aes(x = Group.1, y = perc, color = "people"), size = 2) +
+  geom_line(data = data_quarter_people, aes(x = Group.1, y = perc, color = "people"), size = 2) +
   # plot common will
-  geom_line(data = data_quarter_common,
-            aes(x = Group.1, y = perc, color = "common will"), size = 2) +
+  geom_line(data = data_quarter_common, aes(x = Group.1, y = perc, color = "common will"), size = 2) +
   # plot elite
-  geom_line(data = data_quarter_elite,
-            aes(x = Group.1, y = perc, color = "elite"), size = 2) +
+  geom_line(data = data_quarter_elite, aes(x = Group.1, y = perc, color = "elite"), size = 2) +
   scale_color_manual(name='Legend',
                      breaks=c('people', 'elite', 'common will'),
                      values=c('people'='red', 'elite'='blue', 'common will'='green'))+ 
   
-  scale_x_continuous("Quarters", labels = as.character(data_quarter_people$Group.1),
-                     breaks = data_quarter_people$Group.1)+
+  scale_x_continuous("Quarters", labels = as.character(data_quarter_people$Group.1), breaks = data_quarter_people$Group.1)+
   ylab("Percentage of populist words")+
   labs(title = " Compare the 3 components of the populism level")
 
 p
 
-
+################
 #Over time general level populism (quarters)
 data_quarter_general <- aggregate(x = data_dict1$populism,  # Specify data column
           by = list(data_dict1$quarter),  # Specify group indicator
@@ -192,11 +182,11 @@ data_quarter_general$perc <- data_quarter_general$x
 # plot the level of populism
 plot_general <- ggplot(data = data_quarter_general, aes(x = Group.1, y = perc))+
   geom_line(color = "#00AFBB", size = 2)+
-  scale_x_continuous("Quarters", labels = as.character(data_quarter_general$Group.1),
-                     breaks = data_quarter_general$Group.1)+
+  scale_x_continuous("Quarters", labels = as.character(data_quarter_general$Group.1), breaks = data_quarter_general$Group.1)+
   ylab("Percentage of populist words")+
   labs(title = "General level of populism over quarters")
 plot_general
+
 ```
 
 ### Frequencies of the 3 components of populism for each parliamentary group
@@ -217,9 +207,6 @@ ggplot(data = tstat1, aes(x = factor(nrow(tstat1):1), y = frequency *100)) +
 
 ### Ranking of parliamentary groups according to their level of populism
 
-The code is only shown for the main "POPULISM"  indicator 
-but is identical for the single components
-
 ```{r}
 #By party no time (quarters)
 
@@ -228,7 +215,7 @@ data_party <- aggregate(x = data_dict1$populism,  # Specify data column
           by = list(data_dict1$party_id),  # Specify group indicator
           FUN = mean) # Specify function (i.e. mean)
 data_party$perc <- round(data_party$x,3)
-
+kable(data_party %>% select(Group.1, perc) %>%  arrange(desc(perc)))
 
 ggplot(data=data_party, aes(x=Group.1, y=perc)) +
   geom_bar(stat="identity", fill="steelblue")+
@@ -240,21 +227,12 @@ ggplot(data=data_party, aes(x=Group.1, y=perc)) +
   xlab("Parliamentary groups")+
   labs(title = "LEVEL OF POPULISM")
 
-kable(data_party %>% select(Group.1, perc) %>%  arrange(desc(perc)),
-      col.names = c("Party","Perc"),
-      caption = "Populism")%>%
-  kable_styling(latex_options = "HOLD_position")
-```
-\newpage
-```{r, echo=FALSE}
 # PEOPLE
 data_party_people <- aggregate(x = data_dict1$people,  # Specify data column
           by = list(data_dict1$party_id),  # Specify group indicator
           FUN = mean) # Specify function (i.e. mean)
 data_party_people$perc <- round(data_party_people$x * 100,3)
-kable(data_party_people %>% select(Group.1, perc)%>% arrange(desc(perc)), col.names = c("Party","Perc"),
-      caption = "People")%>%
-  kable_styling(latex_options = "HOLD_position")
+kable(data_party_people %>% select(Group.1, perc)%>% arrange(desc(perc)))
 
 ggplot(data=data_party_people, aes(x=Group.1, y=perc)) +
   geom_bar(stat="identity", fill="steelblue")+
@@ -271,9 +249,7 @@ data_party_common <- aggregate(x = data_dict1$common_will,  # Specify data colum
           by = list(data_dict1$party_id),  # Specify group indicator
           FUN = mean) # Specify function (i.e. mean)
 data_party_common$perc <- round(data_party_common$x * 100,3)
-kable(data_party_common %>% select(Group.1, perc)%>% arrange(desc(perc)), col.names = c("Party", "Perc"),
-      caption = "Common will")%>%
-  kable_styling(latex_options = "HOLD_position")
+kable(data_party_common %>% select(Group.1, perc)%>% arrange(desc(perc)))
 
 ggplot(data=data_party_common, aes(x=Group.1, y=perc)) +
   geom_bar(stat="identity", fill="steelblue")+
@@ -290,9 +266,7 @@ data_party_elite <- aggregate(x = data_dict1$elite,  # Specify data column
           by = list(data_dict1$party_id),  # Specify group indicator
           FUN = mean) # Specify function (i.e. mean)
 data_party_elite$perc <- round(data_party_elite$x * 100,3)
-kable(data_party_elite %>% select(Group.1, perc)%>% arrange(desc(perc)), col.names = c("Party","Perc"),
-      caption = "Elite")%>%
-  kable_styling(latex_options = "HOLD_position")
+kable(data_party_elite %>% select(Group.1, perc)%>% arrange(desc(perc)))
 
 ggplot(data=data_party_elite, aes(x=Group.1, y=perc)) +
   geom_bar(stat="identity", fill="steelblue")+
@@ -304,10 +278,8 @@ ggplot(data=data_party_elite, aes(x=Group.1, y=perc)) +
   xlab("Parliamentary groups")+
   labs(title = "LEVEL OF POPULISM: ELITE COMPONENT")
 ```
-
-\newpage
-
-### Bivariate regression for check t-test 
+Are the average values of populism for each party statistically different from each other?
+The reference category is PD
 
 ```{r}
 # bivariate regression for check t-test 
@@ -337,16 +309,14 @@ left_party <- data_dict1 %>% select(populism, party_id, quarter) %>%
 # Left parties in time
 ggplot(left_party, aes(x=quarter, y=populism, color=party_id)) +
   geom_line(size=1.5)+
-  scale_x_continuous("Quarters", labels = as.character(left_party$quarter),
-                     breaks = left_party$quarter)+
+  scale_x_continuous("Quarters", labels = as.character(left_party$quarter), breaks = left_party$quarter)+
   ylab("Percentage of populist words")+
   ggtitle("Level of populism over time for left-wing parties")
 
 # Right parties in time
 ggplot(right_party, aes(x=quarter, y=populism, color=party_id)) +
   geom_line(size=1.5)+
-  scale_x_continuous("Quarters", labels = as.character(right_party$quarter),
-                     breaks = right_party$quarter)+
+  scale_x_continuous("Quarters", labels = as.character(right_party$quarter), breaks = right_party$quarter)+
   ylab("Percentage of populist words")+
   ggtitle("Level of populism over time for right-wing parties")
 ```
@@ -367,8 +337,7 @@ ggplot(right_party, aes(x=quarter, y=populism, color=party_id)) +
 ```{r, warning=FALSE}
 # Dictionary analysis with Rooduijn_Pauwels_Italian
 # By quarter
-dfm_dict2  <- dfm_lookup(dfm_weigh_p_quart,
-                         dictionary = Rooduijn_Pauwels_Italian)
+dfm_dict2  <- dfm_lookup(dfm_weigh_p_quart, dictionary = Rooduijn_Pauwels_Italian)
 
 ```
 
@@ -376,6 +345,10 @@ dfm_dict2  <- dfm_lookup(dfm_weigh_p_quart,
 data_dict2 <- dfm_dict2 %>% 
   quanteda::convert(to = "data.frame") %>% 
   cbind(docvars(dfm_dict2))
+
+# Add variable with general level of populism
+#data_dict2 <- data_dict2 %>% mutate(populism = (people + common_will + elite) * 100)
+
 ```
 
 
@@ -427,8 +400,7 @@ ggplot(data=data_party2, aes(x=Group.1, y=perc)) +
 ```{r, warning=FALSE}
 # Dictionary analysis with Rooduijn_Pauwels_Italian
 # By quarter
-dfm_dict3  <- dfm_lookup(dfm_weigh_p_quart,
-                         dictionary = Grundl_Italian_adapted)
+dfm_dict3  <- dfm_lookup(dfm_weigh_p_quart, dictionary = Grundl_Italian_adapted)
 
 ```
 
@@ -436,6 +408,10 @@ dfm_dict3  <- dfm_lookup(dfm_weigh_p_quart,
 data_dict3 <- dfm_dict3 %>% 
   quanteda::convert(to = "data.frame") %>% 
   cbind(docvars(dfm_dict3))
+
+# Add variable with general level of populism
+#data_dict2 <- data_dict2 %>% mutate(populism = (people + common_will + elite) * 100)
+
 ```
 
 
@@ -498,6 +474,53 @@ grid()
 title(main = "Compare how the different dictionaries score")
 ```
 
+
+## DA SISTEMARE LA COMPARAZIONE TRA DIZIONARI !
+## Compare how the dictionaries score for the most populist parliamentary group
+
+```{r, eval=FALSE}
+# Create the columns with the "populist score"
+# 11 for the "most populist" and 1 for the least
+dfm_dict1_tstat_party_filtered$my_rank <- rank(dfm_dict1_tstat_party_filtered$populism)
+dfm_dict2_tstat_party$my_rank <- rank(dfm_dict2_tstat_party$frequency)
+dict_3_tstat_party$my_rank <- rank(dict_3_tstat_party$frequency)
+dict_4_tstat_party$my_rank <- rank(dict_4_tstat_party$frequency)
+
+# define the parliamentary group list
+party <- c("LEGA","PD","M5S","FI","FDI","MISTO",
+           "LEU","CI","IV","INDIPENDENTE","REG_LEAGUES")
+# create an empty df
+party_rank <- data.frame(first = vector(), second = vector(),
+                         third = vector(), fourth = vector(), fifth = vector() )
+
+# loop the rank for each parliamentary group
+for (i in party)
+{
+  rank_dict_1 <- (dfm_dict1_tstat_party_filtered %>% filter(group == i ) %>% .$my_rank)
+  rank_dict_2 <- (dfm_dict2_tstat_party %>% filter(group == i ) %>% .$my_rank)
+  rank_dict_3 <- (dict_3_tstat_party %>% filter(group == i ) %>% .$my_rank)
+  rank_dict_4 <- (dict_4_tstat_party %>% filter(group == i ) %>% .$my_rank)
+  
+  party <- (i)
+  party_rank <- rbind(party_rank, cbind(party, rank_dict_1, rank_dict_2,
+                                        rank_dict_3, rank_dict_4))
+}
+
+# change the format of the columns in numeric
+party_rank$rank_dict_1 <- as.numeric(party_rank$rank_dict_1)
+party_rank$rank_dict_2 <- as.numeric(party_rank$rank_dict_2)
+party_rank$rank_dict_3 <- as.numeric(party_rank$rank_dict_3)
+party_rank$rank_dict_4 <- as.numeric(party_rank$rank_dict_4)
+
+# Create the column with the sum of the single score
+party_rank$total_score <- rowSums(party_rank[,-1])
+kable(party_rank %>% arrange(desc(total_score)), col.names = c("Party",
+                                                               "Dec_Bous_Grun",
+                                                               "Rood_Pau_it",
+                                                               "Grun_it",
+                                                               "Dec_Bous",
+                                                               "Total"))
+```
 
 
 

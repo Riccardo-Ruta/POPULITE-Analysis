@@ -130,8 +130,6 @@ kable(missing_df)
 
 ```
 
-From this check I'll obtain 148178 urls missing, this variable is not collected properly and we will not use in the analysis, and also results 6494 tweets missings, those are the cases when someone post only images or video without text, so the extraction is correct.
-
 ### Remove rows with missing tweets
 
 ```{r}
@@ -247,7 +245,7 @@ DFM <- dfm_remove(DFM, emoji)
 
 ![Emoji removed](output/emoji.png)
 
-### Now the data are ready for the next analysis
+**Now the data are ready for the next analysis**
 
 \newpage
 
@@ -261,11 +259,14 @@ n_parl <- length(unique(dataset$nome))
 n_parl
 
 # How many parliamentarians for each party_id?
-n_parl_party <- dataset %>% select(party_id, nome) %>% group_by(party_id) %>% unique() %>% count()
+n_parl_party <- dataset %>% select(party_id, nome) %>%
+  group_by(party_id) %>% unique() %>% count() %>%
+  arrange(desc(n))
 kable(n_parl_party)
 
 # Gender composition
-n_gender <- dataset %>% select(genere, nome) %>% group_by(genere) %>% unique() %>% count()
+n_gender <- dataset %>% select(genere, nome) %>%
+  group_by(genere) %>% unique() %>% count()
 kable(n_gender)
 
 # Wich is the period of analysis?
@@ -278,7 +279,7 @@ min(tw$date)
 ```{r, warning=FALSE}
 # Textplotwordcloud
 set.seed(123)
-textplot_wordcloud(DFM, min_count = 20,max_words = 300,
+textplot_wordcloud(DFM, min_count = 20,max_words = 200,
      color = c('red', 'pink', 'green', 'purple', 'blue'))
 ```
 
@@ -300,7 +301,9 @@ ggplot(features_dfm, aes(x = feature, y = frequency)) +
 # group and weight the DFM
 dfm_party_weight <- dfm_group(DFM, groups = party_id) %>%
   dfm_weight(scheme = "prop")
+```
 
+```{r, eval=FALSE}
 # Plot relative frequency by party_id
 freq_weight <- textstat_frequency(dfm_party_weight, n = 7, groups = party_id)
 
@@ -314,6 +317,8 @@ ggplot(data = freq_weight, aes(x = nrow(freq_weight):1, y = frequency)) +
   ggtitle("Relative frequency") +
   labs(x = NULL, y = NULL)
 ```
+
+![](figs/1.2_relative_frequencies.png)
 
 ## Most common hashtag
 
@@ -358,14 +363,14 @@ ggplot(data = tstat_freq, aes(x = nrow(tstat_freq):1, y = frequency)) +
 ### Co-occurrence Plot of hashtags
 
 ```{r}
-# NOT WEIGHTED
 tag_dfm_NOT_W <- dfm_select(DFM, pattern = "#*")
 toptag_NOT <- names(topfeatures(tag_dfm_NOT_W, 20))
 
 tag_fcm_NOT <- fcm(tag_dfm_NOT_W)
 set.seed(666)
 topgat_fcm_NOT <- fcm_select(tag_fcm_NOT, pattern = toptag_NOT)
-textplot_network(topgat_fcm_NOT, min_freq = 0.1, edge_alpha = 0.8, edge_size = 5)
+textplot_network(topgat_fcm_NOT, min_freq = 0.1,
+                 edge_alpha = 0.8, edge_size = 5)
 ```
 
 ## Most frequently mentioned usernames
@@ -383,8 +388,10 @@ kable(topuser, col.names = "Most mentioned username")
 user_dfm_gender_weight <- dfm_group(user_dfm, groups = genere) %>%
   dfm_weight(scheme = "prop")
 
-user_tstat_freq <- textstat_frequency(user_dfm_gender_weight, n = 20,
-                                 groups = user_dfm_gender_weight$genere)
+user_tstat_freq <- textstat_frequency(
+  user_dfm_gender_weight,
+  n = 20,
+  groups = user_dfm_gender_weight$genere)
 ```
 
 ```{r, echo=FALSE}
@@ -401,7 +408,6 @@ ggplot(data = user_tstat_freq, aes(x = nrow(user_tstat_freq):1, y = frequency)) 
 ### Co-occurrence plot of usernames
 
 ```{r, echo=FALSE}
-# NOT WEIGHTED
 user_dfm_NOT_W <- dfm_select(DFM, pattern = "@*")
 topuser_NOT <- names(topfeatures(user_dfm_NOT_W, 20, scheme = "docfreq"))
 
@@ -505,7 +511,8 @@ if_else(party_id == "M5S" &date < "2020-01-22" , "@luigidimaio",
 if_else(party_id == "M5S" &date > "2020-01-22" &date < "2021-08-06", "@vitocrimi",
 if_else(party_id == "M5S" & date > "2021-08-061", "@GiuseppeConteIT",
 if_else(party_id == "FI", "@berlusconi",
-if_else(party_id == "LEGA", "@matteosalvinimi",                                   if_else(party_id == "IV", "@matteorenzi",
+if_else(party_id == "LEGA", "@matteosalvinimi",
+if_else(party_id == "IV", "@matteorenzi",
 if_else(party_id == "CI", "@LuigiBrugnaro",
 if_else(party_id == "LEU", "@robersperanza",
 "NA"))))))))))))

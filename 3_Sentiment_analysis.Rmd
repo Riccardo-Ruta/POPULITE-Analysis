@@ -14,7 +14,9 @@ output:
 source(here::here("src","00_setup.R"))
 ```
 
+# Emotion analysis
 
+## Import the LIWC2007_Dictionary
 
 ```{r, results="hide"}
 # Data
@@ -43,7 +45,8 @@ myLWIC_ITA <- dictionary(list(positive = LWIC_ITA[["Emo_Pos"]],
                               anxiety = LWIC_ITA[["Ansia"]],
                               anger = LWIC_ITA[["Rabbia"]],
                               sadness = LWIC_ITA[["Tristez"]],
-                              optimism = LWIC_ITA[["Ottimis"]]))
+                              optimism = LWIC_ITA[["Ottimis"]]
+                              ))
 
 myLWIC_ITA_sent <- dictionary(list(positive = LWIC_ITA[["Emo_Pos"]],
                               negative = LWIC_ITA[["Emo_Neg"]]))
@@ -53,7 +56,7 @@ myLWIC_ITA_sent <- dictionary(list(positive = LWIC_ITA[["Emo_Pos"]],
 kable(num_words)
 ```
 
-### Group and weight the dfm
+## Group and weight the dfm
 
 ```{r}
 # By party & quarter
@@ -79,19 +82,28 @@ data_dict_emo <- DFM_emotions %>%
   cbind(docvars(DFM_emotions))
 
 # Create a new variable with the difference of negative - positive emotions
-data_dict_emo$negative_prevalence <- (data_dict_emo$negative - data_dict_emo$positive)
+data_dict_emo$negative_prevalence <-
+  (data_dict_emo$negative - data_dict_emo$positive)
 
 # Transform the proportion into percentage
-data_dict_emo <- data_dict_emo %>% mutate(positive =  positive * 100,
-                                          negative = negative * 100,
-                                          anxiety = anxiety * 100,
-                                          anger = anger *100,
-                                          sadness = sadness * 100,
-                                          optimism = optimism *100,
-                                          negative_prevalence = negative_prevalence *100)
+data_dict_emo <- data_dict_emo %>%
+  mutate(positive =  positive * 100,
+                    negative = negative * 100,
+                    anxiety = anxiety * 100,
+                    anger = anger *100,
+                    sadness = sadness * 100,
+                    optimism = optimism *100,
+                    negative_prevalence = negative_prevalence *100)
 ```
 
+\newpage
+
 ## Percentage of the emotions in time
+
+These are the start and end dates of the quarters covered by the analysis
+
+![](figs/Trimester%20dates.png){width="434"}
+
 The code is only shown for 'positive' but is identical for all emotions
 
 ```{r}
@@ -113,6 +125,7 @@ plot_positive <- ggplot(data = data_quarter_positive, aes(x = Group.1, y = perc)
 plot_positive
 
 ```
+
 ```{r, echo=FALSE, warning=FALSE}
 # NEGATIVE
 data_quarter_negative <- aggregate(x = data_dict_emo$negative,  # Specify data column
@@ -179,19 +192,19 @@ plot_sadness
 
 ############
 # OPTIMISM
-data_quarter_optimism <- aggregate(x = data_dict_emo$optimism,  # Specify data column
-          by = list(data_dict_emo$quarter),  # Specify group indicator
-          FUN = mean) # Specify function (i.e. mean)
-data_quarter_optimism$perc <- data_quarter_optimism$x
+#data_quarter_optimism <- aggregate(x = data_dict_emo$optimism,  # Specify data column
+#          by = list(data_dict_emo$quarter),  # Specify group indicator
+#          FUN = mean) # Specify function (i.e. mean)
+#data_quarter_optimism$perc <- data_quarter_optimism$x
 
- plot
-plot_optimism<- ggplot(data = data_quarter_optimism, aes(x = Group.1, y = perc))+
-  geom_line(color = "#00AFBB", size = 2)+
-  scale_x_continuous("Quarters", labels = as.character(data_quarter_optimism$Group.1), breaks = data_quarter_optimism$Group.1)+
-  geom_line(aes(x = Group.1, y = mean(perc)), linetype = "dashed")+
-  ylab("Percentage of optimistic words")+
-  labs(title = "Optimism Emo")
-plot_optimism
+# plot
+#plot_optimism<- ggplot(data = data_quarter_optimism, aes(x = Group.1, y = perc))+
+#  geom_line(color = "#00AFBB", size = 2)+
+#  scale_x_continuous("Quarters", labels = as.character(data_quarter_optimism$Group.1), breaks = #data_quarter_optimism$Group.1)+
+# geom_line(aes(x = Group.1, y = mean(perc)), linetype = "dashed")+
+#  ylab("Percentage of optimistic words")+
+#  labs(title = "Optimism Emo")
+#plot_optimism
 
 #########
 # compare the levels
@@ -227,14 +240,15 @@ p2 <- ggplot() +
   # mean sadness 
   geom_line(data = data_quarter_sadness, aes(x = Group.1, y = mean(perc)), linetype = "dashed") +
   # plot optimism
-  geom_line(data = data_quarter_optimism, aes(x = Group.1, y = perc, color = "optimism"), size = 2) +
+  #geom_line(data = data_quarter_optimism, aes(x = Group.1, y = perc, color = "optimism"), size = 2) +
   # mean optimism 
-  geom_line(data = data_quarter_optimism, aes(x = Group.1, y = mean(perc)), linetype = "dashed") +
+  #geom_line(data = data_quarter_optimism, aes(x = Group.1, y = mean(perc)), linetype = "dashed") +
   
   scale_color_manual(name='Legend',
                      breaks=c('anxiety', 'anger', 'sadness', 'optimism'),
                      values=c('anxiety'='red', 'anger'='blue',
-                              'sadness'='green', 'optimism'= 'black'))+ 
+                              'sadness'='green')#, 'optimism'= 'black')
+                     )+ 
   
   scale_x_continuous("Quarters", labels = as.character(data_quarter_positive$Group.1), breaks = data_quarter_positive$Group.1)+
   ylab("Percentage of words")+
@@ -245,12 +259,13 @@ p2
 
 ```
 
-
 ## Main emotion for each parliamentary group
 
 ```{r, echo=FALSE}
 
 tstat_emo <- textstat_frequency(DFM_emotions, groups = party_id)
+
+tstat_emo <- tstat_emo %>% filter(feature != "optimism")
 
 ggplot(data = tstat_emo, aes(x = factor(nrow(tstat_emo):1), y = frequency *100)) +
     geom_point() +
@@ -258,18 +273,22 @@ ggplot(data = tstat_emo, aes(x = factor(nrow(tstat_emo):1), y = frequency *100))
     coord_flip() +
     scale_x_discrete(breaks = nrow(tstat_emo):1,
                        labels = tstat_emo$feature) +
-    labs(x = NULL, y = "Relative frequency")
+    labs(x = NULL, y = "Relative frequency")+
+  ggtitle("Main emotions for each parliamentary group")
 ```
 
 The code is only shown for 'positive' but is identical for all emotions
-```{r}
 
+```{r}
 # POSITIVE
 data_party_positive <- aggregate(x = data_dict_emo$positive,  # Specify data column
           by = list(data_dict_emo$party_id),  # Specify group indicator
           FUN = mean) # Specify function (i.e. mean)
 data_party_positive$perc <- round(data_party_positive$x,3)
-kable(data_party_positive %>% select(Group.1, perc) %>%  arrange(desc(perc)), caption = "POSITIVE")
+
+kable(data_party_positive %>%
+        select(Group.1, perc) %>% 
+        arrange(desc(perc)), caption = "POSITIVE")
 
 ggplot(data=data_party_positive, aes(x=Group.1, y=perc)) +
   geom_bar(stat="identity", fill="steelblue")+
@@ -281,6 +300,9 @@ ggplot(data=data_party_positive, aes(x=Group.1, y=perc)) +
   coord_flip()
 
 ```
+
+\newpage
+
 ```{r, echo=FALSE}
 #By party no time (quarters)
 # NEGATIVE
@@ -350,6 +372,9 @@ ggplot(data=data_party_sadness, aes(x=Group.1, y=perc)) +
   xlab("Parliamentary group")+
   labs(title = "Sadness emotion")
 ##################
+```
+
+```{r, echo=FALSE, eval=FALSE,include=FALSE}
 
 # OPTIMISM
 data_party_optimism <- aggregate(x = data_dict_emo$optimism,  # Specify data column
@@ -369,6 +394,7 @@ ggplot(data=data_party_optimism, aes(x=Group.1, y=perc)) +
 ```
 
 ### Are the average values of positive/negative emotions for each party statistically different from each other?
+
 The reference category is PD
 
 ```{r}
@@ -411,30 +437,32 @@ data_dict_emo$populism <- data_dict1$populism
 data_dict_emo$factor_quarter <- relevel(data_dict_emo$factor_quarter, ref = "8")
 
 # Negative prevalence
-negative_prevalence_model <- lm(negative_prevalence ~ factor_party + factor_quarter + populism, data_dict_emo)
+negative_prevalence_model <- lm(negative_prevalence ~ factor_party +
+                                  factor_quarter +
+                                  populism, data_dict_emo)
 summary(negative_prevalence_model)
 
 # Negative emotion
-negative_model <- lm(negative ~ factor_party + factor_quarter + populism, data_dict_emo)
+negative_model <- lm(negative ~ factor_party +
+                       factor_quarter +
+                       populism, data_dict_emo)
 summary(negative_model)
 
 # Anxiety emotion
-anxiety_model <- lm(anxiety ~ factor_party + factor_quarter + populism, data_dict_emo)
+anxiety_model <- lm(anxiety ~ factor_party +
+                      factor_quarter +
+                      populism, data_dict_emo)
 summary(anxiety_model)
 
 # Anger emotion
-anger_model <- lm(anger ~ factor_party + factor_quarter + populism, data_dict_emo)
+anger_model <- lm(anger ~ factor_party +
+                    factor_quarter +
+                    populism, data_dict_emo)
 summary(anger_model)
 
 # sadness emotion
-sadness_model <- lm(sadness ~ factor_party + factor_quarter + populism, data_dict_emo)
+sadness_model <- lm(sadness ~ factor_party +
+                      factor_quarter +
+                      populism, data_dict_emo)
 summary(sadness_model)
 ```
-
-### Tab the results
-
-```{r}
-tab_model(negative_model,negative_prevalence_model)
-```
-
-
