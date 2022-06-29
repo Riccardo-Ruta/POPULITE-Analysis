@@ -243,7 +243,7 @@ DFM <- dfm_remove(DFM, emoji)
 #save(DFM,file="data/dfm.Rda")
 ```
 
-![Emoji removed](output/emoji.png)
+![Emoji removed](figs/emoji.png)
 
 **Now the data are ready for the next analysis**
 
